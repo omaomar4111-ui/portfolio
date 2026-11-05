@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم — إدارة البورتفوليو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0d11; --surface: #15161b; --surface2: #1c1e25;
+      --fg: #ece8e1; --muted: #9b978f; --line: #2b2c32;
+      --accent: #f2a541; --danger: #e5484d; --success: #30a46c;
+      --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--fg); font-family: var(--font-body);
+      min-height: 100vh; padding: 0 24px 48px; line-height: 1.5;
+    }
+    a { color: inherit; text-decoration: none; }
+    .mono { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    button { font-family: inherit; cursor: pointer; }
+    input, textarea, select {
+      font-family: inherit; font-size: 14px;
+      width: 100%; padding: 10px 14px;
+      background: var(--surface2); color: var(--fg);
+      border: 1px solid var(--line); border-radius: 8px;
+      outline: none; transition: border-color .2s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 90px; }
+    label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--muted); }
+    .field { margin-bottom: 16px; }
+    .btn {
+      padding: 10px 20px; border-radius: 8px; border: none;
+      font-weight: 600; font-size: 14px;
+      background: var(--accent); color: #17120a; transition: filter .2s;
+    }
+    .btn:hover { filter: brightness(1.1); }
+    .btn.secondary { background: var(--surface2); color: var(--fg); border: 1px solid var(--line); }
+    .btn.danger { background: var(--danger); color: #fff; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* Login */
+    .login-wrap {
+      max-width: 400px; margin: 80px auto;
+      background: var(--surface); padding: 36px 32px;
+      border-radius: 16px; border: 1px solid var(--line);
+    }
+    .login-wrap h1 { font-family: var(--font-display); margin-bottom: 8px; font-size: 1.6rem; }
+    .login-wrap p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+
+    /* Dashboard */
+    .dash { max-width: 1080px; margin: 0 auto; }
+    .dash-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 24px 0; border-bottom: 1px solid var(--line);
+      flex-wrap: wrap; gap: 12px;
+    }
+    .dash-head h1 { font-family: var(--font-display); font-size: 1.4rem; }
+    .tabs { display: flex; gap: 8px; margin: 24px 0; flex-wrap: wrap; }
+    .tab {
+      padding: 10px 18px; border-radius: 8px; background: var(--surface);
+      border: 1px solid var(--line); font-size: 14px; color: var(--muted);
+      transition: background .2s, color .2s;
+    }
+    .tab.active { background: var(--accent); color: #17120a; border-color: var(--accent); font-weight: 600; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 12px; padding: 24px; margin-bottom: 20px;
+    }
+    .card h2 { font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .preview {
+      width: 100px; height: 125px; object-fit: cover;
+      border-radius: 8px; border: 1px solid var(--line); margin-top: 8px;
+    }
+
+    .video-row {
+      display: grid; grid-template-columns: 80px 1fr auto; gap: 16px;
+      align-items: center; padding: 12px 16px;
+      background: var(--surface2); border-radius: 8px; margin-bottom: 8px;
+      border: 1px solid transparent; transition: border-color .2s;
+    }
+    .video-row:hover { border-color: var(--line); }
+    .video-row img {
+      width: 80px; height: 45px; border-radius: 6px;
+      object-fit: cover; background: #000;
+    }
+    .video-row .info h3 { font-size: 14px; margin-bottom: 2px; }
+    .video-row .actions { display: flex; gap: 6px; }
+    .video-row .actions button { padding: 6px 12px; font-size: 12px; }
+
+    /* Modal */
+    .modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,.8);
+      display: none; align-items: center; justify-content: center;
+      z-index: 100; padding: 20px; overflow-y: auto;
+    }
+    .modal.open { display: flex; }
+    .modal-content {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 16px; padding: 28px; max-width: 520px; width: 100%;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-content h2 { font-family: var(--font-display); margin-bottom: 20px; font-size: 1.3rem; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+    .progress {
+      height: 6px; background: var(--surface2); border-radius: 3px;
+      overflow: hidden; margin-top: 8px; display: none;
+    }
+    .progress.active { display: block; }
+    .progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--success); color: #fff; padding: 12px 24px;
+      border-radius: 8px; font-size: 14px; font-weight: 600;
+      opacity: 0; transition: opacity .3s; z-index: 200; pointer-events: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .toast.show { opacity: 1; }
+    .toast.error { background: var(--danger); }
+
+    .config-warning {
+      background: rgba(229, 72, 77, 0.15); border: 1px solid var(--danger);
+      color: #ff9d9d; padding: 14px; border-radius: 8px; margin-bottom: 16px;
+      font-size: 13px; line-height: 1.5;
+    }
+    #loading { text-align: center; padding: 40px; color: var(--muted); }
+    .empty { text-align: center; padding: 40px; color: var(--muted); font-size: .95rem; }
+  </style>
+</head>
+<body>
+  <!-- شاشة تسجيل الدخول -->
+  <div id="loginView" style="display:none">
+    <div class="login-wrap">
+      <div id="loginConfigWarn" class="config-warning" style="display:none">
+        ⚠️ تنبيه: لم يتم تعديل <code>firebase-config.js</code> بعد. يرجى وضع مفاتيح Firebase أولاً ليعمل تسجيل الدخول.
+      </div>
+      <h1>لوحة التحكم</h1>
+      <p>سجّل الدخول بحساب الأدمن لإدارة محتوى البورتفوليو</p>
+      <div class="field">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="loginEmail" placeholder="omaomar4111@gmail.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn" id="loginBtn" style="width:100%">تسجيل الدخول</button>
+      <p id="loginErr" style="color:var(--danger);margin-top:12px;font-size:13px;text-align:center"></p>
+    </div>
+  </div>
+
+  <!-- لوحة التحكم -->
+  <div id="dashView" class="dash" style="display:none">
+    <div class="dash-head">
+      <h1>لوحة التحكم — إدارة البورتفوليو</h1>
+      <div style="display:flex;gap:8px">
+        <a href="index.html" target="_blank" class="btn secondary">عرض الموقع ↗</a>
+        <button class="btn danger" id="logoutBtn">تسجيل خروج</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="settings">بيانات الموقع</button>
+      <button class="tab" data-tab="shorts">فيديوهات قصيرة (9:16)</button>
+      <button class="tab" data-tab="longs">فيديوهات طويلة (16:9)</button>
+    </div>
+
+    <!-- الإعدادات -->
+    <div class="panel active" id="panel-settings">
+      <div class="card">
+        <h2>البيانات الأساسية ومعلومات التواصل</h2>
+        <div class="grid-2">
+          <div class="field">
+            <label>الاسم الكامل</label>
+            <input type="text" id="setName" placeholder="عمر أحمد">
+          </div>
+          <div class="field">
+            <label>المسمى الوظيفي</label>
+            <input type="text" id="setTitle" placeholder="محرر فيديو ومونتير محترف">
+          </div>
+        </div>
+        <div class="field">
+          <label>نبذة مهنية (Bio)</label>
+          <textarea id="setBio" placeholder="اكتب نبذة مختصرة وجذابة عن خبرتك ومجالك..."></textarea>
+        </div>
+        <div class="field">
+          <label>الصورة الشخصية (تظهر في الواجهة)</label>
+          <input type="file" id="setProfileFile" accept="image/*">
+          <div class="progress" id="setProfileProgress"><i></i></div>
+          <img id="setProfilePreview" class="preview" style="display:none" alt="معاينة الصورة">
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>رقم الهاتف</label>
+            <input type="text" id="setPhone" placeholder="01144826641">
+          </div>
+          <div class="field">
+            <label>واتساب (بالكود الدولي بدون + أو أصفار إضافية)</label>
+            <input type="text" id="setWhatsapp" placeholder="201144826641">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>البريد الإلكتروني للعمل</label>
+            <input type="email" id="setEmail" placeholder="omaomar4111@gmail.com">
+          </div>
+          <div class="field">
+            <label>حساب إنستغرام (اسم المستخدم فقط)</label>
+            <input type="text" id="setInstagram" placeholder="your_handle">
+          </div>
+        </div>
+        <div class="field">
+          <label>قناة يوتيوب (الرابط الكامل أو اسم المستخدم)</label>
+          <input type="text" id="setYoutube" placeholder="https://youtube.com/@channel">
+        </div>
+        <button class="btn" id="saveSettings">حفظ التغييرات</button>
+      </div>
+    </div>
+
+    <!-- فيديوهات قصيرة -->
+    <div class="panel" id="panel-shorts">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h2 style="margin:0">قائمة الفيديوهات القصيرة (Reels / Shorts / TikTok)</h2>
+          <button class="btn" id="addShort">+ إضافة فيديو قصير</button>
+        </div>
+        <div id="shortsList"><div id="loading">جاري التحميل…</div></div>
+      </div>
+    </div>
+
+    <!-- فيديوهات طويلة -->
+    <div class="panel" id="panel-longs">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h2 style="margin:0">قائمة الفيديوهات الطويلة (أفلام، بودكاست، وثائقي)</h2>
+          <button class="btn" id="addLong">+ إضافة فيديو طويل</button>
+        </div>
+        <div id="longsList"><div id="loading">جاري التحميل…</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة التعديل والإضافة (Modal) -->
+  <div class="modal" id="videoModal">
+    <div class="modal-content">
+      <h2 id="modalTitle">إضافة فيديو</h2>
+      <input type="hidden" id="videoId" data-type="">
+      <div class="field">
+        <label>عنوان الفيديو *</label>
+        <input type="text" id="vTitle" placeholder="مثال: إعلان سينمائي لشركة X">
+      </div>
+      <div class="field">
+        <label>المدة (مثال: 0:45 أو 12:30)</label>
+        <input type="text" id="vDuration" placeholder="0:45">
+      </div>
+      <div class="field" id="genreField" style="display:none">
+        <label>النوع أو التصنيف (وثائقي، بودكاست، موشن...)</label>
+        <input type="text" id="vGenre" placeholder="وثائقي / إعلان تجاري">
+      </div>
+      <div class="field">
+        <label>رابط الفيديو (YouTube، Shorts، أو رابط مباشر MP4)</label>
+        <input type="text" id="vUrl" placeholder="https://youtube.com/shorts/... أو https://.../video.mp4">
+        <div class="hint" style="font-size:12px;color:var(--muted);margin-top:4px">💡 يفضل رفع الفيديوهات على YouTube ووضع الرابط هنا لتوفير مساحة وتكاليف Firebase وضمان سرعة التشغيل.</div>
+      </div>
+      <div class="field">
+        <label>أو ارفع ملف الفيديو مباشرة لـ Storage (اختياري - حتى 25MB)</label>
+        <input type="file" id="vFile" accept="video/*">
+        <div class="progress" id="vFileProgress"><i></i></div>
+        <div class="hint" style="font-size:12px;color:var(--muted);margin-top:4px">⚠️ لو حجم الفيديو أكبر من 25MB، ارفعه على YouTube واستخدم الرابط أعلاه.</div>
+      </div>
+      <div class="field">
+        <label>الصورة المصغرة (Thumbnail) *</label>
+        <input type="file" id="vThumb" accept="image/*">
+        <div class="progress" id="vThumbProgress"><i></i></div>
+        <img id="vThumbPreview" class="preview" style="display:none" alt="معاينة الصورة">
+      </div>
+      <div class="modal-actions">
+        <button class="btn secondary" id="modalCancel">إلغاء</button>
+        <button class="btn" id="modalSave">حفظ الفيديو</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    // جلب الإعدادات من window.firebaseConfig أو firebaseConfig
+    const config = window.firebaseConfig || (typeof firebaseConfig !== 'undefined' ? firebaseConfig : null);
+    const isConfigValid = config && 
+                          config.apiKey && 
+                          config.apiKey !== "YOUR_API_KEY";
+
+    if (!isConfigValid) {
+      document.getElementById('loginConfigWarn').style.display = 'block';
+    }
+
+    if (isConfigValid && !firebase.apps.length) {
+      firebase.initializeApp(config);
+    }
+
+    const auth = (isConfigValid && firebase.apps.length) ? firebase.auth() : null;
+    const db = (isConfigValid && firebase.apps.length) ? firebase.firestore() : null;
+    const storage = (isConfigValid && firebase.apps.length) ? firebase.storage() : null;
+
+    // Toast
+    function toast(msg, isErr = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (isErr ? ' error' : '');
+      setTimeout(() => t.className = 'toast', 2800);
+    }
+
+    // إدارة تسجيل الدخول
+    if (auth) {
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          document.getElementById('loginView').style.display = 'none';
+          document.getElementById('dashView').style.display = 'block';
+          loadAll();
+        } else {
+          document.getElementById('loginView').style.display = 'block';
+          document.getElementById('dashView').style.display = 'none';
+        }
+      });
+    } else {
+      document.getElementById('loginView').style.display = 'block';
+    }
+
+    document.getElementById('loginBtn').onclick = async () => {
+      if (!auth) {
+        document.getElementById('loginErr').textContent = 'برجاء ضبط إعدادات firebase-config.js أولاً.';
+        return;
+      }
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPass').value;
+      const errEl = document.getElementById('loginErr');
+      errEl.textContent = '';
+      
+      if (!email || !pass) {
+        errEl.textContent = 'يرجى إدخال البريد الإلكتروني وكلمة المرور';
+        return;
+      }
+
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+      } catch (e) {
+        errEl.textContent = 'خطأ في الدخول: ' + (e.message || e.code);
+      }
+    };
+
+    document.getElementById('logoutBtn').onclick = () => {
+      if (auth) auth.signOut();
+    };
+
+    // التبديل بين التبويبات
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      };
+    });
+
+    // دالة رفع الملفات إلى Storage مع مؤشر التقدم
+    function uploadFile(file, folder, progressEl) {
+      return new Promise((resolve, reject) => {
+        if (!storage) return reject(new Error("Firebase Storage غير مهيأ"));
+        const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const ref = storage.ref(folder + '/' + Date.now() + '_' + cleanName);
+        const task = ref.put(file);
+        const bar = progressEl ? progressEl.querySelector('i') : null;
+        if (progressEl) progressEl.classList.add('active');
+        
+        task.on('state_changed',
+          snap => {
+            if (bar && snap.totalBytes > 0) {
+              bar.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + '%';
+            }
+          },
+          err => {
+            if (progressEl) progressEl.classList.remove('active');
+            reject(err);
+          },
+          async () => {
+            const url = await task.snapshot.ref.getDownloadURL();
+            if (progressEl) progressEl.classList.remove('active');
+            resolve(url);
+          }
+        );
+      });
+    }
+
+    // ========== تحميل الإعدادات ==========
+    async function loadSettings() {
+      if (!db) return;
+      try {
+        const doc = await db.collection('settings').doc('main').get();
+        const s = doc.exists ? doc.data() : {};
+        document.getElementById('setName').value = s.name || '';
+        document.getElementById('setTitle').value = s.title || '';
+        document.getElementById('setBio').value = s.bio || '';
+        document.getElementById('setPhone').value = s.phone || '';
+        document.getElementById('setWhatsapp').value = s.whatsapp || '';
+        document.getElementById('setEmail').value = s.email || '';
+        document.getElementById('setInstagram').value = s.instagram || '';
+        document.getElementById('setYoutube').value = s.youtube || '';
+        if (s.profileImage) {
+          const p = document.getElementById('setProfilePreview');
+          p.src = s.profileImage;
+          p.style.display = 'block';
+        }
+      } catch (e) {
+        console.error('loadSettings error:', e);
+      }
+    }
+
+    document.getElementById('setProfileFile').onchange = async e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      try {
+        const url = await uploadFile(f, 'profile', document.getElementById('setProfileProgress'));
+        const p = document.getElementById('setProfilePreview');
+        p.src = url;
+        p.style.display = 'block';
+        p.dataset.newUrl = url;
+        toast('تم رفع الصورة بنجاح — اضغط "حفظ التغييرات" لتأكيدها');
+      } catch (err) {
+        toast('خطأ أثناء الرفع: ' + err.message, true);
+      }
+    };
+
+    document.getElementById('saveSettings').onclick = async () => {
+      if (!db) return;
+      const btn = document.getElementById('saveSettings');
+      btn.disabled = true;
+      try {
+        const data = {
+          name: document.getElementById('setName').value.trim(),
+          title: document.getElementById('setTitle').value.trim(),
+          bio: document.getElementById('setBio').value.trim(),
+          phone: document.getElementById('setPhone').value.trim(),
+          whatsapp: document.getElementById('setWhatsapp').value.trim(),
+          email: document.getElementById('setEmail').value.trim(),
+          instagram: document.getElementById('setInstagram').value.trim().replace(/^@/,''),
+          youtube: document.getElementById('setYoutube').value.trim(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        const newImg = document.getElementById('setProfilePreview').dataset.newUrl;
+        if (newImg) data.profileImage = newImg;
+
+        await db.collection('settings').doc('main').set(data, { merge: true });
+        toast('تم حفظ الإعدادات بنجاح ✓');
+      } catch (e) {
+        toast('خطأ أثناء الحفظ: ' + e.message, true);
+      }
+      btn.disabled = false;
+    };
+
+    // ========== تحميل قوائم الفيديوهات ==========
+    async function loadShorts() {
+      if (!db) return;
+      try {
+        const snap = await db.collection('shortVideos').get();
+        const list = document.getElementById('shortsList');
+        if (snap.empty) {
+          list.innerHTML = '<div class="empty">لا توجد فيديوهات قصيرة مضافة بعد</div>';
+          return;
+        }
+        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        docs.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+
+        list.innerHTML = docs.map(v => `
+          <div class="video-row">
+            <img src="${v.thumbnail || ''}" alt="">
+            <div class="info">
+              <h3>${v.title || '(بدون عنوان)'}</h3>
+              <span class="mono">${v.duration || 'غير محدد'}</span>
+            </div>
+            <div class="actions">
+              <button class="btn secondary" onclick="editVideo('shortVideos','${v.id}')">تعديل</button>
+              <button class="btn danger" onclick="deleteVideo('shortVideos','${v.id}')">حذف</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error('loadShorts error:', e);
+      }
+    }
+
+    async function loadLongs() {
+      if (!db) return;
+      try {
+        const snap = await db.collection('longVideos').get();
+        const list = document.getElementById('longsList');
+        if (snap.empty) {
+          list.innerHTML = '<div class="empty">لا توجد فيديوهات طويلة مضافة بعد</div>';
+          return;
+        }
+        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        docs.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+
+        list.innerHTML = docs.map(v => `
+          <div class="video-row">
+            <img src="${v.thumbnail || ''}" alt="">
+            <div class="info">
+              <h3>${v.title || '(بدون عنوان)'}</h3>
+              <span class="mono">${v.genre ? v.genre + ' · ' : ''}${v.duration || ''}</span>
+            </div>
+            <div class="actions">
+              <button class="btn secondary" onclick="editVideo('longVideos','${v.id}')">تعديل</button>
+              <button class="btn danger" onclick="deleteVideo('longVideos','${v.id}')">حذف</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error('loadLongs error:', e);
+      }
+    }
+
+    async function loadAll() {
+      try {
+        await Promise.all([loadSettings(), loadShorts(), loadLongs()]);
+      } catch (e) {
+        console.error('loadAll error:', e);
+        toast('حدث خطأ أثناء تحميل البيانات', true);
+      }
+    }
+
+    // ========== إدارة النافذة المنبثقة (Modal) ==========
+    const modal = document.getElementById('videoModal');
+    const vId = document.getElementById('videoId');
+
+    function openModal(type, data) {
+      vId.dataset.type = type;
+      vId.value = data?.id || '';
+      document.getElementById('modalTitle').textContent = data?.id ? 'تعديل بيانات الفيديو' : 'إضافة فيديو جديد';
+      document.getElementById('vTitle').value = data?.title || '';
+      document.getElementById('vDuration').value = data?.duration || '';
+      document.getElementById('vUrl').value = data?.videoUrl || '';
+      document.getElementById('vGenre').value = data?.genre || '';
+      document.getElementById('genreField').style.display = (type === 'longVideos') ? 'block' : 'none';
+      
+      const tp = document.getElementById('vThumbPreview');
+      if (data?.thumbnail) {
+        tp.src = data.thumbnail;
+        tp.style.display = 'block';
+        tp.dataset.newUrl = data.thumbnail;
+      } else {
+        tp.style.display = 'none';
+        tp.dataset.newUrl = '';
+        tp.removeAttribute('src');
+      }
+      
+      document.getElementById('vFile').value = '';
+      document.getElementById('vThumb').value = '';
+      modal.classList.add('open');
+    }
+
+    function closeModal() {
+      modal.classList.remove('open');
+      document.getElementById('vFileProgress').classList.remove('active');
+      document.getElementById('vThumbProgress').classList.remove('active');
+    }
+
+    document.getElementById('modalCancel').onclick = closeModal;
+
+    // معاينة الصورة المصغرة محلياً
+    document.getElementById('vThumb').onchange = e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = ev => {
+        const p = document.getElementById('vThumbPreview');
+        p.src = ev.target.result;
+        p.style.display = 'block';
+      };
+      r.readAsDataURL(f);
+    };
+
+    // فحص حجم ملف الفيديو قبل الرفع
+    document.getElementById('vFile').onchange = e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      const sizeMB = f.size / (1024 * 1024);
+      if (sizeMB > 20) {
+        toast(`تنبيه: حجم الفيديو (${sizeMB.toFixed(1)}MB) كبير. الأفضل استخدام رابط YouTube لتوفير المساحة وسرعة البث.`, true);
+      }
+    };
+
+    document.getElementById('modalSave').onclick = async () => {
+      if (!db) return;
+      const type = vId.dataset.type;
+      const id = vId.value;
+      const saveBtn = document.getElementById('modalSave');
+      saveBtn.disabled = true;
+      
+      try {
+        const thumbFile = document.getElementById('vThumb').files[0];
+        const vidFile = document.getElementById('vFile').files[0];
+        let thumbnail = document.getElementById('vThumbPreview').dataset.newUrl || '';
+        let videoUrl = document.getElementById('vUrl').value.trim();
+
+        if (vidFile) {
+          const sizeMB = vidFile.size / (1024 * 1024);
+          if (sizeMB > 25) {
+            toast(`حجم الفيديو (${sizeMB.toFixed(1)}MB) يتجاوز الحد الموصى به (25MB). يُرجى رفعه على YouTube أو تقليل حجمه لتجنب نفاد حصة Firebase المجانية.`, true);
+            saveBtn.disabled = false;
+            return;
+          }
+        }
+
+        if (thumbFile) {
+          thumbnail = await uploadFile(thumbFile, 'thumbnails', document.getElementById('vThumbProgress'));
+        }
+        if (vidFile) {
+          videoUrl = await uploadFile(vidFile, 'videos', document.getElementById('vFileProgress'));
+        }
+
+        if (!thumbnail) {
+          toast('الصورة المصغرة (Thumbnail) مطلوبة', true);
+          saveBtn.disabled = false;
+          return;
+        }
+
+        if (!videoUrl) {
+          toast('يرجى إدخال رابط الفيديو أو رفع ملف', true);
+          saveBtn.disabled = false;
+          return;
+        }
+
+        const data = {
+          title: document.getElementById('vTitle').value.trim() || 'فيديو بدون عنوان',
+          duration: document.getElementById('vDuration').value.trim() || '',
+          videoUrl: videoUrl,
+          thumbnail: thumbnail
+        };
+        if (type === 'longVideos') {
+          data.genre = document.getElementById('vGenre').value.trim();
+        }
+
+        if (id) {
+          await db.collection(type).doc(id).update(data);
+        } else {
+          data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          await db.collection(type).add(data);
+        }
+
+        closeModal();
+        toast('تم الحفظ بنجاح ✓');
+        if (type === 'shortVideos') loadShorts(); else loadLongs();
+      } catch (e) {
+        toast('خطأ أثناء الحفظ: ' + e.message, true);
+      }
+      saveBtn.disabled = false;
+    };
+
+    // أحداث الإضافة والتعديل والحذف
+    document.getElementById('addShort').onclick = () => openModal('shortVideos', null);
+    document.getElementById('addLong').onclick = () => openModal('longVideos', null);
+
+    window.editVideo = async (type, id) => {
+      try {
+        const doc = await db.collection(type).doc(id).get();
+        if (doc.exists) openModal(type, { id, ...doc.data() });
+      } catch (e) {
+        toast('خطأ في جلب بيانات الفيديو: ' + e.message, true);
+      }
+    };
+
+    window.deleteVideo = async (type, id) => {
+      if (!confirm('هل أنت متأكد من رغبتك في حذف هذا الفيديو؟')) return;
+      try {
+        await db.collection(type).doc(id).delete();
+        toast('تم حذف الفيديو');
+        if (type === 'shortVideos') loadShorts(); else loadLongs();
+      } catch (e) {
+        toast('خطأ أثناء الحذف: ' + e.message, true);
+      }
+    };
+  </script>
+</body>
+</html>

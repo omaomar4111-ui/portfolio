@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بورتفوليو</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0d11;
+      --surface: rgba(255,255,255,.04);
+      --fg: #ece8e1;
+      --muted: #9b978f;
+      --line: #2b2c32;
+      --accent: #f2a541;
+      --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--fg);
+      font-family: var(--font-body); line-height: 1.6;
+      padding: 0 24px 48px;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0; z-index: -1;
+      background:
+        radial-gradient(70% 55% at 8% 0%, rgba(32,92,104,.38), transparent 70%),
+        radial-gradient(55% 45% at 100% 38%, rgba(70,52,128,.30), transparent 70%),
+        radial-gradient(65% 50% at 85% 100%, rgba(242,165,65,.13), transparent 70%),
+        linear-gradient(180deg, #0f1115 0%, #0c0d11 55%, #0e0d10 100%);
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; position: relative; }
+    a { color: inherit; text-decoration: none; }
+    .mono {
+      font-family: var(--font-mono); font-size: 12px;
+      letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+    }
+
+    .top {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 0; flex-wrap: wrap; gap: 12px;
+    }
+    .brand { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; }
+    .top nav { display: flex; gap: 22px; flex-wrap: wrap; }
+    .top nav a { color: var(--muted); font-size: 14px; transition: color .2s; }
+    .top nav a:hover { color: var(--fg); }
+
+    .hero {
+      padding: 48px 0 32px; display: grid;
+      grid-template-columns: 1.5fr 1fr; gap: 48px; align-items: end;
+    }
+    .hero-text h1 {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2.5rem, 7vw, 5.5rem); line-height: .95;
+      text-transform: uppercase; letter-spacing: -.02em;
+      margin: 12px 0 20px;
+    }
+    .hero-text .lead { font-size: 1.1rem; color: var(--muted); max-width: 52ch; }
+    .hero-portrait {
+      aspect-ratio: 4/5; border-radius: 8px; overflow: hidden;
+      background: var(--surface); border: 1px solid var(--line);
+    }
+    .hero-portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    @media (max-width: 720px) {
+      .hero { grid-template-columns: 1fr; gap: 24px; }
+      .hero-portrait { max-width: 320px; }
+    }
+
+    .section { padding: 48px 0; }
+    .sec-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 8px;
+    }
+    .sec-head h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 700;
+    }
+    .stage {
+      position: relative; height: 420px; perspective: 1500px;
+      overflow: hidden; cursor: grab; border-block: 1px solid var(--line);
+      mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+    }
+    .ring {
+      position: absolute; top: 36px; left: 50%;
+      width: 200px; height: 356px; margin-left: -100px;
+      transform-style: preserve-3d;
+      transition: transform .5s cubic-bezier(.25, 1, .5, 1);
+    }
+    .card { position: absolute; inset: 0; will-change: transform; cursor: pointer; }
+    .screen {
+      position: absolute; inset: 0; border-radius: 26px; overflow: hidden;
+      background: #050506; border: 5px solid #050506;
+      box-shadow: 0 24px 50px -20px rgba(0,0,0,.6);
+    }
+    .screen img { width: 100%; height: 100%; object-fit: cover; }
+    .cap {
+      position: absolute; bottom: 14px; left: 12px; right: 12px; z-index: 2;
+      color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.7);
+    }
+    .cap h3 { font-family: var(--font-display); font-size: 1rem; margin-bottom: 4px; }
+    .cap .dur { font-family: var(--font-mono); font-size: 11px; opacity: .8; }
+    .ctrl { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+    .ctrl button {
+      width: 46px; height: 46px; border-radius: 50%;
+      border: 1px solid var(--line); background: var(--surface);
+      color: var(--fg); cursor: pointer; font-size: 1.2rem;
+      transition: background .2s, border-color .2s;
+    }
+    .ctrl button:hover {
+      background: var(--line); border-color: var(--accent);
+    }
+
+    .film-list { display: grid; gap: 8px; }
+    .film-item {
+      display: grid; grid-template-columns: auto auto 1fr auto; gap: 16px;
+      align-items: center; padding: 14px 16px;
+      border-bottom: 1px solid var(--line); cursor: pointer;
+      transition: background .2s;
+    }
+    .film-item:hover { background: var(--surface); }
+    .film-item .idx { font-family: var(--font-mono); color: var(--accent); }
+    .film-item .thumb {
+      width: 90px; height: 50px; border-radius: 6px;
+      object-fit: cover; background: #1a1a1a;
+    }
+    .film-item h3 { font-family: var(--font-display); font-size: 1.05rem; }
+    .film-item .dur { font-family: var(--font-mono); color: var(--muted); }
+    .empty {
+      text-align: center; padding: 40px; color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .services-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+    }
+    .service-card {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 12px; padding: 24px;
+    }
+    .service-card .mono { margin-bottom: 8px; }
+    .service-card h3 { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 8px; }
+    .service-card p { color: var(--muted); font-size: .95rem; }
+
+    .contact-list {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px; margin-top: 24px;
+    }
+    .contact-item {
+      display: flex; flex-direction: column; gap: 6px; padding: 20px;
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 12px; transition: border-color .2s, transform .2s;
+    }
+    .contact-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .contact-item strong {
+      font-family: var(--font-display); font-size: 1.05rem;
+      color: var(--fg); word-break: break-word;
+    }
+
+    .footer {
+      text-align: center; padding: 48px 0 24px; color: var(--muted);
+      font-size: .9rem; border-top: 1px solid var(--line); margin-top: 48px;
+    }
+    .footer a { color: var(--accent); }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed; inset: 0; background: rgba(0,0,0,.9);
+      display: none; align-items: center; justify-content: center;
+      z-index: 100; padding: 20px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox .box {
+      max-width: 90vw; max-height: 90vh; width: 100%;
+      aspect-ratio: 16/9; position: relative;
+    }
+    .lightbox.vertical .box { aspect-ratio: 9/16; max-width: 60vh; }
+    .lightbox iframe, .lightbox video {
+      width: 100%; height: 100%; border: none; border-radius: 12px;
+      background: #000;
+    }
+    .lightbox .close {
+      position: absolute; top: 20px; right: 20px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,.1); color: #fff; border: none;
+      font-size: 22px; cursor: pointer;
+    }
+    .setup-banner {
+      background: rgba(242,165,65,0.15); border: 1px solid var(--accent);
+      color: #ffda85; padding: 12px 18px; border-radius: 8px; margin: 16px 0;
+      font-size: 13px; text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="setupNotice" class="setup-banner" style="display:none">
+      ⚠️ لم يتم تفعيل مفاتيح Firebase بعد. يرجى تعديل ملف <code>firebase-config.js</code> بالقيم الخاصة بمشروعك.
+    </div>
+
+    <header class="top">
+      <a href="#" class="brand" id="brandName">بورتفوليو</a>
+      <nav>
+        <a href="#shorts">فيديوهات قصيرة</a>
+        <a href="#films">فيديوهات طويلة</a>
+        <a href="#services">الخدمات</a>
+        <a href="#contact">تواصل</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="top">
+        <div class="hero-text">
+          <span class="mono" id="heroMeta">محرر فيديو ومونتير</span>
+          <h1 id="heroName">بورتفوليو احترافي</h1>
+          <p class="lead" id="heroBio">مرحباً بك في معرض أعمالي في المونتاج وصناعة المحتوى المرئي.</p>
+        </div>
+        <div class="hero-portrait">
+          <img id="profileImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='500'><rect width='400' height='500' fill='%231a1a1a'/><text x='50%25' y='50%25' fill='%23666' font-size='20' text-anchor='middle'>صورة شخصية</text></svg>" alt="صورة">
+        </div>
+      </section>
+
+      <section class="section" id="shorts">
+        <div class="sec-head">
+          <h2>فيديوهات قصيرة (9:16)</h2>
+          <span class="mono">اسحب أو استخدم الأسهم</span>
+        </div>
+        <div class="stage" id="stage">
+          <div class="ring" id="ring"></div>
+        </div>
+        <div class="ctrl">
+          <button id="prev" aria-label="السابق">‹</button>
+          <button id="next" aria-label="التالي">›</button>
+        </div>
+      </section>
+
+      <section class="section" id="films">
+        <div class="sec-head"><h2>فيديوهات طويلة (16:9)</h2></div>
+        <div class="film-list" id="filmList"></div>
+      </section>
+
+      <section class="section" id="services">
+        <div class="sec-head"><h2>ما أقدمه</h2></div>
+        <div class="services-grid">
+          <div class="service-card">
+            <span class="mono">9:16 · 15–60 ثانية</span>
+            <h3>مونتاج فيديوهات قصيرة</h3>
+            <p>خطافات، إيقاع، ترجمة ديناميكية، ومؤثرات صوتية للريلز، تيك توك، ويوتيوب شورتس.</p>
+          </div>
+          <div class="service-card">
+            <span class="mono">16:9 · 2–20 دقيقة</span>
+            <h3>مونتاج فيديوهات طويلة</h3>
+            <p>أفلام ترويجية، مقابلات، حلقات بودكاست، وثائقيات، وفيديوهات يوتيوب احترافية.</p>
+          </div>
+          <div class="service-card">
+            <span class="mono">عناوين · جرافيك</span>
+            <h3>موشن جرافيكس وعناوين</h3>
+            <p>تصميم عناوين متحركة (Lower Thirds)، انتقالات سلسة ومؤثرات بصرية تعزز الرسالة.</p>
+          </div>
+          <div class="service-card">
+            <span class="mono">تصحيح · هندسة صوت</span>
+            <h3>ألوان وصوتيات</h3>
+            <p>تصحيح ألوان سينمائي (Color Grading)، تنظيف الضوضاء، ومكساج صوتي نقي ومتوازن.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="contact">
+        <div class="sec-head"><h2>تواصل معي</h2></div>
+        <p class="lead">متاح للمشاريع الجديدة والمستمرة — راسلني مباشرة لمناقشة فكرتك.</p>
+        <div class="contact-list" id="contactList"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>© <span id="year"></span> <span id="footName">بورتفوليو</span>. جميع الحقوق محفوظة.</p>
+    </footer>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="close" id="lbClose" aria-label="إغلاق">✕</button>
+    <div class="box" id="lbBox"></div>
+  </div>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    // جلب الإعدادات من window.firebaseConfig أو firebaseConfig
+    const config = window.firebaseConfig || (typeof firebaseConfig !== 'undefined' ? firebaseConfig : null);
+    const isConfigValid = config && 
+                          config.apiKey && 
+                          config.apiKey !== "YOUR_API_KEY";
+
+    if (!isConfigValid) {
+      document.getElementById('setupNotice').style.display = 'block';
+      console.warn("⚠️ برجاء وضع بيانات مشروع Firebase في ملف firebase-config.js");
+    }
+
+    let db = null;
+    try {
+      if (!firebase.apps.length && isConfigValid) {
+        firebase.initializeApp(config);
+      }
+      if (firebase.apps.length) {
+        db = firebase.firestore();
+      }
+    } catch (err) {
+      console.error("Firebase init failed:", err);
+    }
+
+    // ========== تحميل الإعدادات ==========
+    async function loadSettings() {
+      if (!db) return;
+      try {
+        const doc = await db.collection('settings').doc('main').get();
+        if (!doc.exists) return;
+        const s = doc.data();
+        
+        const name = s.name || 'اسمك';
+        const title = s.title || 'محرر فيديو ومونتير';
+        const bio = s.bio || 'مرحباً بك في معرض أعمالي في المونتاج وصناعة المحتوى المرئي.';
+
+        document.getElementById('brandName').textContent = name;
+        document.getElementById('footName').textContent = name;
+        document.getElementById('heroName').textContent = name;
+        document.getElementById('heroMeta').textContent = title;
+        document.getElementById('heroBio').textContent = bio;
+        document.title = name + ' — ' + title;
+
+        if (s.profileImage) {
+          document.getElementById('profileImg').src = s.profileImage;
+        }
+
+        // جهات الاتصال
+        const contacts = [];
+        if (s.phone) {
+          contacts.push({ label: 'اتصال', text: s.phone, href: 'tel:' + s.phone });
+        }
+        if (s.whatsapp) {
+          const cleanWa = s.whatsapp.replace(/[^0-9]/g, '');
+          contacts.push({ label: 'واتساب', text: s.whatsapp, href: 'https://wa.me/' + cleanWa });
+        }
+        if (s.email) {
+          contacts.push({ label: 'البريد الإلكتروني', text: s.email, href: 'mailto:' + s.email });
+        }
+        if (s.instagram) {
+          const handle = s.instagram.replace(/^@/, '');
+          contacts.push({ label: 'إنستغرام', text: '@' + handle, href: 'https://instagram.com/' + handle });
+        }
+        if (s.youtube) {
+          const ytUrl = s.youtube.startsWith('http') ? s.youtube : 'https://youtube.com/' + s.youtube;
+          contacts.push({ label: 'يوتيوب', text: s.youtube, href: ytUrl });
+        }
+
+        if (contacts.length) {
+          document.getElementById('contactList').innerHTML = contacts.map(c => `
+            <a href="${c.href}" class="contact-item" target="${c.href.startsWith('http') ? '_blank' : '_self'}" rel="noopener">
+              <span class="mono">${c.label}</span>
+              <strong>${c.text}</strong>
+            </a>
+          `).join('');
+        }
+      } catch (e) {
+        console.error('settings error:', e);
+      }
+    }
+
+    async function loadShorts() {
+      if (!db) {
+        document.getElementById('ring').innerHTML = '';
+        document.getElementById('stage').innerHTML = '<div class="empty">بانتظار ربط قاعدة بيانات Firebase لعرض الفيديوهات</div>';
+        return;
+      }
+      try {
+        const snap = await db.collection('shortVideos').get();
+        const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        // فرز زمني محلي لضمان التوافق
+        items.sort((a, b) => {
+          const tA = a.createdAt?.seconds || 0;
+          const tB = b.createdAt?.seconds || 0;
+          return tA - tB;
+        });
+        renderCarousel(items);
+      } catch (e) {
+        console.error('Error loading shorts:', e);
+      }
+    }
+
+    async function loadLongs() {
+      if (!db) {
+        document.getElementById('filmList').innerHTML = '<div class="empty">بانتظار ربط قاعدة بيانات Firebase لعرض الفيديوهات</div>';
+        return;
+      }
+      try {
+        const snap = await db.collection('longVideos').get();
+        const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        items.sort((a, b) => {
+          const tA = a.createdAt?.seconds || 0;
+          const tB = b.createdAt?.seconds || 0;
+          return tA - tB;
+        });
+        renderFilms(items);
+      } catch (e) {
+        console.error('Error loading longs:', e);
+      }
+    }
+
+    // ========== الكاروسيل ثلاثي الأبعاد ==========
+    let currentAngle = 0;
+    let ringEl, stageEl, angleStep, cardCount;
+
+    function renderCarousel(items) {
+      ringEl = document.getElementById('ring');
+      stageEl = document.getElementById('stage');
+      if (!ringEl || !stageEl) return;
+      ringEl.innerHTML = '';
+
+      if (!items.length) {
+        stageEl.innerHTML = '<div class="empty">لا توجد فيديوهات قصيرة بعد</div>';
+        return;
+      }
+
+      cardCount = items.length;
+      angleStep = 360 / cardCount;
+      const radius = Math.max(380, cardCount * 85);
+
+      items.forEach((video, i) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        const thumb = video.thumbnail || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="533"><rect width="300" height="533" fill="%23222"/></svg>';
+        card.innerHTML = `
+          <div class="screen">
+            <img src="${thumb}" alt="${video.title || ''}" loading="lazy">
+            <div class="cap">
+              <h3>${video.title || ''}</h3>
+              <div class="dur">${video.duration || ''}</div>
+            </div>
+          </div>`;
+        card.style.transform = `rotateY(${i * angleStep}deg) translateZ(${radius}px)`;
+        card.addEventListener('click', () => openLightbox(video.videoUrl, true));
+        ringEl.appendChild(card);
+      });
+      currentAngle = 0;
+      ringEl.style.transform = 'rotateY(0deg)';
+    }
+
+    function rotate(deg) {
+      if (!ringEl) return;
+      currentAngle += deg;
+      ringEl.style.transform = `rotateY(${currentAngle}deg)`;
+    }
+
+    document.getElementById('prev').addEventListener('click', () => rotate(angleStep || 60));
+    document.getElementById('next').addEventListener('click', () => rotate(-(angleStep || 60)));
+
+    // سحب باللمس والماوس
+    let dragStart = 0, dragging = false;
+    function addDrag(el) {
+      el.addEventListener('mousedown', e => { dragStart = e.clientX; dragging = true; });
+      window.addEventListener('mouseup', e => {
+        if (!dragging) return;
+        dragging = false;
+        const d = e.clientX - dragStart;
+        if (d > 40) rotate(angleStep || 60);
+        if (d < -40) rotate(-(angleStep || 60));
+      });
+      el.addEventListener('touchstart', e => { dragStart = e.touches[0].clientX; }, { passive: true });
+      el.addEventListener('touchend', e => {
+        const d = e.changedTouches[0].clientX - dragStart;
+        if (d > 40) rotate(angleStep || 60);
+        if (d < -40) rotate(-(angleStep || 60));
+      });
+    }
+
+    // ========== قائمة الفيديوهات الطويلة ==========
+    function renderFilms(items) {
+      const list = document.getElementById('filmList');
+      if (!items.length) {
+        list.innerHTML = '<div class="empty">لا توجد فيديوهات طويلة بعد</div>';
+        return;
+      }
+      list.innerHTML = items.map((f, i) => `
+        <div class="film-item" data-url="${(f.videoUrl || '').replace(/"/g, '&quot;')}">
+          <span class="idx">${String(i + 1).padStart(2, '0')}</span>
+          <img class="thumb" src="${f.thumbnail || ''}" alt="${f.title || ''}" loading="lazy">
+          <div>
+            <h3>${f.title || ''}</h3>
+            <span class="mono">${f.genre || ''}</span>
+          </div>
+          <span class="dur">${f.duration || ''}</span>
+        </div>
+      `).join('');
+
+      list.querySelectorAll('.film-item').forEach(el => {
+        el.addEventListener('click', () => openLightbox(el.dataset.url, false));
+      });
+    }
+
+    // ========== شاشة العرض (Lightbox) ==========
+    function openLightbox(url, vertical) {
+      if (!url) return;
+      const lb = document.getElementById('lightbox');
+      const box = document.getElementById('lbBox');
+      lb.classList.toggle('vertical', !!vertical);
+
+      // دعم روابط يوتيوب العادية، الشورتس، والمختصرة
+      const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i);
+      if (ytMatch) {
+        box.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+      } else if (/\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(url) || url.includes('firebasestorage.googleapis.com')) {
+        box.innerHTML = `<video src="${url}" controls autoplay playsinline></video>`;
+      } else {
+        window.open(url, '_blank');
+        return;
+      }
+      lb.classList.add('open');
+    }
+
+    document.getElementById('lbClose').addEventListener('click', closeLightbox);
+    document.getElementById('lightbox').addEventListener('click', e => {
+      if (e.target.id === 'lightbox') closeLightbox();
+    });
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.getElementById('lbBox').innerHTML = '';
+    }
+
+    // تهيئة الصفحة
+    document.getElementById('year').textContent = new Date().getFullYear();
+    loadSettings();
+    loadShorts().then(() => {
+      const s = document.getElementById('stage');
+      if (s) addDrag(s);
+    });
+    loadLongs();
+  </script>
+</body>
+</html>
