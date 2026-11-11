@@ -1035,10 +1035,17 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
         }
 
         const ytMatch = url.match(ytRegex);
+        const driveMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/) || url.match(/folders\/([a-zA-Z0-9_-]+)/);
         let thumbnail = '';
         if (ytMatch) {
           const videoId = ytMatch[1];
           thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+        } else if (driveMatch) {
+          const fileId = driveMatch[1];
+          thumbnail = `https://drive.google.com/thumbnail?id=${fileId}&sz=w400`;
+          if (!url.includes('/preview')) {
+            url = `https://drive.google.com/file/d/${fileId}/preview`;
+          }
         }
 
         if (!url) return;
@@ -1104,6 +1111,16 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
         toast(`تم الاستيراد بنجاح! (${importedShorts} قصير، ${importedLongs} طويل) ✓`);
         statusEl.textContent = `✅ اكتمل الاستيراد بنجاح! تم حفظ ${importedShorts} فيديو قصير و ${importedLongs} فيديو طويل.`;
         document.getElementById('bulkInput').value = '';
+
+        const sArr = itemsToSave.filter(x => x.coll === 'shortVideos').map(x => ({ id: 'bulk_' + Math.random().toString(36).substr(2,9), ...x.data }));
+        const lArr = itemsToSave.filter(x => x.coll === 'longVideos').map(x => ({ id: 'bulk_' + Math.random().toString(36).substr(2,9), ...x.data }));
+        try {
+          const curS = JSON.parse(localStorage.getItem('portfolio_shorts') || '[]');
+          const curL = JSON.parse(localStorage.getItem('portfolio_longs') || '[]');
+          localStorage.setItem('portfolio_shorts', JSON.stringify([...curS, ...sArr]));
+          localStorage.setItem('portfolio_longs', JSON.stringify([...curL, ...lArr]));
+          if (typeof syncToPortfolioVideos === 'function') syncToPortfolioVideos();
+        } catch(e) {}
 
         loadShorts();
         loadLongs();
