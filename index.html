@@ -160,13 +160,16 @@ section { padding-block: clamp(36px, 6vw, 72px); }
   position: relative; height: calc(var(--ch) + 72px); perspective: 1500px; overflow: hidden;
   cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y; overscroll-behavior-x: contain;
   border-block: 1px solid var(--line);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 17%, #000 83%, transparent 100%);
-          mask-image: linear-gradient(90deg, transparent 0%, #000 17%, #000 83%, transparent 100%);
   background: radial-gradient(60% 55% at 50% 100%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
 }
+.stage::before, .stage::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: clamp(36px, 10vw, 100px); z-index: 120; pointer-events: none;
+}
+.stage::before { left: 0; background: linear-gradient(90deg, #0c0d11 0%, transparent 100%); }
+.stage::after { right: 0; background: linear-gradient(270deg, #0c0d11 0%, transparent 100%); }
 .stage:active { cursor: grabbing; }
-.ring { position: absolute; top: 36px; left: 50%; width: var(--cw); height: var(--ch); margin-left: calc(var(--cw) / -2); transform-style: preserve-3d; }
-.card { position: absolute; inset: 0; will-change: transform, filter, opacity; }
+.ring { position: absolute; top: 36px; left: 50%; width: var(--cw); height: var(--ch); margin-left: calc(var(--cw) / -2); transform-style: preserve-3d; will-change: transform; }
+.card { position: absolute; inset: 0; will-change: transform, opacity; }
 .screen {
   position: absolute; inset: 0; border-radius: 26px; overflow: hidden; background: #050506;
   border: 5px solid #050506; outline: 1px solid var(--line);
@@ -591,10 +594,12 @@ const PLAY_SVG = '<svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg>';
 
 /* thumbnails: a poster picture if given; otherwise '#t=0.1' makes phones show the video's first frame */
 const thumbSrc = (u) => (u && !u.includes('#')) ? u + '#t=0.1' : u;
-const thumbImg = (x) => {
-  const p = x.thumbnail || x.poster || (x.fileId ? 'https://drive.google.com/thumbnail?id=' + x.fileId + '&sz=w600' : (x.id ? 'https://drive.google.com/thumbnail?id=' + x.id + '&sz=w600' : ''));
+const thumbImg = (x, isLazy = false) => {
+  const fid = x.fileId || x.id || '';
+  const p = x.thumbnail || x.poster || (fid ? 'https://drive.google.com/thumbnail?id=' + fid + '&sz=w600' : '');
   if (!p) return '';
-  return '<img class="thumb" src="' + p + '" alt="' + (x.title || '') + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t){this.dataset.t=1;this.src=\'https://drive.google.com/thumbnail?id=' + (x.fileId || x.id) + '&sz=w600\';}">';
+  const lazyAttr = isLazy ? ' loading="lazy"' : '';
+  return '<img class="thumb" src="' + p + '"' + lazyAttr + ' alt="' + (x.title || '') + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t){this.dataset.t=1;this.src=\'https://drive.google.com/thumbnail?id=' + fid + '&sz=w600\';}">';
 };
 const posterAttr = (x) => x.poster ? ` poster="${x.poster}"` : '';
 
@@ -770,12 +775,10 @@ function paint() {
     const op = a <= 2 ? 1 - a * 0.07 : Math.max(0, 0.86 * (1 - (a - 2) / 0.7));
 
     c.style.transform = `translateX(${x.toFixed(1)}px) translateZ(${(-a * 40).toFixed(1)}px) rotateY(${rot.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
-    c.style.filter = 'none';
     c.style.opacity = op.toFixed(3);
     c.style.zIndex = String(100 - Math.round(a * 10));
     c.style.visibility = op > 0.01 ? 'visible' : 'hidden';
     c.style.pointerEvents = a < 2.4 ? '' : 'none';
-    c.style.setProperty('--dim', Math.min(a * 0.22, 0.5).toFixed(3));
   });
 }
 function tick() {
@@ -795,9 +798,15 @@ const SND_ON = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path 
 const SND_OFF = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w" d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></svg>';
 const audible = () => soundOn;
 function playWithSound(v) {
-  v.muted = !soundOn;
+  if (!v) return;
+  if (!soundOn) v.muted = true;
   const pr = v.play();
-  if (pr) pr.catch(() => { v.muted = true; v.play().catch(() => {}); });
+  if (pr && typeof pr.catch === 'function') {
+    pr.catch(() => {
+      v.muted = true;
+      v.play().catch(() => {});
+    });
+  }
 }
 function refreshSound() {
   document.querySelectorAll('.snd-btn').forEach((b) => {
@@ -833,9 +842,26 @@ function stopAll() {
     else restartBar(c);
   });
 }
+/* Preload next and previous card videos for zero-latency rotation */
+function preloadNeighbors() {
+  if (!cards || !cards.length) return;
+  const cur = active();
+  const next = (cur + 1) % N;
+  const prev = (cur - 1 + N) % N;
+  [next, prev].forEach(k => {
+    const c = cards[k];
+    if (c) {
+      const v = c.querySelector('video');
+      if (v && !v.src && v.dataset.src) {
+        v.preload = 'metadata';
+        v.src = v.dataset.src;
+      }
+    }
+  });
+}
 /* The center video only plays while: the carousel is on screen, this tab is the one being viewed,
    no pop-up / long-form preview is playing, and the visitor hasn't paused it themselves. */
-let stageVisible = !('IntersectionObserver' in window), userPaused = false, filmPreview = false, playerOpen = false;
+let stageVisible = true, userPaused = false, filmPreview = false, playerOpen = false;
 function syncShort() {
   const c = cards[active()];
   if (!c) return;
@@ -848,9 +874,10 @@ function syncShort() {
       if (!v.src && v.dataset.src) v.src = v.dataset.src;
       playWithSound(v);
     }
+    preloadNeighbors();
   } else {
     c.classList.add('paused');
-    if (v) v.pause();
+    if (v && !v.paused) v.pause();
   }
 }
 function startCard(card) {
@@ -975,11 +1002,44 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 layout(); info();
-if (!reduced) startCard(cards[0]);
+let stageVisible = true;
+if (!reduced && cards[0]) startCard(cards[0]);
 
 if ('IntersectionObserver' in window) {
-  new IntersectionObserver(([e]) => { stageVisible = e.isIntersecting; syncShort(); }, { threshold: 0.5 }).observe(stage);
+  new IntersectionObserver(([e]) => {
+    stageVisible = e.isIntersecting;
+    syncShort();
+  }, { threshold: 0.05, rootMargin: '160px 0px 160px 0px' }).observe(stage);
 }
+
+// Ensure video autoplays immediately on page load across all browsers
+function tryAutoplay() {
+  if (cards && cards[0]) {
+    const v = cards[0].querySelector('video');
+    if (v) {
+      v.muted = true;
+      const p = v.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(() => { v.muted = true; v.play().catch(() => {}); });
+      }
+    }
+    startCard(cards[0]);
+  }
+}
+
+setTimeout(tryAutoplay, 60);
+window.addEventListener('load', tryAutoplay);
+['click', 'touchstart', 'scroll', 'keydown'].forEach(ev => {
+  window.addEventListener(ev, () => {
+    const c = cards[active()];
+    if (c) {
+      const v = c.querySelector('video');
+      if (v && v.paused && !userPaused && !playerOpen) {
+        playWithSound(v);
+      }
+    }
+  }, { once: true, passive: true });
+});
 
 /* ---------- long-form ----------
    Desktop: hovering a film plays a silent preview; moving away pauses it.
@@ -996,7 +1056,7 @@ function renderFilms(newItems) {
     <article class="film">
       <div class="frame${f.src ? ' has-video' : ''}" style="--h:${f.hue || 210}" role="button" tabindex="0" data-i="${i}" aria-label="Play ${f.title}">
         <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
-        ${thumbImg(f)}
+        ${thumbImg(f, true)}
         ${(() => {
           const sUrl = getDirectStreamUrl(f.src || f.videoUrl);
           const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
@@ -1290,23 +1350,33 @@ function startFirestoreSync() {
       const vids = [];
       snap.forEach(d => {
         const v = d.data();
+        const fid = v.fileId || d.id || '';
         vids.push({
           id: d.id,
-          title: v.title || 'Workout',
+          fileId: fid,
+          title: v.title || 'Gym Workout',
           kind: v.genre || 'Gym & Fitness',
           dur: v.duration || '0:30',
           role: v.role || 'Edit · sound design · color',
-          poster: v.thumbnail || `https://lh3.googleusercontent.com/d/${v.fileId || ''}`,
-          src: getCleanEmbedUrl(v.videoUrl || (v.fileId ? `https://drive.google.com/file/d/${v.fileId}/preview` : '')),
-          videoUrl: getCleanEmbedUrl(v.videoUrl || (v.fileId ? `https://drive.google.com/file/d/${v.fileId}/preview` : '')),
+          poster: v.thumbnail || (fid ? `https://drive.google.com/thumbnail?id=${fid}&sz=w600` : ''),
+          thumbnail: v.thumbnail || (fid ? `https://drive.google.com/thumbnail?id=${fid}&sz=w600` : ''),
+          src: v.videoUrl || (fid ? `https://drive.google.com/file/d/${fid}/preview` : ''),
+          videoUrl: v.videoUrl || (fid ? `https://drive.google.com/file/d/${fid}/preview` : ''),
           hue: 180 + (vids.length * 13) % 170,
           createdAt: v.createdAt
         });
       });
-      vids.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
-      window.SHORTS = vids;
-      SHORTS = vids;
-      if (typeof renderDrum === 'function') renderDrum(vids);
+      // Natural alphanumeric sort by title (Gym Workout #01 .. #24)
+      vids.sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, { numeric: true, sensitivity: 'base' }));
+
+      // Only re-render if items actually changed to avoid interrupting playing video
+      const curSign = (window.SHORTS || []).map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
+      const newSign = vids.map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
+      if (curSign !== newSign || !cards.length) {
+        window.SHORTS = vids;
+        SHORTS = vids;
+        if (typeof renderDrum === 'function') renderDrum(vids);
+      }
     }
   }, err => console.warn('Firestore shortVideos listen notice:', err.message));
 
@@ -1316,21 +1386,30 @@ function startFirestoreSync() {
       const vids = [];
       snap.forEach(d => {
         const v = d.data();
+        const fid = v.fileId || d.id || '';
         vids.push({
           id: d.id,
-          title: v.title || 'Film',
-          kind: v.genre || 'Long-form Video',
+          fileId: fid,
+          title: v.title || 'Gym Workout',
+          kind: v.genre || 'Gym & Fitness',
           dur: v.duration || '3:00',
-          poster: v.thumbnail || `https://lh3.googleusercontent.com/d/${v.fileId || ''}`,
-          src: v.videoUrl || `https://drive.google.com/file/d/${v.fileId || ''}/preview`,
+          poster: v.thumbnail || (fid ? `https://drive.google.com/thumbnail?id=${fid}&sz=w600` : ''),
+          thumbnail: v.thumbnail || (fid ? `https://drive.google.com/thumbnail?id=${fid}&sz=w600` : ''),
+          src: v.videoUrl || (fid ? `https://drive.google.com/file/d/${fid}/preview` : ''),
+          videoUrl: v.videoUrl || (fid ? `https://drive.google.com/file/d/${fid}/preview` : ''),
           hue: 200 + (vids.length * 17) % 150,
           createdAt: v.createdAt
         });
       });
-      vids.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
-      window.FILMS = vids;
-      FILMS = vids;
-      if (typeof renderFilms === 'function') renderFilms(vids);
+      vids.sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, { numeric: true, sensitivity: 'base' }));
+
+      const curSign = (window.FILMS || []).map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
+      const newSign = vids.map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
+      if (curSign !== newSign) {
+        window.FILMS = vids;
+        FILMS = vids;
+        if (typeof renderFilms === 'function') renderFilms(vids);
+      }
     }
   }, err => console.warn('Firestore longVideos listen notice:', err.message));
 }
