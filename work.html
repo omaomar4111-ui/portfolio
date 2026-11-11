@@ -488,7 +488,7 @@ ring.innerHTML = SHORTS.map((w, i) => `
     <div class="screen">
       <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
       ${thumbImg(w)}
-      ${w.src ? `<video src="${w.poster ? w.src : thumbSrc(w.src)}"${posterAttr(w)} playsinline loop preload="metadata"></video>` : ''}
+      ${w.src && !w.src.includes('drive.google.com') && !w.src.includes('youtube') ? `<video src="${w.poster ? w.src : thumbSrc(w.src)}"${posterAttr(w)} playsinline loop preload="metadata"></video>` : ''}
       <span class="playbtn">${PLAY_SVG}</span>
       ${w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
       <div class="cap"><h3>${w.title}</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>${w.dur}</span></div></div>
@@ -715,7 +715,7 @@ $('#films-grid').innerHTML = FILMS.map((f, i) => `
     <div class="frame${f.src ? ' has-video' : ''}" style="--h:${f.hue}" role="button" tabindex="0" data-i="${i}" aria-label="Play ${f.title}">
       <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
       ${thumbImg(f)}
-      ${f.src ? `<video src="${f.poster ? f.src : thumbSrc(f.src)}"${posterAttr(f)} muted playsinline loop preload="metadata"></video>` : ''}
+      ${f.src && !f.src.includes('drive.google.com') && !f.src.includes('youtube') ? `<video src="${f.poster ? f.src : thumbSrc(f.src)}"${posterAttr(f)} muted playsinline loop preload="metadata"></video>` : ''}
       <span class="playbtn">${PLAY_SVG}</span>
       ${canHover ? '<span class="hint">Click to watch</span>' : ''}
       ${f.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
@@ -764,9 +764,12 @@ function openPlayer(i, kind = 'film') {
   document.querySelectorAll('.film .frame video').forEach((v) => v.pause());
   playerOpen = true; syncShort();
   pFrame.style.setProperty('--h', f.hue);
-  pFrame.innerHTML = f.src
-    ? `<video src="${f.src}"${posterAttr(f)} controls autoplay playsinline></video>`
-    : `<div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div><div class="p-empty"><span>Sample · add the video file to play it here</span></div>`;
+  if (f.src && (f.src.includes('drive.google.com') || f.src.includes('youtube.com') || f.src.includes('youtu.be'))) {
+    pFrame.innerHTML = `<iframe src="${f.src}" allow="autoplay; fullscreen" allowfullscreen style="width:100%;height:100%;border:none;border-radius:14px;background:#000;"></iframe>`;
+  } else if (f.src) {
+    pFrame.innerHTML = `<video src="${f.src}"${posterAttr(f)} controls autoplay playsinline></video>`;
+  } else {
+    pFrame.innerHTML = `<div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div><div class="p-empty"><span>Sample · add the video file to play it here</span></div>`;
   $('#p-title').textContent = f.title;
   $('#p-sub').textContent = `${f.kind} · ${f.dur}`;
   document.documentElement.style.overflow = 'hidden';
@@ -784,6 +787,7 @@ function closePlayer() {
   player.close();
 }
 player.addEventListener('close', () => {
+  pFrame.innerHTML = '';
   const pv = pFrame.querySelector('video'); if (pv) pv.pause();
   pFrame.innerHTML = '';
   document.documentElement.style.overflow = '';
