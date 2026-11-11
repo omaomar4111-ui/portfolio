@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <title>Omar Omar Portfolio</title>
-<!-- ===== Browser tab icon + link preview (chat apps, Facebook, LinkedIn, X...) =====
+<!-- ===== Browser tab icon + link preview (WhatsApp, Facebook, LinkedIn, X...) =====
      Upload icon.png, favicon-32.png, apple-touch-icon.png and preview.jpg next to index.html.
      To use your own icon: replace those three icon files with yours (same names).
      If you move the site to your own domain, change the two https://omaomar4111-ui.github.io/portfolio/ links below. -->
@@ -16,7 +16,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Omar Omar Portfolio">
 <meta property="og:description" content="Video editor. Short-form and long-form editing for brands, creators and podcasts, in English and Arabic.">
-<meta property="og:url" content="https://omaomar4111-ui.github.io/portfolio/work.html">
+<meta property="og:url" content="https://omaomar4111-ui.github.io/portfolio/">
 <meta property="og:image" content="https://omaomar4111-ui.github.io/portfolio/preview.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -294,7 +294,6 @@ html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transiti
 .contact h2 { font-family: var(--font-title); font-weight: 800; font-stretch: 118%; font-variation-settings: "wdth" 118; font-size: clamp(2rem, 5.2vw, 4rem); letter-spacing: -.02em; line-height: 1.02; margin: 0 0 24px; max-width: 18ch; text-wrap: balance; }
 .mail { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .mail code { font-family: var(--font-mono); font-size: clamp(1rem, 2.4vw, 1.3rem); user-select: all; overflow-wrap: anywhere; }
-.hire-note { color: var(--muted); max-width: 52ch; margin: -8px 0 26px; font-size: 1.05rem; line-height: 1.6; }
 .contact-list { display: grid; gap: 0; border-top: 1px solid var(--line); max-width: 760px; }
 .contact-list .mail { padding-block: 18px; border-bottom: 1px solid var(--line); gap: 10px 18px; }
 .c-label { width: 92px; flex: none; }
@@ -326,7 +325,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
       <a href="#shorts">Short-form</a>
       <a href="#films">Long-form</a>
       <a href="#services">Services</a>
-      <a href="#contact">Hire me</a>
+      <a href="#contact">Contact</a>
     </nav>
   </header>
 
@@ -392,13 +391,16 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
 
     <section id="contact" class="contact" aria-labelledby="contact-h">
       <h2 id="contact-h">Got footage that needs cutting?</h2>
-      <p class="hire-note">I take projects through Upwork. Send me a message there to talk about your footage, timeline and budget.</p>
       <div class="contact-list">
         <div class="mail">
-          <span class="mono c-label">Upwork</span>
-          <span class="c-val">Omar Omar</span>
-          <!-- Replace the link below with your own Upwork profile link -->
-          <a class="btn" id="upwork-link" href="https://www.upwork.com/freelancers/mostafasharkawy/" target="_blank" rel="noopener">View my Upwork profile</a>
+          <span class="mono c-label">WhatsApp</span>
+          <a class="c-val" href="https://wa.me/201144826641" target="_blank" rel="noopener">+20 114 482 6641</a>
+          <a class="btn btn-wa" href="https://wa.me/201144826641" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18.2a8.2 8.2 0 01-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1112 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 01-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 00-.7.3 3 3 0 00-.9 2.2 5.2 5.2 0 001.1 2.7 11.8 11.8 0 004.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 001.8-1.2 2.2 2.2 0 00.1-1.3c0-.1-.2-.2-.5-.3z"/></svg>Message on WhatsApp</a>
+        </div>
+        <div class="mail">
+          <span class="mono c-label">Email</span>
+          <a class="c-val" id="email" href="mailto:omaomar4111@gmail.com">omaomar4111@gmail.com</a>
+          <button class="btn btn-ghost" type="button" id="copy">Copy email</button>
         </div>
       </div>
     </section>
@@ -416,11 +418,105 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
   </footer>
 </div>
 
-<script src="videos.js"></script>
+
+  <!-- Firebase Integration -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="videos.js"></script>
+
 <script>
 /* Videos are edited in videos.js (shared with work.html). */
 const SHORTS = window.SHORTS || [];
 const FILMS = window.FILMS || [];
+
+// Load dynamic videos from localStorage or Firestore
+(async function() {
+  // 1. Check localStorage first (instant & reliable)
+  try {
+    const locShorts = localStorage.getItem('portfolio_shorts');
+    if (locShorts) {
+      const arr = JSON.parse(locShorts);
+      if (arr && arr.length > 0) {
+        window.SHORTS = arr.map((v, i) => ({
+          title: v.title || `Short #${i+1}`,
+          kind: v.genre || 'Gym & Fitness',
+          dur: v.duration || '0:30',
+          role: 'Edit · sound design · color',
+          poster: v.thumbnail || 'profile.jpg',
+          src: v.videoUrl || '',
+          hue: 190 + (i * 13) % 160
+        }));
+        if (typeof renderDrum === 'function') renderDrum();
+      }
+    }
+    const locLongs = localStorage.getItem('portfolio_longs');
+    if (locLongs) {
+      const arr = JSON.parse(locLongs);
+      if (arr && arr.length > 0) {
+        window.FILMS = arr.map((v, i) => ({
+          title: v.title || `Film #${i+1}`,
+          kind: v.genre || 'Long-form Video',
+          dur: v.duration || '3:00',
+          poster: v.thumbnail || 'profile.jpg',
+          src: v.videoUrl || '',
+          hue: 210 + (i * 17) % 140
+        }));
+        if (typeof renderFilms === 'function') renderFilms();
+      }
+    }
+  } catch(e) {}
+
+  // 2. Sync from Firebase Firestore in background
+  try {
+    if (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      
+      const shortsSnap = await db.collection('shortVideos').get();
+      if (!shortsSnap.empty) {
+        const fireShorts = shortsSnap.docs.map((d, i) => {
+          const v = d.data();
+          return {
+            title: v.title || 'Short Video',
+            kind: v.genre || 'Reels',
+            dur: v.duration || '0:30',
+            role: 'Edit · sound design · color',
+            poster: v.thumbnail || 'profile.jpg',
+            src: v.videoUrl || '',
+            hue: 190 + (i * 13) % 160
+          };
+        });
+        if (fireShorts.length > 0) {
+          window.SHORTS = fireShorts;
+          if (typeof renderDrum === 'function') renderDrum();
+        }
+      }
+
+      const longsSnap = await db.collection('longVideos').get();
+      if (!longsSnap.empty) {
+        const fireLongs = longsSnap.docs.map((d, i) => {
+          const v = d.data();
+          return {
+            title: v.title || 'Long Video',
+            kind: v.genre || 'Film',
+            dur: v.duration || '3:00',
+            poster: v.thumbnail || 'profile.jpg',
+            src: v.videoUrl || '',
+            hue: 210 + (i * 17) % 140
+          };
+        });
+        if (fireLongs.length > 0) {
+          window.FILMS = fireLongs;
+          if (typeof renderFilms === 'function') renderFilms();
+        }
+      }
+    }
+  } catch(e) {
+    console.log('Firestore fetch skipped:', e);
+  }
+})();
+
 
 /* Your photo. src: path or data URI of the image. layout: 'beside' (next to the name) or 'behind' (blurred behind the name).
    position: which part of the photo stays in view, as 'x% y%'. */
@@ -476,28 +572,51 @@ if (!reduced) {
 
 /* ---------- carousel ---------- */
 const ring = $('#ring'), stage = $('#stage');
-const N = SHORTS.length, step = 360 / N;
+let N = SHORTS.length, step = N ? 360 / N : 30;
 const PLAY_SVG = '<svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg>';
 
 /* thumbnails: a poster picture if given; otherwise '#t=0.1' makes phones show the video's first frame */
 const thumbSrc = (u) => (u && !u.includes('#')) ? u + '#t=0.1' : u;
 const thumbImg = (x) => x.poster ? `<img class="thumb" src="${x.poster}" alt="" loading="lazy" decoding="async">` : '';
 const posterAttr = (x) => x.poster ? ` poster="${x.poster}"` : '';
-ring.innerHTML = SHORTS.map((w, i) => `
-  <article class="card${w.src ? ' has-video' : ''}" style="--h:${w.hue}; --dur:${secs(w.dur)}s" aria-label="${w.title}">
-    <div class="screen">
-      <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
-      ${thumbImg(w)}
-      ${w.src && !w.src.includes('drive.google.com') && !w.src.includes('youtube') ? `<video src="${w.poster ? w.src : thumbSrc(w.src)}"${posterAttr(w)} playsinline loop preload="metadata"></video>` : ''}
-      <span class="playbtn">${PLAY_SVG}</span>
-      ${w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
-      <div class="cap"><h3>${w.title}</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>${w.dur}</span></div></div>
-    </div>
-  </article>`).join('');
-const cards = [...ring.children];
 
-$('#ticks').innerHTML = SHORTS.map((w, i) => `<button type="button" aria-label="Show ${w.title}"></button>`).join('');
-const ticks = [...$('#ticks').children];
+let cards = [];
+let ticks = [];
+
+function renderDrum(newItems) {
+  if (newItems && Array.isArray(newItems)) window.SHORTS = newItems;
+  const list = window.SHORTS || [];
+  if (!list.length) return;
+  N = list.length;
+  step = 360 / N;
+  idx = 0; angle = 0; target = 0;
+
+  ring.innerHTML = list.map((w, i) => `
+    <article class="card${w.src ? ' has-video' : ''}" style="--h:${w.hue || (190 + (i*13)%160)}; --dur:${secs(w.dur || '0:30')}s" aria-label="${w.title}">
+      <div class="screen">
+        <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
+        ${thumbImg(w)}
+        ${w.src && !w.src.includes('drive.google.com') && !w.src.includes('youtube') ? `<video src="${w.poster ? w.src : thumbSrc(w.src)}"${posterAttr(w)} playsinline loop preload="metadata"></video>` : ''}
+        <span class="playbtn">${PLAY_SVG}</span>
+        ${w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
+        <div class="cap"><h3>${w.title}</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>${w.dur || '0:30'}</span></div></div>
+      </div>
+    </article>`).join('');
+  cards = [...ring.children];
+
+  const ticksEl = $('#ticks');
+  if (ticksEl) {
+    ticksEl.innerHTML = list.map((w, i) => `<button type="button" aria-label="Show ${w.title}"></button>`).join('');
+    ticks = [...ticksEl.children];
+    ticks.forEach((t, i) => t.addEventListener('click', () => { touched(); goToCard(i); }));
+  }
+
+  layout();
+  info();
+  if (!reduced && cards[0]) startCard(cards[0]);
+}
+
+renderDrum();
 
 let R = 300, idx = 0, angle = 0, target = 0, raf = 0, dragging = false, lastTouch = 0, hover = false;
 const active = () => ((idx % N) + N) % N;
@@ -711,39 +830,49 @@ if ('IntersectionObserver' in window) {
    Desktop: hovering a film plays a silent preview; moving away pauses it.
    Click / tap / Enter: opens the pop-up player with sound. Close with X, Esc, or a click outside. */
 const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-$('#films-grid').innerHTML = FILMS.map((f, i) => `
-  <article class="film">
-    <div class="frame${f.src ? ' has-video' : ''}" style="--h:${f.hue}" role="button" tabindex="0" data-i="${i}" aria-label="Play ${f.title}">
-      <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
-      ${thumbImg(f)}
-      ${f.src && !f.src.includes('drive.google.com') && !f.src.includes('youtube') ? `<video src="${f.poster ? f.src : thumbSrc(f.src)}"${posterAttr(f)} muted playsinline loop preload="metadata"></video>` : ''}
-      <span class="playbtn">${PLAY_SVG}</span>
-      ${canHover ? '<span class="hint">Click to watch</span>' : ''}
-      ${f.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
-      <span class="dur">${f.dur}</span>
-      <div class="pbar"><i></i></div>
-    </div>
-    <h3>${f.title}</h3>
-    <p>${f.kind}</p>
-  </article>`).join('');
 
-document.querySelectorAll('.film .frame').forEach((fr) => {
-  const v = fr.querySelector('video'), bar = fr.querySelector('.pbar i');
-  if (v) v.addEventListener('timeupdate', () => { if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + '%'; });
-  if (canHover) {
-    fr.addEventListener('mouseenter', () => {
-      fr.classList.add('hovering');
-      if (v) { filmPreview = true; syncShort(); playWithSound(v); }
-    });
-    fr.addEventListener('mouseleave', () => {
-      fr.classList.remove('hovering');
-      if (v) { v.pause(); filmPreview = false; syncShort(); }
-      else { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
-    });
-  }
-  fr.addEventListener('click', (e) => { if (e.target.closest('.snd-btn')) return; openPlayer(+fr.dataset.i); });
-  fr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPlayer(+fr.dataset.i); } });
-});
+function renderFilms(newItems) {
+  if (newItems && Array.isArray(newItems)) window.FILMS = newItems;
+  const list = window.FILMS || [];
+  const grid = $('#films-grid');
+  if (!grid || !list.length) return;
+
+  grid.innerHTML = list.map((f, i) => `
+    <article class="film">
+      <div class="frame${f.src ? ' has-video' : ''}" style="--h:${f.hue || 210}" role="button" tabindex="0" data-i="${i}" aria-label="Play ${f.title}">
+        <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
+        ${thumbImg(f)}
+        ${f.src && !f.src.includes('drive.google.com') && !f.src.includes('youtube') ? `<video src="${f.poster ? f.src : thumbSrc(f.src)}"${posterAttr(f)} muted playsinline loop preload="metadata"></video>` : ''}
+        <span class="playbtn">${PLAY_SVG}</span>
+        ${canHover ? '<span class="hint">Click to watch</span>' : ''}
+        ${f.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
+        <span class="dur">${f.dur || '3:00'}</span>
+        <div class="pbar"><i></i></div>
+      </div>
+      <h3>${f.title}</h3>
+      <p>${f.kind || 'Film'}</p>
+    </article>`).join('');
+
+  grid.querySelectorAll('.film .frame').forEach((fr) => {
+    const v = fr.querySelector('video'), bar = fr.querySelector('.pbar i');
+    if (v) v.addEventListener('timeupdate', () => { if (v.duration && bar) bar.style.width = (v.currentTime / v.duration * 100) + '%'; });
+    if (canHover) {
+      fr.addEventListener('mouseenter', () => {
+        fr.classList.add('hovering');
+        if (v) { filmPreview = true; syncShort(); playWithSound(v); }
+      });
+      fr.addEventListener('mouseleave', () => {
+        fr.classList.remove('hovering');
+        if (v) { v.pause(); filmPreview = false; syncShort(); }
+        else if (bar) { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
+      });
+    }
+    fr.addEventListener('click', (e) => { if (e.target.closest('.snd-btn')) return; openPlayer(+fr.dataset.i, 'film'); });
+    fr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPlayer(+fr.dataset.i, 'film'); } });
+  });
+}
+
+renderFilms();
 
 document.addEventListener('click', (e) => {
   const b = e.target.closest('.snd-btn'); if (!b) return;

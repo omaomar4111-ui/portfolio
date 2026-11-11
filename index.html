@@ -430,8 +430,44 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
 const SHORTS = window.SHORTS || [];
 const FILMS = window.FILMS || [];
 
-// Load dynamic videos from Firestore if configured
+// Load dynamic videos from localStorage or Firestore
 (async function() {
+  // 1. Check localStorage first (instant & reliable)
+  try {
+    const locShorts = localStorage.getItem('portfolio_shorts');
+    if (locShorts) {
+      const arr = JSON.parse(locShorts);
+      if (arr && arr.length > 0) {
+        window.SHORTS = arr.map((v, i) => ({
+          title: v.title || `Short #${i+1}`,
+          kind: v.genre || 'Gym & Fitness',
+          dur: v.duration || '0:30',
+          role: 'Edit · sound design · color',
+          poster: v.thumbnail || 'profile.jpg',
+          src: v.videoUrl || '',
+          hue: 190 + (i * 13) % 160
+        }));
+        if (typeof renderDrum === 'function') renderDrum();
+      }
+    }
+    const locLongs = localStorage.getItem('portfolio_longs');
+    if (locLongs) {
+      const arr = JSON.parse(locLongs);
+      if (arr && arr.length > 0) {
+        window.FILMS = arr.map((v, i) => ({
+          title: v.title || `Film #${i+1}`,
+          kind: v.genre || 'Long-form Video',
+          dur: v.duration || '3:00',
+          poster: v.thumbnail || 'profile.jpg',
+          src: v.videoUrl || '',
+          hue: 210 + (i * 17) % 140
+        }));
+        if (typeof renderFilms === 'function') renderFilms();
+      }
+    }
+  } catch(e) {}
+
+  // 2. Sync from Firebase Firestore in background
   try {
     if (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
       if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -439,7 +475,7 @@ const FILMS = window.FILMS || [];
       
       const shortsSnap = await db.collection('shortVideos').get();
       if (!shortsSnap.empty) {
-        const fireShorts = shortsSnap.docs.map(d => {
+        const fireShorts = shortsSnap.docs.map((d, i) => {
           const v = d.data();
           return {
             title: v.title || 'Short Video',
@@ -448,19 +484,18 @@ const FILMS = window.FILMS || [];
             role: 'Edit · sound design · color',
             poster: v.thumbnail || 'profile.jpg',
             src: v.videoUrl || '',
-            hue: 190
+            hue: 190 + (i * 13) % 160
           };
         });
         if (fireShorts.length > 0) {
           window.SHORTS = fireShorts;
-          // Re-render carousel if initialized
           if (typeof renderDrum === 'function') renderDrum();
         }
       }
 
       const longsSnap = await db.collection('longVideos').get();
       if (!longsSnap.empty) {
-        const fireLongs = longsSnap.docs.map(d => {
+        const fireLongs = longsSnap.docs.map((d, i) => {
           const v = d.data();
           return {
             title: v.title || 'Long Video',
@@ -468,7 +503,7 @@ const FILMS = window.FILMS || [];
             dur: v.duration || '3:00',
             poster: v.thumbnail || 'profile.jpg',
             src: v.videoUrl || '',
-            hue: 210
+            hue: 210 + (i * 17) % 140
           };
         });
         if (fireLongs.length > 0) {
@@ -478,7 +513,7 @@ const FILMS = window.FILMS || [];
       }
     }
   } catch(e) {
-    console.log('Using local videos.js catalog:', e);
+    console.log('Firestore fetch skipped:', e);
   }
 })();
 

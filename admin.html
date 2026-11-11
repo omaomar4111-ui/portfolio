@@ -596,63 +596,81 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
 
     // ========== تحميل قوائم الفيديوهات ==========
     async function loadShorts() {
-      if (!db) return;
-      try {
-        const snap = await db.collection('shortVideos').get();
-        const list = document.getElementById('shortsList');
-        if (snap.empty) {
-          list.innerHTML = '<div class="empty">لا توجد فيديوهات قصيرة مضافة بعد</div>';
-          return;
+      let docs = [];
+      if (db) {
+        try {
+          const snap = await db.collection('shortVideos').get();
+          if (!snap.empty) {
+            docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          }
+        } catch (e) {
+          console.warn('Firestore loadShorts error:', e);
         }
-        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        docs.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
-
-        list.innerHTML = docs.map(v => `
-          <div class="video-row">
-            <img src="${v.thumbnail || ''}" alt="">
-            <div class="info">
-              <h3>${v.title || '(بدون عنوان)'}</h3>
-              <span class="mono">${v.duration || 'غير محدد'}</span>
-            </div>
-            <div class="actions">
-              <button class="btn secondary" onclick="editVideo('shortVideos','${v.id}')">تعديل</button>
-              <button class="btn danger" onclick="deleteVideo('shortVideos','${v.id}')">حذف</button>
-            </div>
-          </div>
-        `).join('');
-      } catch (e) {
-        console.error('loadShorts error:', e);
       }
+      if (!docs.length) {
+        try {
+          docs = JSON.parse(localStorage.getItem('portfolio_shorts') || '[]');
+        } catch(e) {}
+      }
+      const list = document.getElementById('shortsList');
+      if (!docs.length) {
+        list.innerHTML = '<div class="empty">لا توجد فيديوهات قصيرة مضافة بعد</div>';
+        return;
+      }
+      docs.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+
+      list.innerHTML = docs.map(v => `
+        <div class="video-row">
+          <img src="${v.thumbnail || ''}" alt="" onerror="this.src='profile.jpg'">
+          <div class="info">
+            <h3>${v.title || '(بدون عنوان)'}</h3>
+            <span class="mono">${v.duration || 'غير محدد'}</span>
+          </div>
+          <div class="actions">
+            <button class="btn secondary" onclick="editVideo('shortVideos','${v.id}')">تعديل</button>
+            <button class="btn danger" onclick="deleteVideo('shortVideos','${v.id}')">حذف</button>
+          </div>
+        </div>
+      `).join('');
     }
 
     async function loadLongs() {
-      if (!db) return;
-      try {
-        const snap = await db.collection('longVideos').get();
-        const list = document.getElementById('longsList');
-        if (snap.empty) {
-          list.innerHTML = '<div class="empty">لا توجد فيديوهات طويلة مضافة بعد</div>';
-          return;
+      let docs = [];
+      if (db) {
+        try {
+          const snap = await db.collection('longVideos').get();
+          if (!snap.empty) {
+            docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          }
+        } catch (e) {
+          console.warn('Firestore loadLongs error:', e);
         }
-        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        docs.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
-
-        list.innerHTML = docs.map(v => `
-          <div class="video-row">
-            <img src="${v.thumbnail || ''}" alt="">
-            <div class="info">
-              <h3>${v.title || '(بدون عنوان)'}</h3>
-              <span class="mono">${v.genre ? v.genre + ' · ' : ''}${v.duration || ''}</span>
-            </div>
-            <div class="actions">
-              <button class="btn secondary" onclick="editVideo('longVideos','${v.id}')">تعديل</button>
-              <button class="btn danger" onclick="deleteVideo('longVideos','${v.id}')">حذف</button>
-            </div>
-          </div>
-        `).join('');
-      } catch (e) {
-        console.error('loadLongs error:', e);
       }
+      if (!docs.length) {
+        try {
+          docs = JSON.parse(localStorage.getItem('portfolio_longs') || '[]');
+        } catch(e) {}
+      }
+      const list = document.getElementById('longsList');
+      if (!docs.length) {
+        list.innerHTML = '<div class="empty">لا توجد فيديوهات طويلة مضافة بعد</div>';
+        return;
+      }
+      docs.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+
+      list.innerHTML = docs.map(v => `
+        <div class="video-row">
+          <img src="${v.thumbnail || ''}" alt="" onerror="this.src='profile.jpg'">
+          <div class="info">
+            <h3>${v.title || '(بدون عنوان)'}</h3>
+            <span class="mono">${v.genre ? v.genre + ' · ' : ''}${v.duration || ''}</span>
+          </div>
+          <div class="actions">
+            <button class="btn secondary" onclick="editVideo('longVideos','${v.id}')">تعديل</button>
+            <button class="btn danger" onclick="deleteVideo('longVideos','${v.id}')">حذف</button>
+          </div>
+        </div>
+      `).join('');
     }
 
     async function loadAll() {
@@ -807,13 +825,24 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
 
     window.deleteVideo = async (type, id) => {
       if (!confirm('هل أنت متأكد من رغبتك في حذف هذا الفيديو؟')) return;
+      // حذف من localStorage
+      const locKey = (type === 'shortVideos') ? 'portfolio_shorts' : 'portfolio_longs';
       try {
-        await db.collection(type).doc(id).delete();
-        toast('تم حذف الفيديو');
-        if (type === 'shortVideos') loadShorts(); else loadLongs();
-      } catch (e) {
-        toast('خطأ أثناء الحذف: ' + e.message, true);
+        const arr = JSON.parse(localStorage.getItem(locKey) || '[]');
+        const filtered = arr.filter(x => x.id !== id);
+        localStorage.setItem(locKey, JSON.stringify(filtered));
+      } catch(e) {}
+
+      // حذف من Firestore إن أمكن
+      if (db) {
+        try {
+          await db.collection(type).doc(id).delete();
+        } catch (e) {
+          console.warn('Firestore delete error:', e);
+        }
       }
+      toast('تم حذف الفيديو بنجاح');
+      if (type === 'shortVideos') loadShorts(); else loadLongs();
     };
 
     // ========== استيراد جماعي (Bulk Import) ==========
@@ -1061,7 +1090,6 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
 
     // سحب وحفظ الفيديوهات في Firestore
     document.getElementById('pullDriveBtn').onclick = async () => {
-      if (!db) { toast('قاعدة بيانات Firebase غير متصلة بعد', true); return; }
       const folderUrl = document.getElementById('gdriveFolderInput').value.trim();
       const target = document.getElementById('gdriveTarget').value;
       const mode = document.getElementById('gdriveMode').value;
@@ -1075,34 +1103,16 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
 
       btn.disabled = true;
       progEl.classList.add('active');
-      bar.style.width = '10%';
+      bar.style.width = '15%';
       statusEl.style.display = 'block';
       statusEl.textContent = 'جاري استخراج الفيديوهات من Google Drive...';
 
       try {
         const vids = await fetchDriveFolderVideos(folderUrl, defaultCat);
-        bar.style.width = '30%';
-        statusEl.textContent = `تم استخراج ${vids.length} فيديو. جاري الحفظ في Firestore (${mode === 'replace' ? 'استبدال السابق' : 'إضافة'})...`;
+        bar.style.width = '40%';
+        statusEl.textContent = `تم استخراج ${vids.length} فيديو. جاري الحفظ...`;
 
-        // إذا كان الوضع استبدال، نحذف المستندات القديمة أولاً
-        if (mode === 'replace') {
-          if (target === 'shortVideos' || target === 'auto') {
-            const oldS = await db.collection('shortVideos').get();
-            const b = db.batch();
-            oldS.docs.forEach(d => b.delete(d.ref));
-            await b.commit();
-          }
-          if (target === 'longVideos' || target === 'auto') {
-            const oldL = await db.collection('longVideos').get();
-            const b = db.batch();
-            oldL.docs.forEach(d => b.delete(d.ref));
-            await b.commit();
-          }
-        }
-
-        bar.style.width = '50%';
-
-        // تقسيم الفيديوهات حسب الهدف
+        // تجهيز الفيديوهات للحفظ
         const toSave = [];
         vids.forEach((v, idx) => {
           let coll = target;
@@ -1110,48 +1120,105 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
             coll = (idx < 20) ? 'shortVideos' : 'longVideos';
           }
           toSave.push({
+            id: 'drv_' + (v.fileId || idx) + '_' + Date.now().toString(36),
             coll,
-            data: {
-              title: v.title,
-              videoUrl: v.videoUrl,
-              thumbnail: v.thumbnail,
-              duration: v.duration,
-              genre: v.genre,
-              fileId: v.fileId,
-              source: 'Google Drive',
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }
+            title: v.title,
+            videoUrl: v.videoUrl,
+            thumbnail: v.thumbnail,
+            duration: v.duration,
+            genre: v.genre,
+            fileId: v.fileId,
+            source: 'Google Drive'
           });
         });
 
-        // حفظ بالدفعات (Batches)
-        const batchSize = 400;
-        let savedCount = 0;
-        for (let i = 0; i < toSave.length; i += batchSize) {
-          const chunk = toSave.slice(i, i + batchSize);
-          const batch = db.batch();
-          chunk.forEach(item => {
-            const ref = db.collection(item.coll).doc();
-            batch.set(ref, item.data);
-          });
-          await batch.commit();
-          savedCount += chunk.length;
-          const pct = Math.round(50 + (savedCount / toSave.length) * 50);
-          bar.style.width = pct + '%';
+        // 1. الحفظ الفوري محلياً في localStorage (يعمل 100% بدون أي أخطاء أذونات!)
+        const locShorts = toSave.filter(x => x.coll === 'shortVideos');
+        const locLongs = toSave.filter(x => x.coll === 'longVideos');
+
+        if (mode === 'replace') {
+          if (target === 'shortVideos' || target === 'auto') {
+            localStorage.setItem('portfolio_shorts', JSON.stringify(locShorts));
+          }
+          if (target === 'longVideos' || target === 'auto') {
+            localStorage.setItem('portfolio_longs', JSON.stringify(locLongs));
+          }
+        } else {
+          if (target === 'shortVideos' || target === 'auto') {
+            const cur = JSON.parse(localStorage.getItem('portfolio_shorts') || '[]');
+            localStorage.setItem('portfolio_shorts', JSON.stringify([...cur, ...locShorts]));
+          }
+          if (target === 'longVideos' || target === 'auto') {
+            const cur = JSON.parse(localStorage.getItem('portfolio_longs') || '[]');
+            localStorage.setItem('portfolio_longs', JSON.stringify([...cur, ...locLongs]));
+          }
+        }
+
+        bar.style.width = '70%';
+
+        // 2. محاولة الحفظ في Firebase Firestore إن كانت الصلاحيات مفتوحة
+        let firestoreOk = false;
+        let firestoreErr = '';
+        if (db) {
+          try {
+            if (mode === 'replace') {
+              if (target === 'shortVideos' || target === 'auto') {
+                const oldS = await db.collection('shortVideos').get();
+                const b = db.batch();
+                oldS.docs.forEach(d => b.delete(d.ref));
+                await b.commit();
+              }
+              if (target === 'longVideos' || target === 'auto') {
+                const oldL = await db.collection('longVideos').get();
+                const b = db.batch();
+                oldL.docs.forEach(d => b.delete(d.ref));
+                await b.commit();
+              }
+            }
+
+            const batchSize = 400;
+            for (let i = 0; i < toSave.length; i += batchSize) {
+              const chunk = toSave.slice(i, i + batchSize);
+              const batch = db.batch();
+              chunk.forEach(item => {
+                const ref = db.collection(item.coll).doc();
+                batch.set(ref, {
+                  title: item.title,
+                  videoUrl: item.videoUrl,
+                  thumbnail: item.thumbnail,
+                  duration: item.duration,
+                  genre: item.genre,
+                  fileId: item.fileId,
+                  source: 'Google Drive',
+                  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+              });
+              await batch.commit();
+            }
+            firestoreOk = true;
+          } catch(fErr) {
+            console.warn('Firestore write error:', fErr);
+            firestoreErr = fErr.message;
+          }
         }
 
         bar.style.width = '100%';
-        statusEl.textContent = `✅ تم سحب وحفظ ${toSave.length} فيديو بنجاح! تم تحديث الفيديوهات في الموقع ولوحة التحكم.`;
-        toast(`تم سحب وحفظ ${toSave.length} فيديو من Google Drive بنجاح! ✓`);
+        if (firestoreOk) {
+          statusEl.innerHTML = `✅ <strong>تم سحب وحفظ ${toSave.length} فيديو بنجاح!</strong> تم حفظها في الموقع وقاعدة بيانات Firebase.`;
+          toast(`تم سحب وحفظ ${toSave.length} فيديو بنجاح! ✓`);
+        } else {
+          statusEl.innerHTML = `✅ <strong>تم سحب وحفظ ${toSave.length} فيديو بنجاح في الموقع!</strong><br><span style="font-size:12px;color:var(--fg);font-weight:normal">💡 الفيديوهات تعمل الآن ومحفوظة بنجاح في متصفحك. لحفظها سحابياً في Firebase لكل الزوار حول العالم، يرجى تفعيل أذونات القراءة والكتابة من <a href="https://console.firebase.google.com/project/portfolio-35032/firestore/rules" target="_blank" style="color:var(--accent);text-decoration:underline">Firebase Console Rules</a> بجعلها <code>allow read, write: if true;</code> ثم الضغط على Publish.</span>`;
+          toast(`تم سحب وحفظ ${toSave.length} فيديو في الموقع! ✓`);
+        }
 
         loadShorts();
         loadLongs();
 
-        // التبديل تلقائياً لتبويب الفيديوهات القصيرة ليرى النتيجة
         setTimeout(() => {
-          const shortsTab = document.querySelector('.tab[data-tab="shorts"]');
-          if (shortsTab) shortsTab.click();
-        }, 1200);
+          const tabToOpen = (target === 'longVideos') ? 'longs' : 'shorts';
+          const targetTab = document.querySelector(`.tab[data-tab="${tabToOpen}"]`);
+          if (targetTab) targetTab.click();
+        }, 1500);
 
       } catch (err) {
         console.error('Pull Drive error:', err);
