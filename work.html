@@ -511,6 +511,21 @@ try {
       if (l.length) window.FILMS = l;
     }
   }
+  const locS = localStorage.getItem('portfolio_shorts');
+  const locL = localStorage.getItem('portfolio_longs');
+  if (locS) {
+    const sArr = JSON.parse(locS);
+    if (Array.isArray(sArr) && sArr.length) window.SHORTS = sArr;
+  }
+  if (locL) {
+    const lArr = JSON.parse(locL);
+    if (Array.isArray(lArr) && lArr.length) window.FILMS = lArr;
+  }
+  const locSet = localStorage.getItem('portfolio_settings');
+  if (locSet) {
+    const sData = JSON.parse(locSet);
+    if (sData && typeof applySettingsData === 'function') applySettingsData(sData);
+  }
 } catch(e) {}
 
 let SHORTS = window.SHORTS || [];

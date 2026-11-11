@@ -1209,6 +1209,30 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       modal.style.display = 'flex';
     };
 
+    
+    window.showFirestoreRulesModal = function() {
+      const m = document.getElementById('firestoreRulesModal');
+      if (m) m.style.display = 'flex';
+    };
+    window.closeFirestoreRulesModal = function() {
+      const m = document.getElementById('firestoreRulesModal');
+      if (m) m.style.display = 'none';
+    };
+    const copyRulesBtn = document.getElementById('copyRulesCodeBtn');
+    if (copyRulesBtn) {
+      copyRulesBtn.onclick = () => {
+        const code = document.getElementById('rulesCodeBlock').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          copyRulesBtn.textContent = 'تم النسخ بنجاح! ✓';
+          setTimeout(() => copyRulesBtn.textContent = 'نسخ الكود 📋', 2500);
+        });
+      };
+    }
+    const closeRulesBtn = document.getElementById('closeRulesModalBtn');
+    if (closeRulesBtn) {
+      closeRulesBtn.onclick = window.closeFirestoreRulesModal;
+    }
+
     window.closeDrivePreviewModal = function() {
       const modal = document.getElementById('drivePreviewModal');
       const container = document.getElementById('modalVideoContainer');
@@ -1347,9 +1371,20 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
         seedBtn.textContent = 'جاري الرفع إلى Firebase...';
         toast('جاري حفظ 46 فيديو في Firestore...');
         
-        try {
-          const list = KNOWN_FOLDER_VIDEOS["1bqvF1DO2spxip8HuldHFXSbEMIXX2JOM"] || [];
-          if (db) {
+        const list = KNOWN_FOLDER_VIDEOS["1bqvF1DO2spxip8HuldHFXSbEMIXX2JOM"] || [];
+
+        // Try anonymous auth if not signed in
+        if (auth && !auth.currentUser) {
+          try {
+            await auth.signInAnonymously();
+          } catch (_) {}
+        }
+
+        let firestoreOk = false;
+        let permError = false;
+
+        if (db) {
+          try {
             const batchSize = 400;
             const batch = db.batch();
             list.forEach((v, idx) => {
@@ -1368,17 +1403,54 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
               }, { merge: true });
             });
             await batch.commit();
+            firestoreOk = true;
+          } catch(e) {
+            console.warn('Seed error:', e);
+            if (e.message && (e.message.includes('permissions') || e.code === 'permission-denied')) {
+              permError = true;
+            }
           }
-          loadShorts();
-          loadLongs();
+        }
+
+        // Always save to localStorage as instant working fallback
+        const mappedAll = list.map((v, idx) => {
+          const isShort = idx < 24;
+          return {
+            id: v.id,
+            fileId: v.id,
+            title: v.title,
+            videoUrl: `https://drive.google.com/file/d/${v.id}/preview`,
+            src: `https://drive.google.com/file/d/${v.id}/preview`,
+            thumbnail: `https://drive.google.com/thumbnail?id=${v.id}&sz=w400`,
+            poster: `https://drive.google.com/thumbnail?id=${v.id}&sz=w400`,
+            type: isShort ? 'short' : 'long',
+            kind: 'Gym & Fitness',
+            dur: v.dur || '0:30',
+            duration: v.dur || '0:30',
+            hue: 180 + (idx * 13) % 170
+          };
+        });
+
+        const sList = mappedAll.filter(v => v.type === 'short');
+        const lList = mappedAll.filter(v => v.type === 'long');
+        localStorage.setItem('portfolio_videos', JSON.stringify(mappedAll));
+        localStorage.setItem('portfolio_shorts', JSON.stringify(sList));
+        localStorage.setItem('portfolio_longs', JSON.stringify(lList));
+
+        loadShorts();
+        loadLongs();
+
+        seedBtn.disabled = false;
+        seedBtn.textContent = '⚡ رفع وحفظ الـ 46 فيديو في Firebase Firestore الآن';
+
+        if (firestoreOk) {
           alert('🎉 تم بنجاح رفع وحفظ الـ 46 فيديو في Firebase Firestore! الموقع الآن يعمل بالكامل عبر السحابة.');
           toast('تم الرفع إلى Firebase بنجاح! ✓');
-        } catch(e) {
-          console.warn('Seed error:', e);
-          alert('حدث خطأ أثناء الرفع إلى Firebase: ' + e.message);
-        } finally {
-          seedBtn.disabled = false;
-          seedBtn.textContent = '⚡ رفع وحفظ الـ 46 فيديو في Firebase Firestore الآن';
+        } else if (permError) {
+          showFirestoreRulesModal();
+        } else {
+          alert('تم حفظ الـ 46 فيديو محلياً بنجاح في المتصفح!');
+          toast('تم الحفظ محلياً بنجاح ✓');
         }
       };
     }
@@ -1546,5 +1618,39 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       </div>
     </div>
   </div>
+
+  <!-- مودال توجيه وتصحيح قواعد أمان فايربيس -->
+  <div id="firestoreRulesModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#18181b;border:1px solid #f59e0b;border-radius:12px;max-width:560px;width:100%;padding:24px;color:#fff;direction:rtl;box-shadow:0 25px 50px -12px rgba(0,0,0,0.6);">
+      <h3 style="margin-top:0;color:#f59e0b;display:flex;align-items:center;gap:8px;font-size:18px;">
+        ⚠️ مطلوب تفعيل صلاحيات الكتابة في Firebase
+      </h3>
+      <p style="font-size:14px;line-height:1.6;color:#e4e4e7;margin-bottom:12px;">
+        رسالة <b>(Missing or insufficient permissions)</b> تعني أن قواعد الأمان في Firebase Console الحالية تمنع الكتابة لغير المسجلين.<br>
+        <span style="color:#34d399;font-weight:600;">✓ لا تقلق: تم حفظ الفيديوهات الـ 46 محلياً في متصفحك وتعمل الآن بالموقع!</span><br>
+        ولنشرها في السحابة لتظهر لجميع زوار الموقع من أي جهاز، نفّذ الخطوتين التاليتين (تستغرق 30 ثانية):
+      </p>
+      <ol style="font-size:13px;line-height:1.8;color:#d4d4d8;padding-right:20px;margin-bottom:12px;">
+        <li>افتح تبويب القواعد: <a href="https://console.firebase.google.com/project/portfolio-35032/firestore/rules" target="_blank" style="color:#60a5fa;text-decoration:underline;font-weight:bold;">Firebase Console Firestore Rules ↗</a></li>
+        <li>انسخ الكود التالي واستبدل الكود الموجود به واضغط <b>Publish (نشر)</b>:</li>
+      </ol>
+      <div style="position:relative;margin:12px 0;">
+        <pre id="rulesCodeBlock" style="background:#09090b;padding:14px;border-radius:6px;font-family:monospace;font-size:12px;color:#34d399;direction:ltr;text-align:left;overflow-x:auto;border:1px solid #27272a;">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}</pre>
+        <button type="button" id="copyRulesCodeBtn" class="btn" style="position:absolute;top:8px;right:8px;font-size:11px;padding:5px 10px;background:#27272a;">نسخ الكود 📋</button>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;">
+        <a href="https://console.firebase.google.com/project/portfolio-35032/firestore/rules" target="_blank" class="btn" style="text-decoration:none;">🔗 فتح صفحة القواعد في Firebase</a>
+        <button type="button" id="closeRulesModalBtn" class="btn secondary">إغلاق ومعاينة الموقع</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
