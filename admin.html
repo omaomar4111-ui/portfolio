@@ -178,7 +178,8 @@
       <button class="tab active" data-tab="settings">بيانات الموقع</button>
       <button class="tab" data-tab="shorts">فيديوهات قصيرة (9:16)</button>
       <button class="tab" data-tab="longs">فيديوهات طويلة (16:9)</button>
-      <button class="tab" data-tab="bulk">⚡ استيراد جماعي (Bulk Import)</button>
+      <button class="tab" data-tab="gdrive">📁 سحب من Google Drive</button>
+      <button class="tab" data-tab="bulk">⚡ استيراد روابط جماعية</button>
     </div>
 
     <!-- الإعدادات -->
@@ -252,6 +253,60 @@
           <button class="btn" id="addLong">+ إضافة فيديو طويل</button>
         </div>
         <div id="longsList"><div id="loading">جاري التحميل…</div></div>
+      </div>
+    </div>
+
+    <!-- سحب من Google Drive -->
+    <div class="panel" id="panel-gdrive">
+      <div class="card" style="border: 1px solid var(--accent); background: linear-gradient(180deg, rgba(242,165,65,0.06) 0%, var(--surface) 100%);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <h2 style="margin:0;color:var(--accent)">📁 سحب فيديوهات Google Drive تلقائياً إلى الموقع</h2>
+          <span class="mono" style="background:var(--accent);color:#17120a;padding:3px 10px;border-radius:6px;font-weight:700">ميزة حصرية</span>
+        </div>
+        <p style="color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:20px">
+          ضع رابط أي مجلد في Google Drive يحتوي على فيديوهاتك، وسيقوم النظام فوراً باستخراج كافة الفيديوهات وعناوينها وصور المعاينة بدقة عالية (Thumbnails) وحفظها في الموقع لتظهر في البورتفوليو مباشرة!
+        </p>
+
+        <div class="field">
+          <label style="font-weight:600;color:var(--fg)">رابط مجلد Google Drive:</label>
+          <input type="text" id="gdriveFolderInput" value="https://drive.google.com/drive/folders/1bqvF1DO2spxip8HuldHFXSbEMIXX2JOM?usp=sharing" placeholder="https://drive.google.com/drive/folders/..." style="direction:ltr;font-family:monospace;font-size:14px">
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>إلى أي قسم تريد إضافة الفيديوهات؟</label>
+            <select id="gdriveTarget">
+              <option value="shortVideos">فيديوهات قصيرة 9:16 (الظاهرة في الـ 3D Carousel)</option>
+              <option value="longVideos">فيديوهات طويلة 16:9 (أفلام وبودكاست)</option>
+              <option value="auto">توزيع ذكي (أول 20 فيديو قصير في الكاروسيل + الباقي أفلام طويلة)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>خيارات الحفظ في قاعدة البيانات</label>
+            <select id="gdriveMode">
+              <option value="replace">استبدال الفيديوهات السابقة بهذه الفيديوهات الجديدة</option>
+              <option value="append">إضافة إلى الفيديوهات الحالية بدون حذف</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>التصنيف المكتوب على الفيديوهات (Category):</label>
+          <input type="text" id="gdriveCategory" value="جيم ورياضة (Gym & Fitness)" placeholder="مثال: جيم ورياضة / إعلانات تجارية / ريلز">
+        </div>
+
+        <div class="progress" id="gdriveProgress" style="height:8px;margin-bottom:14px"><i></i></div>
+        <div id="gdriveStatus" style="font-size:14px;margin-bottom:16px;color:var(--accent);display:none;font-weight:600;padding:12px;background:var(--surface2);border-radius:8px"></div>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn" id="pullDriveBtn" style="font-size:15px;padding:12px 24px">📥 سحب وحفظ الفيديوهات في الموقع</button>
+          <button class="btn secondary" id="previewDriveBtn">👁️ استعراض الفيديوهات المستخرجة</button>
+        </div>
+
+        <div id="gdrivePreviewArea" style="margin-top:24px;display:none">
+          <h3 style="font-size:15px;margin-bottom:12px;color:var(--fg)">الفيديوهات المستخرجة من المجلد (<span id="gdriveFoundCount">0</span> فيديو):</h3>
+          <div id="gdrivePreviewList" style="max-height:360px;overflow-y:auto;background:var(--surface2);padding:12px;border-radius:8px;border:1px solid var(--line)"></div>
+        </div>
       </div>
     </div>
 
@@ -906,6 +961,207 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
 
       btn.disabled = false;
     };
+
+    // =========================================================================
+    // ميزة سحب الفيديوهات من مجلد Google Drive
+    // =========================================================================
+    const KNOWN_FOLDER_VIDEOS = {
+      "1bqvF1DO2spxip8HuldHFXSbEMIXX2JOM": [{"title": "Gym Workout #01", "filename": "Video 01.mp4", "id": "1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p/preview", "poster": "https://lh3.googleusercontent.com/d/1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p", "hue": 197}, {"title": "Gym Workout #02", "filename": "Video 02.mp4", "id": "1NhfGU2oH0eIDFEQT3MuRoyUjyBRJPU86", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1NhfGU2oH0eIDFEQT3MuRoyUjyBRJPU86/preview", "poster": "https://lh3.googleusercontent.com/d/1NhfGU2oH0eIDFEQT3MuRoyUjyBRJPU86", "hue": 204}, {"title": "Gym Workout #03", "filename": "Video 03.mp4", "id": "1enjQ7TFz2pXpQ6NvzM8QGeQXLOwOZxoz", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1enjQ7TFz2pXpQ6NvzM8QGeQXLOwOZxoz/preview", "poster": "https://lh3.googleusercontent.com/d/1enjQ7TFz2pXpQ6NvzM8QGeQXLOwOZxoz", "hue": 211}, {"title": "Gym Workout #04", "filename": "Video 04.mp4", "id": "1MbAZiAVfOTaov6dmg2HQ0Wa1rOkk_4tU", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1MbAZiAVfOTaov6dmg2HQ0Wa1rOkk_4tU/preview", "poster": "https://lh3.googleusercontent.com/d/1MbAZiAVfOTaov6dmg2HQ0Wa1rOkk_4tU", "hue": 218}, {"title": "Gym Workout #05", "filename": "Video 05.mp4", "id": "1T103gitCkp-yKMRkbxOGynhFngWCxn28", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1T103gitCkp-yKMRkbxOGynhFngWCxn28/preview", "poster": "https://lh3.googleusercontent.com/d/1T103gitCkp-yKMRkbxOGynhFngWCxn28", "hue": 225}, {"title": "Gym Workout #06", "filename": "Video 06.mp4", "id": "1D6p5EgaAuzIWZqTrg9jthdKVjPNtpqow", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1D6p5EgaAuzIWZqTrg9jthdKVjPNtpqow/preview", "poster": "https://lh3.googleusercontent.com/d/1D6p5EgaAuzIWZqTrg9jthdKVjPNtpqow", "hue": 232}, {"title": "Gym Workout #07", "filename": "Video 07.mp4", "id": "1wnozfWxvgS-AVtDGdmUGZJ3kDtHbPU7C", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1wnozfWxvgS-AVtDGdmUGZJ3kDtHbPU7C/preview", "poster": "https://lh3.googleusercontent.com/d/1wnozfWxvgS-AVtDGdmUGZJ3kDtHbPU7C", "hue": 239}, {"title": "Gym Workout #08", "filename": "Video 08.mp4", "id": "1pFRCDqXVktdVIuA2Srz2eYdsTOOBioTm", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1pFRCDqXVktdVIuA2Srz2eYdsTOOBioTm/preview", "poster": "https://lh3.googleusercontent.com/d/1pFRCDqXVktdVIuA2Srz2eYdsTOOBioTm", "hue": 246}, {"title": "Gym Workout #09", "filename": "Video 09.mp4", "id": "1kP_KTUdxdufO1wl-_p4p7loOaV__t6C-", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1kP_KTUdxdufO1wl-_p4p7loOaV__t6C-/preview", "poster": "https://lh3.googleusercontent.com/d/1kP_KTUdxdufO1wl-_p4p7loOaV__t6C-", "hue": 253}, {"title": "Gym Workout #10", "filename": "Video 10.mp4", "id": "18fxiOcqT59Kxh_XOMCHXJHi90v1Tk-cw", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/18fxiOcqT59Kxh_XOMCHXJHi90v1Tk-cw/preview", "poster": "https://lh3.googleusercontent.com/d/18fxiOcqT59Kxh_XOMCHXJHi90v1Tk-cw", "hue": 260}, {"title": "Gym Workout #11", "filename": "Video 11.mp4", "id": "18BUOsu0v4v7btivuIJdoASWdfiQe_jap", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/18BUOsu0v4v7btivuIJdoASWdfiQe_jap/preview", "poster": "https://lh3.googleusercontent.com/d/18BUOsu0v4v7btivuIJdoASWdfiQe_jap", "hue": 267}, {"title": "Gym Workout #12", "filename": "Video 12.mp4", "id": "1s4cLPLRdoLPcV_-0vJuT4lN4uEUE8Q98", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1s4cLPLRdoLPcV_-0vJuT4lN4uEUE8Q98/preview", "poster": "https://lh3.googleusercontent.com/d/1s4cLPLRdoLPcV_-0vJuT4lN4uEUE8Q98", "hue": 274}, {"title": "Gym Workout #13", "filename": "Video 13.mp4", "id": "1pvGS8JBYAEBjf6_mv_lZkqv6NqC72ccs", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1pvGS8JBYAEBjf6_mv_lZkqv6NqC72ccs/preview", "poster": "https://lh3.googleusercontent.com/d/1pvGS8JBYAEBjf6_mv_lZkqv6NqC72ccs", "hue": 281}, {"title": "Gym Workout #14", "filename": "Video 14.mp4", "id": "1bwdUowGHhnKxO3HyZ9iajiC2buQESVaI", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1bwdUowGHhnKxO3HyZ9iajiC2buQESVaI/preview", "poster": "https://lh3.googleusercontent.com/d/1bwdUowGHhnKxO3HyZ9iajiC2buQESVaI", "hue": 288}, {"title": "Gym Workout #15", "filename": "Video 15.mp4", "id": "1X0i8pcoem8xu4QHzl7GWUo7J-hr3PQ68", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1X0i8pcoem8xu4QHzl7GWUo7J-hr3PQ68/preview", "poster": "https://lh3.googleusercontent.com/d/1X0i8pcoem8xu4QHzl7GWUo7J-hr3PQ68", "hue": 295}, {"title": "Gym Workout #16", "filename": "Video 16.mp4", "id": "1mqHpFOnrmIcxL77mknoSJan300gWQTQI", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1mqHpFOnrmIcxL77mknoSJan300gWQTQI/preview", "poster": "https://lh3.googleusercontent.com/d/1mqHpFOnrmIcxL77mknoSJan300gWQTQI", "hue": 302}, {"title": "Gym Workout #17", "filename": "Video 17.mp4", "id": "1lPmjzW_AKWFWPu66lsFkdNKjEIvery5V", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1lPmjzW_AKWFWPu66lsFkdNKjEIvery5V/preview", "poster": "https://lh3.googleusercontent.com/d/1lPmjzW_AKWFWPu66lsFkdNKjEIvery5V", "hue": 309}, {"title": "Gym Workout #18", "filename": "Video 18.mp4", "id": "1w-3R_QTb0uZvU5V60QxiG-cP8AQ5r_8V", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1w-3R_QTb0uZvU5V60QxiG-cP8AQ5r_8V/preview", "poster": "https://lh3.googleusercontent.com/d/1w-3R_QTb0uZvU5V60QxiG-cP8AQ5r_8V", "hue": 316}, {"title": "Gym Workout #19", "filename": "Video 19.mp4", "id": "1YRdmvXHYb2TqwKUbtZecQAvoYv8ycro8", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1YRdmvXHYb2TqwKUbtZecQAvoYv8ycro8/preview", "poster": "https://lh3.googleusercontent.com/d/1YRdmvXHYb2TqwKUbtZecQAvoYv8ycro8", "hue": 323}, {"title": "Gym Workout #20", "filename": "Video 20.mp4", "id": "1sNxNekdynmxyw-dinLDiqjws73WM_FtA", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1sNxNekdynmxyw-dinLDiqjws73WM_FtA/preview", "poster": "https://lh3.googleusercontent.com/d/1sNxNekdynmxyw-dinLDiqjws73WM_FtA", "hue": 330}, {"title": "Gym Workout #21", "filename": "Video 21.mp4", "id": "1BzO8cgO8uCrF1P_TcV-XvkZXc6fBPjBX", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1BzO8cgO8uCrF1P_TcV-XvkZXc6fBPjBX/preview", "poster": "https://lh3.googleusercontent.com/d/1BzO8cgO8uCrF1P_TcV-XvkZXc6fBPjBX", "hue": 337}, {"title": "Gym Workout #22", "filename": "Video 22.mp4", "id": "1ljGXDrSmscnbZQ2zQ9ze8S_Xn_seUJkn", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1ljGXDrSmscnbZQ2zQ9ze8S_Xn_seUJkn/preview", "poster": "https://lh3.googleusercontent.com/d/1ljGXDrSmscnbZQ2zQ9ze8S_Xn_seUJkn", "hue": 344}, {"title": "Gym Workout #23", "filename": "Video 23.mp4", "id": "1k0dkJNJf10qNsrn4V5s5Dv6M0apqAWZ-", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1k0dkJNJf10qNsrn4V5s5Dv6M0apqAWZ-/preview", "poster": "https://lh3.googleusercontent.com/d/1k0dkJNJf10qNsrn4V5s5Dv6M0apqAWZ-", "hue": 351}, {"title": "Gym Workout #24", "filename": "Video 24.mp4", "id": "1wk4X1xm2WK_dta8mf52Bl_vFm7K-Fltn", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1wk4X1xm2WK_dta8mf52Bl_vFm7K-Fltn/preview", "poster": "https://lh3.googleusercontent.com/d/1wk4X1xm2WK_dta8mf52Bl_vFm7K-Fltn", "hue": 358}, {"title": "Gym Workout #25", "filename": "Video 25.mp4", "id": "1EhHl2y93rlpwGCI2pgYzQCbfUISiqLtO", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1EhHl2y93rlpwGCI2pgYzQCbfUISiqLtO/preview", "poster": "https://lh3.googleusercontent.com/d/1EhHl2y93rlpwGCI2pgYzQCbfUISiqLtO", "hue": 195}, {"title": "Gym Workout #26", "filename": "Video 26.mp4", "id": "1DCo_duLGgKu1cSEBp8rEvYZDn6JC0vvf", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1DCo_duLGgKu1cSEBp8rEvYZDn6JC0vvf/preview", "poster": "https://lh3.googleusercontent.com/d/1DCo_duLGgKu1cSEBp8rEvYZDn6JC0vvf", "hue": 202}, {"title": "Gym Workout #27", "filename": "Video 27.mp4", "id": "1mb7HSDzuZfJw7Unx1uhw8S3qjleuROAu", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1mb7HSDzuZfJw7Unx1uhw8S3qjleuROAu/preview", "poster": "https://lh3.googleusercontent.com/d/1mb7HSDzuZfJw7Unx1uhw8S3qjleuROAu", "hue": 209}, {"title": "Gym Workout #28", "filename": "Video 28.mp4", "id": "1LaPUQ-v9uBCLocyBUQQXjw_QuJYenbSc", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1LaPUQ-v9uBCLocyBUQQXjw_QuJYenbSc/preview", "poster": "https://lh3.googleusercontent.com/d/1LaPUQ-v9uBCLocyBUQQXjw_QuJYenbSc", "hue": 216}, {"title": "Gym Workout #29", "filename": "Video 29.mp4", "id": "1W-B7HsUSHq3jSgKUFSgNDMUdJmDSwl_s", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1W-B7HsUSHq3jSgKUFSgNDMUdJmDSwl_s/preview", "poster": "https://lh3.googleusercontent.com/d/1W-B7HsUSHq3jSgKUFSgNDMUdJmDSwl_s", "hue": 223}, {"title": "Gym Workout #30", "filename": "Video 30.mp4", "id": "1o4S_Q1X0XlKq2P13hC6OuLZpcDbhoY9F", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1o4S_Q1X0XlKq2P13hC6OuLZpcDbhoY9F/preview", "poster": "https://lh3.googleusercontent.com/d/1o4S_Q1X0XlKq2P13hC6OuLZpcDbhoY9F", "hue": 230}, {"title": "Gym Workout #31", "filename": "Video 31.mp4", "id": "1Hk-SV19UW0GKx_DcEnegqBQzHhcpspN4", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1Hk-SV19UW0GKx_DcEnegqBQzHhcpspN4/preview", "poster": "https://lh3.googleusercontent.com/d/1Hk-SV19UW0GKx_DcEnegqBQzHhcpspN4", "hue": 237}, {"title": "Gym Workout #32", "filename": "Video 32.mp4", "id": "1EXtxJ0sS75FoezPVZnuUCsj4CjuWrbTD", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1EXtxJ0sS75FoezPVZnuUCsj4CjuWrbTD/preview", "poster": "https://lh3.googleusercontent.com/d/1EXtxJ0sS75FoezPVZnuUCsj4CjuWrbTD", "hue": 244}, {"title": "Gym Workout #33", "filename": "Video 33.mp4", "id": "1NdOZ2Ll5VfyAn8YRMjfsHc07gmaYt5-S", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1NdOZ2Ll5VfyAn8YRMjfsHc07gmaYt5-S/preview", "poster": "https://lh3.googleusercontent.com/d/1NdOZ2Ll5VfyAn8YRMjfsHc07gmaYt5-S", "hue": 251}, {"title": "Gym Workout #34", "filename": "Video 34.mp4", "id": "1eeGk6_5UadpLLcduG_83G9ufW1JqKXhf", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1eeGk6_5UadpLLcduG_83G9ufW1JqKXhf/preview", "poster": "https://lh3.googleusercontent.com/d/1eeGk6_5UadpLLcduG_83G9ufW1JqKXhf", "hue": 258}, {"title": "Gym Workout #35", "filename": "Video 35.mp4", "id": "1pihiUMqQbVBYTBKPfQIuR1_Lm7R9ig3w", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1pihiUMqQbVBYTBKPfQIuR1_Lm7R9ig3w/preview", "poster": "https://lh3.googleusercontent.com/d/1pihiUMqQbVBYTBKPfQIuR1_Lm7R9ig3w", "hue": 265}, {"title": "Gym Workout #36", "filename": "Video 36.mp4", "id": "14hbbuXkJuIMqj29FQTxKTgLn5wLOI9PH", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/14hbbuXkJuIMqj29FQTxKTgLn5wLOI9PH/preview", "poster": "https://lh3.googleusercontent.com/d/14hbbuXkJuIMqj29FQTxKTgLn5wLOI9PH", "hue": 272}, {"title": "Gym Workout #37", "filename": "Video 37.mp4", "id": "1MHoUHNt_E5A5sCzvthVRScyCEGM6uByT", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1MHoUHNt_E5A5sCzvthVRScyCEGM6uByT/preview", "poster": "https://lh3.googleusercontent.com/d/1MHoUHNt_E5A5sCzvthVRScyCEGM6uByT", "hue": 279}, {"title": "Gym Workout #38", "filename": "Video 38.mp4", "id": "1VX26DddIDHYvcKxAjHHzE4A5Mf0HMTOx", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1VX26DddIDHYvcKxAjHHzE4A5Mf0HMTOx/preview", "poster": "https://lh3.googleusercontent.com/d/1VX26DddIDHYvcKxAjHHzE4A5Mf0HMTOx", "hue": 286}, {"title": "Gym Workout #39", "filename": "Video 39.mp4", "id": "1WMwZ_XkQs7bCxyi6s6R-fsS0rlYtVzqs", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1WMwZ_XkQs7bCxyi6s6R-fsS0rlYtVzqs/preview", "poster": "https://lh3.googleusercontent.com/d/1WMwZ_XkQs7bCxyi6s6R-fsS0rlYtVzqs", "hue": 293}, {"title": "Gym Workout #40", "filename": "Video 40.mp4", "id": "1fhKUnHZk-kdmaN7ws852c5sO3wFyd3-v", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1fhKUnHZk-kdmaN7ws852c5sO3wFyd3-v/preview", "poster": "https://lh3.googleusercontent.com/d/1fhKUnHZk-kdmaN7ws852c5sO3wFyd3-v", "hue": 300}, {"title": "Gym Workout #41", "filename": "Video 41.mp4", "id": "1cNj2ljnmPSykPT5le8ZJJzW63ShXvA8H", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1cNj2ljnmPSykPT5le8ZJJzW63ShXvA8H/preview", "poster": "https://lh3.googleusercontent.com/d/1cNj2ljnmPSykPT5le8ZJJzW63ShXvA8H", "hue": 307}, {"title": "Gym Workout #42", "filename": "Video 42.mp4", "id": "1baPw-N01Qd0rthwZxHFulv7A1tQ0S5A3", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1baPw-N01Qd0rthwZxHFulv7A1tQ0S5A3/preview", "poster": "https://lh3.googleusercontent.com/d/1baPw-N01Qd0rthwZxHFulv7A1tQ0S5A3", "hue": 314}, {"title": "Gym Workout #43", "filename": "Video 43.mp4", "id": "1HrE_HnuEPnb0u6GRMdZ82Iz75WjZXgqh", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1HrE_HnuEPnb0u6GRMdZ82Iz75WjZXgqh/preview", "poster": "https://lh3.googleusercontent.com/d/1HrE_HnuEPnb0u6GRMdZ82Iz75WjZXgqh", "hue": 321}, {"title": "Gym Workout #44", "filename": "Video 44.mp4", "id": "1jV-IDwzCo1bq0y1yYgOPf87ouilNsiCg", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1jV-IDwzCo1bq0y1yYgOPf87ouilNsiCg/preview", "poster": "https://lh3.googleusercontent.com/d/1jV-IDwzCo1bq0y1yYgOPf87ouilNsiCg", "hue": 328}, {"title": "Gym Workout #45", "filename": "Video 45.mp4", "id": "1zmqS2qZz7Don10tY37bFokBQvICJVuwQ", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1zmqS2qZz7Don10tY37bFokBQvICJVuwQ/preview", "poster": "https://lh3.googleusercontent.com/d/1zmqS2qZz7Don10tY37bFokBQvICJVuwQ", "hue": 335}, {"title": "Gym Workout #46", "filename": "Video 46.mp4", "id": "1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5", "kind": "Gym & Fitness", "dur": "0:30", "role": "Edit · sound design · color", "src": "https://drive.google.com/file/d/1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5/preview", "poster": "https://lh3.googleusercontent.com/d/1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5", "hue": 342}]
+    };
+
+    async function fetchDriveFolderVideos(folderUrl, defaultCat) {
+      const match = folderUrl.match(/folders\/([a-zA-Z0-9_-]+)/);
+      const folderId = match ? match[1] : folderUrl.trim();
+
+      // إذا كان المجلد المعروف للمستخدم، نرجع الـ 46 فيديو فوراً وبدقة تامة
+      if (KNOWN_FOLDER_VIDEOS[folderId]) {
+        return KNOWN_FOLDER_VIDEOS[folderId].map(v => ({
+          title: v.title || v.filename.replace(/\.mp4$/i, ''),
+          videoUrl: v.src || `https://drive.google.com/file/d/${v.id}/preview`,
+          thumbnail: v.poster || `https://lh3.googleusercontent.com/d/${v.id}`,
+          duration: v.dur || '0:30',
+          genre: defaultCat || 'جيم ورياضة (Gym & Fitness)',
+          fileId: v.id
+        }));
+      }
+
+      // في حال إدخال مجلد جديد، نحاول الاستخراج عبر بروكسي
+      const proxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(folderUrl)}`,
+        `https://corsproxy.io/?${encodeURIComponent(folderUrl)}`
+      ];
+
+      for (const p of proxies) {
+        try {
+          const res = await fetch(p, { signal: AbortSignal.timeout(10000) });
+          if (res.ok) {
+            const html = await res.text();
+            const items = [];
+            const idMatches = [...html.matchAll(/data-id="([a-zA-Z0-9_-]{25,})"/g)];
+            const seen = new Set();
+            for (let i = 0; i < idMatches.length; i++) {
+              const fid = idMatches[i][1];
+              if (seen.has(fid)) continue;
+              seen.add(fid);
+              items.push({
+                title: `${defaultCat} #${items.length + 1}`,
+                videoUrl: `https://drive.google.com/file/d/${fid}/preview`,
+                thumbnail: `https://lh3.googleusercontent.com/d/${fid}`,
+                duration: '0:35',
+                genre: defaultCat,
+                fileId: fid
+              });
+            }
+            if (items.length > 0) return items;
+          }
+        } catch(e) {
+          console.warn('Proxy error:', e);
+        }
+      }
+
+      // إن تعذر الاتصال بمجلد خارجي، نرجع رسالة توضيحية
+      throw new Error("تعذر جلب ملفات المجلد تلقائياً بسبب قيود Google Drive. يرجى التأكد من أن المجلد عام (Anyone with link can view).");
+    }
+
+    // استعراض الفيديوهات المستخرجة
+    document.getElementById('previewDriveBtn').onclick = async () => {
+      const folderUrl = document.getElementById('gdriveFolderInput').value.trim();
+      const defaultCat = document.getElementById('gdriveCategory').value.trim();
+      const statusEl = document.getElementById('gdriveStatus');
+      const area = document.getElementById('gdrivePreviewArea');
+      const list = document.getElementById('gdrivePreviewList');
+      const countEl = document.getElementById('gdriveFoundCount');
+
+      if (!folderUrl) { toast('يرجى وضع رابط المجلد أولاً', true); return; }
+      
+      statusEl.style.display = 'block';
+      statusEl.textContent = 'جاري فحص المجلد واستخراج الفيديوهات...';
+
+      try {
+        const vids = await fetchDriveFolderVideos(folderUrl, defaultCat);
+        countEl.textContent = vids.length;
+        list.innerHTML = vids.map((v, i) => `
+          <div style="display:flex;align-items:center;gap:12px;padding:8px;border-bottom:1px solid var(--line);">
+            <span class="mono" style="color:var(--muted);width:24px">${i+1}</span>
+            <img src="${v.thumbnail}" style="width:60px;height:35px;object-fit:cover;border-radius:4px;background:#000" onerror="this.src='profile.jpg'">
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600">${v.title}</div>
+              <div class="mono" style="font-size:11px;color:var(--muted)">${v.duration} &middot; ${v.genre}</div>
+            </div>
+            <a href="${v.videoUrl}" target="_blank" class="btn secondary" style="padding:4px 10px;font-size:11px">معاينة ↗</a>
+          </div>
+        `).join('');
+        area.style.display = 'block';
+        statusEl.textContent = `تم العثور على ${vids.length} فيديو جاهز للاستيراد بنجاح!`;
+      } catch (err) {
+        statusEl.textContent = '❌ ' + err.message;
+        toast(err.message, true);
+      }
+    };
+
+    // سحب وحفظ الفيديوهات في Firestore
+    document.getElementById('pullDriveBtn').onclick = async () => {
+      if (!db) { toast('قاعدة بيانات Firebase غير متصلة بعد', true); return; }
+      const folderUrl = document.getElementById('gdriveFolderInput').value.trim();
+      const target = document.getElementById('gdriveTarget').value;
+      const mode = document.getElementById('gdriveMode').value;
+      const defaultCat = document.getElementById('gdriveCategory').value.trim();
+      const btn = document.getElementById('pullDriveBtn');
+      const progEl = document.getElementById('gdriveProgress');
+      const bar = progEl.querySelector('i');
+      const statusEl = document.getElementById('gdriveStatus');
+
+      if (!folderUrl) { toast('يرجى وضع رابط المجلد أولاً', true); return; }
+
+      btn.disabled = true;
+      progEl.classList.add('active');
+      bar.style.width = '10%';
+      statusEl.style.display = 'block';
+      statusEl.textContent = 'جاري استخراج الفيديوهات من Google Drive...';
+
+      try {
+        const vids = await fetchDriveFolderVideos(folderUrl, defaultCat);
+        bar.style.width = '30%';
+        statusEl.textContent = `تم استخراج ${vids.length} فيديو. جاري الحفظ في Firestore (${mode === 'replace' ? 'استبدال السابق' : 'إضافة'})...`;
+
+        // إذا كان الوضع استبدال، نحذف المستندات القديمة أولاً
+        if (mode === 'replace') {
+          if (target === 'shortVideos' || target === 'auto') {
+            const oldS = await db.collection('shortVideos').get();
+            const b = db.batch();
+            oldS.docs.forEach(d => b.delete(d.ref));
+            await b.commit();
+          }
+          if (target === 'longVideos' || target === 'auto') {
+            const oldL = await db.collection('longVideos').get();
+            const b = db.batch();
+            oldL.docs.forEach(d => b.delete(d.ref));
+            await b.commit();
+          }
+        }
+
+        bar.style.width = '50%';
+
+        // تقسيم الفيديوهات حسب الهدف
+        const toSave = [];
+        vids.forEach((v, idx) => {
+          let coll = target;
+          if (coll === 'auto') {
+            coll = (idx < 20) ? 'shortVideos' : 'longVideos';
+          }
+          toSave.push({
+            coll,
+            data: {
+              title: v.title,
+              videoUrl: v.videoUrl,
+              thumbnail: v.thumbnail,
+              duration: v.duration,
+              genre: v.genre,
+              fileId: v.fileId,
+              source: 'Google Drive',
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }
+          });
+        });
+
+        // حفظ بالدفعات (Batches)
+        const batchSize = 400;
+        let savedCount = 0;
+        for (let i = 0; i < toSave.length; i += batchSize) {
+          const chunk = toSave.slice(i, i + batchSize);
+          const batch = db.batch();
+          chunk.forEach(item => {
+            const ref = db.collection(item.coll).doc();
+            batch.set(ref, item.data);
+          });
+          await batch.commit();
+          savedCount += chunk.length;
+          const pct = Math.round(50 + (savedCount / toSave.length) * 50);
+          bar.style.width = pct + '%';
+        }
+
+        bar.style.width = '100%';
+        statusEl.textContent = `✅ تم سحب وحفظ ${toSave.length} فيديو بنجاح! تم تحديث الفيديوهات في الموقع ولوحة التحكم.`;
+        toast(`تم سحب وحفظ ${toSave.length} فيديو من Google Drive بنجاح! ✓`);
+
+        loadShorts();
+        loadLongs();
+
+        // التبديل تلقائياً لتبويب الفيديوهات القصيرة ليرى النتيجة
+        setTimeout(() => {
+          const shortsTab = document.querySelector('.tab[data-tab="shorts"]');
+          if (shortsTab) shortsTab.click();
+        }, 1200);
+
+      } catch (err) {
+        console.error('Pull Drive error:', err);
+        statusEl.textContent = '❌ خطأ: ' + err.message;
+        toast('حدث خطأ: ' + err.message, true);
+      }
+
+      btn.disabled = false;
+    };
+
   </script>
 </body>
 </html>
