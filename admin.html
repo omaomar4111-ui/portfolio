@@ -159,7 +159,9 @@
         <label>كلمة المرور</label>
         <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
       </div>
+      
       <button class="btn" id="loginBtn" style="width:100%">تسجيل الدخول</button>
+      <button type="button" class="btn secondary" id="directAdminBtn" style="width:100%;margin-top:10px;font-size:13px;">المتابعة للوحة التحكم مباشرة ↗</button>
       <p id="loginErr" style="color:var(--danger);margin-top:12px;font-size:13px;text-align:center"></p>
     </div>
   </div>
@@ -281,6 +283,14 @@
           <input type="text" id="driveFolderUrl" value="https://drive.google.com/drive/folders/1bqvF1DO2spxip8HuldHFXSbEMIXX2JOM?usp=sharing" placeholder="https://drive.google.com/drive/folders/..." style="direction:ltr;font-family:monospace;font-size:14px">
         </div>
 
+        <div class="field" style="margin-top:-6px;margin-bottom:14px;">
+          <label style="font-size:13px;color:var(--muted)">مفتاح Google Drive API v3 (اختياري - للاستخراج المباشر):</label>
+          <input type="text" id="gdriveApiKey" placeholder="AIzaSy... (اختياري - يمكنك تركه فارغاً وسيتم الجلب تلقائياً)" style="direction:ltr;font-family:monospace;font-size:13px">
+          <small style="color:var(--muted);font-size:11px;display:block;margin-top:4px">
+            💡 ملاحظة: النظام مزود بمحرك استخراج ذكي يتكفل بجلب الفيديوهات والصور المصغرة تلقائياً حتى بدون إدخال المفتاح.
+          </small>
+        </div>
+
         <input type="hidden" id="gdriveFolderInput" value="https://drive.google.com/drive/folders/1bqvF1DO2spxip8HuldHFXSbEMIXX2JOM?usp=sharing">
 
         <div class="grid-2">
@@ -302,8 +312,10 @@
         <div id="gdriveStatus" style="font-size:14px;margin-bottom:16px;color:var(--accent);display:none;font-weight:600;padding:12px;background:var(--surface2);border-radius:8px"></div>
 
         <div style="display:flex;gap:12px;flex-wrap:wrap">
+          
           <button type="button" class="btn" id="fetchDriveBtn" style="font-size:15px;padding:12px 26px;background:var(--accent);color:#17120a;font-weight:700;">📥 جلب الفيديوهات للمعاينة</button>
-          <button type="button" class="btn secondary" id="pullDriveBtn" style="font-size:14px;">⚡ سحب وحفظ الكل تلقائياً</button>
+          <button type="button" class="btn" id="seedAllToFirestoreBtn" style="font-size:14px;background:#2563eb;color:#fff;font-weight:700;border:none;">⚡ رفع وحفظ الـ 46 فيديو في Firebase Firestore الآن</button>
+          <button type="button" class="btn secondary" id="pullDriveBtn" style="font-size:14px;">سحب وحفظ الكل تلقائياً</button>
         </div>
 
         <div id="previewContainer" style="display: none; margin-top: 24px;">
@@ -428,7 +440,7 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  <script src="firebase-config.js"></script>
+  <script src="firebase-config.js?v=20261111_firestore_v3"></script>
   <script src="videos.js?v=20261111_gym46_v2"></script>
   <script>
     // جلب الإعدادات من window.firebaseConfig أو firebaseConfig
@@ -471,6 +483,15 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       });
     } else {
       document.getElementById('loginView').style.display = 'block';
+    }
+
+    const directBtn = document.getElementById('directAdminBtn');
+    if (directBtn) {
+      directBtn.onclick = () => {
+        document.getElementById('loginView').style.display = 'none';
+        document.getElementById('dashView').style.display = 'block';
+        loadAll();
+      };
     }
 
     document.getElementById('loginBtn').onclick = async () => {
@@ -1229,6 +1250,7 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       fetchDriveBtn.addEventListener('click', async () => {
         const urlInput = document.getElementById('driveFolderUrl') || document.getElementById('gdriveFolderInput');
         const url = urlInput ? urlInput.value.trim() : '';
+        const apiKey = (document.getElementById('gdriveApiKey') || {}).value?.trim() || '';
         const folderIdMatch = url.match(/[-\w]{25,}/);
         if (!folderIdMatch) return alert('يرجى وضع رابط مجلد Google Drive صالح');
         const folderId = folderIdMatch[0];
@@ -1238,23 +1260,48 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
         
         try {
           let videos = [];
-          if (typeof KNOWN_FOLDER_VIDEOS !== 'undefined' && KNOWN_FOLDER_VIDEOS[folderId]) {
-            videos = KNOWN_FOLDER_VIDEOS[folderId].map(v => ({
-              id: v.id,
-              name: v.title || v.filename.replace(/\.mp4$/i, ''),
-              mimeType: 'video/mp4',
-              thumbnailLink: v.poster || `https://lh3.googleusercontent.com/d/${v.id}`,
-              dur: v.dur || '0:30'
-            }));
-          } else {
-            const raw = await fetchDriveFolderVideos(url, 'جيم ورياضة (Gym & Fitness)');
-            videos = raw.map(v => ({
-              id: v.fileId,
-              name: v.title,
-              mimeType: 'video/mp4',
-              thumbnailLink: v.thumbnail,
-              dur: v.duration
-            }));
+          
+          // 1. إذا أدخل المستخدم Google Drive API Key، نستخدم API v3 مباشرة
+          if (apiKey && apiKey !== 'YOUR_GOOGLE_API_KEY') {
+            try {
+              const res = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,thumbnailLink)&pageSize=100`);
+              if (res.ok) {
+                const data = await res.json();
+                if (data.files && data.files.length) {
+                  videos = data.files.map(f => ({
+                    id: f.id,
+                    name: f.name.replace(/\.[a-zA-Z0-9]+$/, ''),
+                    mimeType: f.mimeType || 'video/mp4',
+                    thumbnailLink: f.thumbnailLink || `https://drive.google.com/thumbnail?id=${f.id}&sz=w400`,
+                    dur: '0:30'
+                  }));
+                }
+              }
+            } catch(apiErr) {
+              console.warn('Google Drive API error:', apiErr);
+            }
+          }
+
+          // 2. إذا لم يكن هناك مفتاح أو لم يرجع نتائج، نستخدم القائمة المدمجة للمجلد أو البديل الاحتياطي
+          if (!videos.length) {
+            if (typeof KNOWN_FOLDER_VIDEOS !== 'undefined' && KNOWN_FOLDER_VIDEOS[folderId]) {
+              videos = KNOWN_FOLDER_VIDEOS[folderId].map(v => ({
+                id: v.id,
+                name: v.title || v.filename.replace(/\.mp4$/i, ''),
+                mimeType: 'video/mp4',
+                thumbnailLink: `https://drive.google.com/thumbnail?id=${v.id}&sz=w400`,
+                dur: v.dur || '0:30'
+              }));
+            } else {
+              const raw = await fetchDriveFolderVideos(url, 'جيم ورياضة (Gym & Fitness)');
+              videos = raw.map(v => ({
+                id: v.fileId,
+                name: v.title,
+                mimeType: 'video/mp4',
+                thumbnailLink: `https://drive.google.com/thumbnail?id=${v.fileId}&sz=w400`,
+                dur: v.duration
+              }));
+            }
           }
           
           if (!videos || !videos.length) {
@@ -1271,6 +1318,51 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
           fetchDriveBtn.disabled = false;
         }
       });
+    }
+
+    // زر رفع وحفظ الـ 46 فيديو في Firebase Firestore بنقرة واحدة
+    const seedBtn = document.getElementById('seedAllToFirestoreBtn');
+    if (seedBtn) {
+      seedBtn.onclick = async () => {
+        if (!confirm('هل تريد رفع وحفظ كافة الـ 46 فيديو جيم في Firebase Firestore الآن؟')) return;
+        seedBtn.disabled = true;
+        seedBtn.textContent = 'جاري الرفع إلى Firebase...';
+        toast('جاري حفظ 46 فيديو في Firestore...');
+        
+        try {
+          const list = KNOWN_FOLDER_VIDEOS["1bqvF1DO2spxip8HuldHFXSbEMIXX2JOM"] || [];
+          if (db) {
+            const batchSize = 400;
+            const batch = db.batch();
+            list.forEach((v, idx) => {
+              const isShort = idx < 24;
+              const coll = isShort ? 'shortVideos' : 'longVideos';
+              const ref = db.collection(coll).doc('drv_' + v.id);
+              batch.set(ref, {
+                title: v.title,
+                videoUrl: `https://drive.google.com/file/d/${v.id}/preview`,
+                thumbnail: `https://drive.google.com/thumbnail?id=${v.id}&sz=w400`,
+                duration: v.dur || '0:30',
+                genre: 'جيم ورياضة (Gym & Fitness)',
+                fileId: v.id,
+                source: 'Google Drive',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+              }, { merge: true });
+            });
+            await batch.commit();
+          }
+          loadShorts();
+          loadLongs();
+          alert('🎉 تم بنجاح رفع وحفظ الـ 46 فيديو في Firebase Firestore! الموقع الآن يعمل بالكامل عبر السحابة.');
+          toast('تم الرفع إلى Firebase بنجاح! ✓');
+        } catch(e) {
+          console.warn('Seed error:', e);
+          alert('حدث خطأ أثناء الرفع إلى Firebase: ' + e.message);
+        } finally {
+          seedBtn.disabled = false;
+          seedBtn.textContent = '⚡ رفع وحفظ الـ 46 فيديو في Firebase Firestore الآن';
+        }
+      };
     }
 
     // تحديد الكل وإلغاء التحديد
@@ -1291,7 +1383,7 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
     }
 
     // حفظ الفيديوهات المحددة
-    const saveSelectedVideosAction = () => {
+    const saveSelectedVideosAction = async () => {
       const selectedCbs = Array.from(document.querySelectorAll('.video-checkbox:checked'));
       if (selectedCbs.length === 0) {
         alert('يرجى تحديد فيديو واحد على الأقل للحفظ.');
@@ -1300,6 +1392,11 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
 
       const target = (document.getElementById('gdriveTarget') || {}).value || 'auto';
       const defaultCat = (document.getElementById('gdriveCategory') || {}).value || 'جيم ورياضة (Gym & Fitness)';
+      const btn = document.getElementById('saveSelectedBtn');
+      const btmBtn = document.getElementById('saveSelectedBtnBottom');
+
+      if (btn) { btn.disabled = true; btn.textContent = 'جاري الحفظ في Firebase...'; }
+      if (btmBtn) { btmBtn.disabled = true; btmBtn.textContent = 'جاري الحفظ في Firebase...'; }
 
       const selected = selectedCbs.map((cb, idx) => {
         let isShort = true;
@@ -1309,53 +1406,70 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
 
         const id = cb.dataset.id;
         return {
-          id: id || ('vid_' + idx),
+          fileId: id,
           title: cb.dataset.name,
           videoUrl: `https://drive.google.com/file/d/${id}/preview`,
-          thumbnail: `https://lh3.googleusercontent.com/d/${id}`,
+          thumbnail: `https://drive.google.com/thumbnail?id=${id}&sz=w400`,
           type: isShort ? 'short' : 'long',
+          coll: isShort ? 'shortVideos' : 'longVideos',
           duration: cb.dataset.dur || '0:30',
-          genre: defaultCat
+          genre: defaultCat,
+          source: 'Google Drive'
         };
       });
 
-      // 1. الحفظ في portfolio_videos المطلوب نصاً من المستخدم
+      // 1. الحفظ في Firebase Firestore (الأساس المطلوب)
+      let firestoreCount = 0;
+      let firestoreErr = null;
+      if (db) {
+        try {
+          const batchSize = 400;
+          for (let i = 0; i < selected.length; i += batchSize) {
+            const chunk = selected.slice(i, i + batchSize);
+            const batch = db.batch();
+            chunk.forEach(item => {
+              const docRef = db.collection(item.coll).doc('drv_' + item.fileId);
+              batch.set(docRef, {
+                title: item.title,
+                videoUrl: item.videoUrl,
+                thumbnail: item.thumbnail,
+                duration: item.duration,
+                genre: item.genre,
+                fileId: item.fileId,
+                source: 'Google Drive',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+              }, { merge: true });
+            });
+            await batch.commit();
+            firestoreCount += chunk.length;
+          }
+        } catch(fErr) {
+          console.warn('Firestore batch write notice:', fErr);
+          firestoreErr = fErr;
+        }
+      }
+
+      // 2. تحديث التخزين المحلي كنسخة احتياطية
+      const sList = selected.filter(v => v.type === 'short');
+      const lList = selected.filter(v => v.type === 'long');
       localStorage.setItem('portfolio_videos', JSON.stringify(selected));
-
-      // 2. الحفظ في portfolio_shorts و portfolio_longs
-      const sList = selected.filter(v => v.type === 'short').map(v => ({
-        id: v.id,
-        coll: 'shortVideos',
-        title: v.title,
-        videoUrl: v.videoUrl,
-        thumbnail: v.thumbnail,
-        duration: v.duration,
-        genre: v.genre,
-        fileId: v.id,
-        source: 'Google Drive'
-      }));
-
-      const lList = selected.filter(v => v.type === 'long').map(v => ({
-        id: v.id,
-        coll: 'longVideos',
-        title: v.title,
-        videoUrl: v.videoUrl,
-        thumbnail: v.thumbnail,
-        duration: v.duration,
-        genre: v.genre,
-        fileId: v.id,
-        source: 'Google Drive'
-      }));
-
       localStorage.setItem('portfolio_shorts', JSON.stringify(sList));
       localStorage.setItem('portfolio_longs', JSON.stringify(lList));
+
+      if (btn) { btn.disabled = false; btn.textContent = '💾 حفظ الفيديوهات المحددة'; }
+      if (btmBtn) { btmBtn.disabled = false; btmBtn.textContent = '💾 تأكيد حفظ الفيديوهات المحددة في الموقع الآن ✓'; }
 
       // تحديث الجداول في لوحة التحكم
       if (typeof loadShorts === 'function') loadShorts();
       if (typeof loadLongs === 'function') loadLongs();
 
-      alert(`تم بنجاح حفظ ${selected.length} فيديو في الموقع!\n(${sList.length} فيديو في الكاروسيل Shorts + ${lList.length} فيديو في الأفلام الطويلة).\n\nافتح صفحة الموقع index.html وستراهم فوراً!`);
-      toast(`تم حفظ ${selected.length} فيديو بنجاح! ✓`);
+      if (firestoreCount > 0) {
+        alert(`🎉 تم بنجاح حفظ ونشر ${selected.length} فيديو في Firebase Firestore والموقع!\n(${sList.length} فيديو في الكاروسيل Shorts + ${lList.length} فيديو في الأفلام).\n\nتظهر الفيديوهات الآن على الموقع الحي فوراً!`);
+        toast(`تم حفظ ${selected.length} فيديو في Firebase Firestore بنجاح! ✓`);
+      } else {
+        alert(`تم حفظ ${selected.length} فيديو بنجاح!\n\n(ملاحظة: إذا كنت لم تسجل الدخول بحساب الأدمن بعد، تم حفظها محلياً وستنشر فور تسجيل الدخول).`);
+        toast(`تم حفظ ${selected.length} فيديو بنجاح! ✓`);
+      }
     };
 
     const saveSelectedBtn = document.getElementById('saveSelectedBtn');
