@@ -1,770 +1,934 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بورتفوليو</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0c0d11;
-      --surface: rgba(255,255,255,.04);
-      --fg: #ece8e1;
-      --muted: #9b978f;
-      --line: #2b2c32;
-      --accent: #f2a541;
-      --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
-      --font-body: 'DM Sans', system-ui, sans-serif;
-      --font-mono: 'DM Mono', monospace;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg); color: var(--fg);
-      font-family: var(--font-body); line-height: 1.6;
-      padding: 0 24px 48px;
-    }
-    body::before {
-      content: ""; position: fixed; inset: 0; z-index: -1;
-      background:
-        radial-gradient(70% 55% at 8% 0%, rgba(32,92,104,.38), transparent 70%),
-        radial-gradient(55% 45% at 100% 38%, rgba(70,52,128,.30), transparent 70%),
-        radial-gradient(65% 50% at 85% 100%, rgba(242,165,65,.13), transparent 70%),
-        linear-gradient(180deg, #0f1115 0%, #0c0d11 55%, #0e0d10 100%);
-    }
-    .wrap { max-width: 1120px; margin: 0 auto; position: relative; }
-    a { color: inherit; text-decoration: none; }
-    .mono {
-      font-family: var(--font-mono); font-size: 12px;
-      letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<title>Omar Omar Portfolio</title>
+<!-- ===== Browser tab icon + link preview (WhatsApp, Facebook, LinkedIn, X...) =====
+     Upload icon.png, favicon-32.png, apple-touch-icon.png and preview.jpg next to index.html.
+     To use your own icon: replace those three icon files with yours (same names).
+     If you move the site to your own domain, change the two https://omaomar4111-ui.github.io/portfolio/ links below. -->
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="description" content="Omar Omar, video editor. Short-form and long-form editing for brands, creators and podcasts, in English and Arabic.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Omar Omar Portfolio">
+<meta property="og:description" content="Video editor. Short-form and long-form editing for brands, creators and podcasts, in English and Arabic.">
+<meta property="og:url" content="https://omaomar4111-ui.github.io/portfolio/">
+<meta property="og:image" content="https://omaomar4111-ui.github.io/portfolio/preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: editing-suite feel. Quiet type-led page, one bold moment: a rotating drum of 9:16 phone screens. */
+:root {
+  color-scheme: dark;
+  --bg: #0f1013;
+  --surface: rgba(255,255,255,.04);
+  --fg: #ece8e1;
+  --muted: #9b978f;
+  --line: #2b2c32;
+  --accent: #f2a541;
+  --on-accent: #17120a;
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-title: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, 'SFMono-Regular', monospace;
+}
 
-    .top {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 20px 0; flex-wrap: wrap; gap: 12px;
-    }
-    .brand { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; }
-    .top nav { display: flex; gap: 22px; flex-wrap: wrap; }
-    .top nav a { color: var(--muted); font-size: 14px; transition: color .2s; }
-    .top nav a:hover { color: var(--fg); }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: #0c0d11; color: var(--fg);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.55;
+  padding-inline: clamp(16px, 4vw, 40px); padding-block: 0 48px;
+}
+.wrap { max-width: 1120px; margin-inline: auto; position: relative; }
+/* background: dark, layered glow — deep teal top-left, warm amber bottom-right, indigo in between */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(70% 55% at 8% 0%, rgba(32, 92, 104, .38), transparent 70%),
+    radial-gradient(55% 45% at 100% 38%, rgba(70, 52, 128, .30), transparent 70%),
+    radial-gradient(65% 50% at 85% 100%, rgba(242, 165, 65, .13), transparent 70%),
+    linear-gradient(180deg, #0f1115 0%, #0c0d11 55%, #0e0d10 100%);
+}
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.mono { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 
-    .hero {
-      padding: 48px 0 32px; display: grid;
-      grid-template-columns: 1.5fr 1fr; gap: 48px; align-items: end;
-    }
-    .hero-text h1 {
-      font-family: var(--font-display); font-weight: 800;
-      font-size: clamp(2.5rem, 7vw, 5.5rem); line-height: .95;
-      text-transform: uppercase; letter-spacing: -.02em;
-      margin: 12px 0 20px;
-    }
-    .hero-text .lead { font-size: 1.1rem; color: var(--muted); max-width: 52ch; }
-    .hero-portrait {
-      aspect-ratio: 4/5; border-radius: 8px; overflow: hidden;
-      background: var(--surface); border: 1px solid var(--line);
-    }
-    .hero-portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    @media (max-width: 720px) {
-      .hero { grid-template-columns: 1fr; gap: 24px; }
-      .hero-portrait { max-width: 320px; }
-    }
+/* header */
+.top { display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: space-between; align-items: center; padding-block: 20px; }
+.top .brand { font-family: var(--font-display); font-weight: 700; text-decoration: none; letter-spacing: -.01em; }
+.top nav { display: flex; flex-wrap: wrap; gap: 4px 22px; }
+.top nav a { text-decoration: none; color: var(--muted); font-size: 14px; }
+.top nav a:hover { color: var(--fg); }
 
-    .section { padding: 48px 0; }
-    .sec-head {
-      display: flex; justify-content: space-between; align-items: baseline;
-      margin-bottom: 24px; flex-wrap: wrap; gap: 8px;
-    }
-    .sec-head h2 {
-      font-family: var(--font-display);
-      font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 700;
-    }
-    .stage {
-      position: relative; height: 420px; perspective: 1500px;
-      overflow: hidden; cursor: grab; border-block: 1px solid var(--line);
-      mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
-    }
-    .ring {
-      position: absolute; top: 36px; left: 50%;
-      width: 200px; height: 356px; margin-left: -100px;
-      transform-style: preserve-3d;
-      transition: transform .5s cubic-bezier(.25, 1, .5, 1);
-    }
-    .card { position: absolute; inset: 0; will-change: transform; cursor: pointer; }
-    .screen {
-      position: absolute; inset: 0; border-radius: 26px; overflow: hidden;
-      background: #050506; border: 5px solid #050506;
-      box-shadow: 0 24px 50px -20px rgba(0,0,0,.6);
-    }
-    .screen img { width: 100%; height: 100%; object-fit: cover; }
-    .cap {
-      position: absolute; bottom: 14px; left: 12px; right: 12px; z-index: 2;
-      color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.7);
-    }
-    .cap h3 { font-family: var(--font-display); font-size: 1rem; margin-bottom: 4px; }
-    .cap .dur { font-family: var(--font-mono); font-size: 11px; opacity: .8; }
-    .ctrl { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
-    .ctrl button {
-      width: 46px; height: 46px; border-radius: 50%;
-      border: 1px solid var(--line); background: var(--surface);
-      color: var(--fg); cursor: pointer; font-size: 1.2rem;
-      transition: background .2s, border-color .2s;
-    }
-    .ctrl button:hover {
-      background: var(--line); border-color: var(--accent);
-    }
+/* hero */
+.hero { position: relative; isolation: isolate; padding-block: clamp(32px, 7vw, 80px) clamp(24px, 4vw, 40px); }
+.portrait { margin: 0; position: relative; overflow: hidden; background: var(--surface); }
+.portrait img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 25%); }
+.portrait .ph { position: absolute; inset: 0; display: grid; place-items: end center; color: var(--muted);
+  background: radial-gradient(80% 60% at 50% 30%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%), linear-gradient(170deg, var(--surface), var(--bg)); }
+.portrait .ph svg { width: 78%; height: auto; fill: currentColor; opacity: .35; }
+.portrait .ph span { position: absolute; left: 12px; bottom: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+/* layout: photo beside the name */
+.hero[data-layout="beside"] { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 64px); align-items: end; }
+.hero[data-layout="beside"] .portrait { order: 2; aspect-ratio: 4 / 5; border-radius: 6px; outline: 1px solid var(--line); }
+/* layout: photo behind the name, softly blurred */
+.hero[data-layout="behind"] { padding-inline: clamp(20px, 5vw, 56px); border-radius: 8px; overflow: hidden; min-height: clamp(300px, 42vw, 440px); display: flex; flex-direction: column; justify-content: flex-end; }
+.hero[data-layout="behind"] .portrait .ph { place-items: end end; }
+.hero[data-layout="behind"] .portrait .ph svg { width: auto; height: 92%; margin-right: 8%; }
+.hero[data-layout="behind"] { background: #0e0f14; }
+.hero[data-layout="behind"] .portrait { position: absolute; inset: 0; z-index: -1; background: #0e0f14; }
+.hero[data-layout="behind"] .portrait .ph { filter: blur(7px); transform: scale(1.08); }
+/* the real photo: anchored right, full height, its own dark backdrop melts into the hero */
+.hero[data-layout="behind"] .portrait img {
+  position: absolute; top: 0; right: clamp(0px, 4vw, 56px); left: auto; height: 100%; width: auto; max-width: none; object-fit: contain; filter: blur(0.6px);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 30%, #000 82%, transparent 100%), linear-gradient(0deg, transparent 0%, #000 28%);
+  -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, transparent 0%, #000 30%, #000 82%, transparent 100%), linear-gradient(0deg, transparent 0%, #000 28%); mask-composite: intersect;
+}
+.hero[data-layout="behind"] .portrait::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(14,15,20,.92) 0%, rgba(14,15,20,.55) 45%, rgba(14,15,20,0) 70%); }
+.hero[data-layout="behind"] .lead { max-width: min(52ch, 56%); }
+@media (max-width: 720px) {
+  .hero[data-layout="behind"] { min-height: 0; padding-top: 72vw; }
+  .hero[data-layout="behind"] .lead { max-width: none; }
+  .hero[data-layout="behind"] .portrait img { right: 50%; transform: translateX(50%); height: 82vw; filter: none; }
+  .hero[data-layout="behind"] .portrait::after { background: linear-gradient(0deg, rgba(14,15,20,.95) 0%, rgba(14,15,20,.6) 45%, rgba(14,15,20,0) 70%); }
+}
+@media (max-width: 720px) {
+  .hero[data-layout="beside"] { grid-template-columns: 1fr; }
+  .hero[data-layout="beside"] .portrait { max-width: 320px; }
+}
+.hero h1 {
+  font-family: var(--font-title); font-weight: 800; font-stretch: 118%; font-variation-settings: "wdth" 118;
+  font-size: clamp(2.2rem, 7.6vw, 6.2rem); text-transform: uppercase;
+  line-height: .95; letter-spacing: -.01em; margin: 14px 0 22px; text-wrap: balance;
+}
+.hero h1 .nl { display: block; width: max-content; max-width: 100%; white-space: nowrap; }
+/* floating tool icons around the photo */
+.tools { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.tool { position: absolute; width: clamp(40px, 4.4vw, 54px); height: auto; border-radius: 22%;
+  box-shadow: 0 14px 30px -10px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.06);
+  animation: drift 7s ease-in-out infinite; }
+.t-pr { top: 11.8%; right: 43.5%; animation-duration: 7.5s; }
+.t-ae { top: 34%; right: 12%; animation-duration: 9s; animation-delay: -3s; }
+.t-cc { top: 71%; right: 42%; animation-duration: 8.2s; animation-delay: -5s; }
+@keyframes drift {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-12px) rotate(3deg); }
+}
+@media (max-width: 720px) {
+  .t-pr { top: 9%;  right: auto; left: 6%; }
+  .t-ae { top: 16%; right: 13%; }
+  .t-cc { top: 36%; right: auto; left: 12%; }
+}
+@media (prefers-reduced-motion: reduce) { .tool { animation: none; } }
+.langs { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.langs .mono { margin-right: 4px; }
+.lang { font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .1em; color: var(--fg);
+  padding: 4px 11px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.hero-grid-text { position: relative; z-index: 1; }
+.hero .lead { max-width: 52ch; font-size: clamp(1.05rem, 2vw, 1.25rem); color: var(--muted); margin: 0; }
+.tc { font-variant-numeric: tabular-nums; color: var(--accent); }
+.ruler { position: relative; height: 34px; margin-top: clamp(28px, 5vw, 48px); border-bottom: 1px solid var(--line); overflow: hidden;
+  background:
+    repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 12px) bottom/100% 8px no-repeat,
+    repeating-linear-gradient(90deg, var(--muted) 0 1px, transparent 1px 120px) bottom/100% 18px no-repeat; }
+.ruler i { position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background: var(--accent); animation: sweep 18s linear infinite; }
+.ruler i::before { content: ""; position: absolute; top: 0; left: -5px; width: 12px; height: 9px; background: var(--accent); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+@keyframes sweep { from { transform: translateX(0); } to { transform: translateX(min(100vw, 1120px)); } }
 
-    .film-list { display: grid; gap: 8px; }
-    .film-item {
-      display: grid; grid-template-columns: auto auto 1fr auto; gap: 16px;
-      align-items: center; padding: 14px 16px;
-      border-bottom: 1px solid var(--line); cursor: pointer;
-      transition: background .2s;
-    }
-    .film-item:hover { background: var(--surface); }
-    .film-item .idx { font-family: var(--font-mono); color: var(--accent); }
-    .film-item .thumb {
-      width: 90px; height: 50px; border-radius: 6px;
-      object-fit: cover; background: #1a1a1a;
-    }
-    .film-item h3 { font-family: var(--font-display); font-size: 1.05rem; }
-    .film-item .dur { font-family: var(--font-mono); color: var(--muted); }
-    .empty {
-      text-align: center; padding: 40px; color: var(--muted);
-      font-size: .95rem;
-    }
+/* sections */
+section { padding-block: clamp(36px, 6vw, 72px); }
+.sec-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 24px; margin-bottom: 24px; }
+.sec-head h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: -.025em; margin: 0; line-height: 1.05; }
 
-    /* Gallery & Filters */
-    .gallery-controls {
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
-    }
-    .cat-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-    .cat-btn {
-      padding: 8px 18px; border-radius: 20px; border: 1px solid var(--line);
-      background: var(--surface); color: var(--muted); cursor: pointer;
-      font-size: 13px; font-weight: 500; transition: all .2s;
-    }
-    .cat-btn:hover { border-color: var(--accent); color: var(--fg); }
-    .cat-btn.active {
-      background: var(--accent); color: #17120a; border-color: var(--accent); font-weight: 700;
-    }
-    .search-box input {
-      background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
-      padding: 9px 18px; color: var(--fg); font-size: 13px; outline: none;
-      width: 260px; transition: border-color .2s;
-    }
-    .search-box input:focus { border-color: var(--accent); }
-    @media (max-width: 600px) { .search-box input { width: 100%; } }
+/* carousel */
+.stage {
+  --cw: clamp(168px, 50vw, 250px); --ch: calc(var(--cw) * 16 / 9);
+  position: relative; height: calc(var(--ch) + 72px); perspective: 1500px; overflow: hidden;
+  cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y; overscroll-behavior-x: contain;
+  border-block: 1px solid var(--line);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 17%, #000 83%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0%, #000 17%, #000 83%, transparent 100%);
+  background: radial-gradient(60% 55% at 50% 100%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+}
+.stage:active { cursor: grabbing; }
+.ring { position: absolute; top: 36px; left: 50%; width: var(--cw); height: var(--ch); margin-left: calc(var(--cw) / -2); transform-style: preserve-3d; }
+.card { position: absolute; inset: 0; will-change: transform, filter, opacity; }
+.screen {
+  position: absolute; inset: 0; border-radius: 26px; overflow: hidden; background: #050506;
+  border: 5px solid #050506; outline: 1px solid var(--line);
+  box-shadow: 0 24px 50px -20px rgba(0,0,0,.6);
+}
+.screen::after { content: ""; position: absolute; inset: 0; background: #000; opacity: calc(var(--dim, 0) * .62); pointer-events: none; border-radius: inherit; }
+.art { position: absolute; inset: 0;
+  background:
+    radial-gradient(90% 55% at 25% 15%, hsl(var(--h) 85% 62% / .85), transparent 65%),
+    radial-gradient(70% 50% at 80% 85%, hsl(calc(var(--h) + 50) 80% 55% / .5), transparent 70%),
+    linear-gradient(165deg, hsl(var(--h) 55% 20%), hsl(calc(var(--h) + 30) 45% 8%)); }
+.art b { position: absolute; right: 10px; top: 38%; font-family: var(--font-display); font-weight: 800; font-size: calc(var(--cw) * .62); line-height: 1; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.22); letter-spacing: -.05em; }
+.screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.chip-row { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; gap: 6px; z-index: 2; }
+.chip { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: #fff; background: rgba(0,0,0,.45); padding: 3px 7px; border-radius: 999px; }
+.cap { position: absolute; left: 12px; right: 12px; bottom: 14px; z-index: 2; color: #fff; }
+.cap h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; line-height: 1.12; margin: 0 0 9px; text-shadow: 0 1px 8px rgba(0,0,0,.5); text-wrap: balance; }
+.bar { height: 3px; background: rgba(255,255,255,.28); border-radius: 2px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); }
+.cap .t { display: flex; justify-content: space-between; margin-top: 6px; font-family: var(--font-mono); font-size: 10px; font-variant-numeric: tabular-nums; opacity: .85; }
+.playbtn { position: absolute; z-index: 3; top: 50%; left: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.35); transition: opacity .2s; }
+.playbtn svg { width: 20px; height: 20px; fill: #fff; margin-left: 3px; }
+.card.playing:not(.paused) .playbtn { opacity: 0; }
+.card.playing:not(.has-video) .bar i { animation: fill var(--dur, 30s) linear forwards; }
+.card.paused .bar i { animation-play-state: paused; }
+@keyframes fill { to { width: 100%; } }
 
-    .video-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-    }
-    .vcard {
-      background: var(--surface); border: 1px solid var(--line);
-      border-radius: 12px; overflow: hidden; cursor: pointer;
-      transition: transform .25s, border-color .25s; display: flex; flex-direction: column;
-    }
-    .vcard:hover { transform: translateY(-4px); border-color: var(--accent); }
-    .vcard-thumb {
-      position: relative; aspect-ratio: 16/9; background: #000; overflow: hidden;
-    }
-    .vcard.vertical .vcard-thumb { aspect-ratio: 9/16; max-height: 380px; }
-    .vcard-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
-    .vcard:hover .vcard-thumb img { transform: scale(1.04); }
-    .vcard-play {
-      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,.35); opacity: 0; transition: opacity .2s;
-    }
-    .vcard-play i {
-      width: 44px; height: 44px; border-radius: 50%; background: var(--accent);
-      display: flex; align-items: center; justify-content: center; color: #17120a; font-size: 18px;
-    }
-    .vcard:hover .vcard-play { opacity: 1; }
-    .vcard-body {
-      padding: 14px; display: flex; flex-direction: column; gap: 6px; flex: 1;
-    }
-    .vcard-badge {
-      font-family: var(--font-mono); font-size: 11px; color: var(--accent);
-    }
-    .vcard-title {
-      font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--fg);
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-    }
-    .vcard-meta {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-top: auto; padding-top: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--muted);
-    }
-    .btn.secondary {
-      background: var(--surface); color: var(--fg); border: 1px solid var(--line);
-      border-radius: 8px; font-weight: 600; cursor: pointer; transition: all .2s;
-    }
-    .btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
+.info { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px 32px; align-items: center; padding-top: 24px; }
+.info h3 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: -.02em; line-height: 1.1; margin: 6px 0 4px; }
+.info p { margin: 0; color: var(--muted); }
+.ctrl { display: flex; align-items: center; gap: 10px; }
+.ctrl button {
+  width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+  display: grid; place-items: center; cursor: pointer; transition: border-color .15s, background .15s;
+}
+.ctrl button:hover { border-color: var(--accent); }
+.ctrl svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ticks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 22px; }
+.ticks button { flex: 1 1 0; min-width: 22px; height: 28px; border: 0; background: transparent; cursor: pointer; position: relative; padding: 0; }
+.ticks button::before { content: ""; position: absolute; left: 0; right: 0; top: 12px; height: 4px; background: var(--line); border-radius: 2px; transition: background .2s; }
+.ticks button[aria-current="true"]::before { background: var(--accent); }
+.ticks button:hover::before { background: var(--muted); }
+.ticks button[aria-current="true"]:hover::before { background: var(--accent); }
 
-    .services-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 24px;
-    }
-    .service-card {
-      background: var(--surface); border: 1px solid var(--line);
-      border-radius: 12px; padding: 24px;
-    }
-    .service-card .mono { margin-bottom: 8px; }
-    .service-card h3 { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 8px; }
-    .service-card p { color: var(--muted); font-size: .95rem; }
+/* films */
+.films { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px; }
+.film { min-width: 0; }
+.film .frame { position: relative; aspect-ratio: 16 / 9; border-radius: 6px; overflow: hidden; background: #050506; outline: 1px solid var(--line); }
+.film .frame .chip-row { top: 10px; }
+.film .frame .dur { position: absolute; right: 10px; bottom: 10px; z-index: 2; font-family: var(--font-mono); font-size: 11px; color: #fff; background: rgba(0,0,0,.55); padding: 2px 6px; border-radius: 3px; font-variant-numeric: tabular-nums; }
+.film .frame .art b { font-size: 120px; top: 14%; }
+.film h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; margin: 12px 0 2px; letter-spacing: -.01em; }
+.film p { margin: 0; color: var(--muted); font-size: 14px; }
 
-    .contact-list {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px; margin-top: 24px;
-    }
-    .contact-item {
-      display: flex; flex-direction: column; gap: 6px; padding: 20px;
-      background: var(--surface); border: 1px solid var(--line);
-      border-radius: 12px; transition: border-color .2s, transform .2s;
-    }
-    .contact-item:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .contact-item strong {
-      font-family: var(--font-display); font-size: 1.05rem;
-      color: var(--fg); word-break: break-word;
-    }
 
-    .footer {
-      text-align: center; padding: 48px 0 24px; color: var(--muted);
-      font-size: .9rem; border-top: 1px solid var(--line); margin-top: 48px;
-    }
-    .footer a { color: var(--accent); }
+/* long-form: hover preview + pop-up player */
+.film .frame { cursor: pointer; }
+.film .frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.film .frame .art { transition: transform 6s ease-out, filter .3s; }
+.film .frame.hovering .art { transform: scale(1.12) translateX(-3%); filter: saturate(1.25) brightness(1.1); }
+.film .frame .playbtn { transition: opacity .2s, transform .2s; }
+.film .frame.hovering .playbtn { opacity: 0; transform: scale(.85); }
+.film .frame .pbar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; z-index: 2; background: rgba(255,255,255,.15); opacity: 0; transition: opacity .2s; }
+.film .frame .pbar i { display: block; height: 100%; width: 0; background: var(--accent); }
+.film .frame.hovering .pbar { opacity: 1; }
+.film .frame:not(.has-video).hovering .pbar i { animation: fill 8s linear forwards; }
+.film .frame .hint { position: absolute; left: 10px; bottom: 10px; z-index: 2; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #fff; background: rgba(0,0,0,.55); padding: 3px 7px; border-radius: 3px; opacity: 0; transition: opacity .2s; }
+.film .frame.hovering .hint { opacity: 1; }
 
-    /* Lightbox */
-    .lightbox {
-      position: fixed; inset: 0; background: rgba(0,0,0,.9);
-      display: none; align-items: center; justify-content: center;
-      z-index: 100; padding: 20px;
-    }
-    .lightbox.open { display: flex; }
-    .lightbox .box {
-      max-width: 90vw; max-height: 90vh; width: 100%;
-      aspect-ratio: 16/9; position: relative;
-    }
-    .lightbox.vertical .box { aspect-ratio: 9/16; max-width: 60vh; }
-    .lightbox iframe, .lightbox video {
-      width: 100%; height: 100%; border: none; border-radius: 12px;
-      background: #000;
-    }
-    .lightbox .close {
-      position: absolute; top: 20px; right: 20px;
-      width: 44px; height: 44px; border-radius: 50%;
-      background: rgba(255,255,255,.1); color: #fff; border: none;
-      font-size: 22px; cursor: pointer;
-    }
-    .setup-banner {
-      background: rgba(242,165,65,0.15); border: 1px solid var(--accent);
-      color: #ffda85; padding: 12px 18px; border-radius: 8px; margin: 16px 0;
-      font-size: 13px; text-align: center;
-    }
-  </style>
+.player { padding: 0; border: 0; background: transparent; color: var(--fg); width: min(1100px, 92vw); max-width: none; max-height: 92vh; overflow: visible; }
+.player::backdrop { background: rgba(4, 5, 8, .84); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.player[open] { animation: pop .22s ease-out; }
+@keyframes pop { from { opacity: 0; transform: scale(.96); } }
+.player .p-frame { position: relative; aspect-ratio: 16 / 9; max-height: calc(92vh - 90px); margin-inline: auto; border-radius: 8px; overflow: hidden; background: #050506; outline: 1px solid var(--line); box-shadow: 0 40px 80px -30px rgba(0,0,0,.8); }
+.player .p-frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.player .p-frame .art b { font-size: clamp(120px, 22vw, 260px); top: 14%; }
+.player .p-empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; color: #fff; }
+.player .p-empty span { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: rgba(0,0,0,.55); padding: 8px 12px; border-radius: 4px; }
+.player .p-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 20px; padding-top: 14px; }
+.player .p-meta h3 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.2rem, 2.6vw, 1.6rem); letter-spacing: -.015em; margin: 0; }
+.player .close { position: absolute; top: -52px; right: 0; width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); background: rgba(20,21,26,.8); color: #fff; display: grid; place-items: center; cursor: pointer; transition: border-color .15s, transform .15s; }
+.player .close:hover { border-color: var(--accent); transform: rotate(90deg); }
+.player .close svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; fill: none; }
+/* short-form pop-up: tall 9:16 player */
+.player.vertical { width: min(92vw, 440px, calc((88vh - 120px) * 9 / 16)); }
+.player.vertical .p-frame { aspect-ratio: 9 / 16; max-height: none; }
+.player.vertical .p-meta { flex-direction: column; gap: 4px; }
+.player.vertical .p-frame .art b { font-size: 140px; }
+/* the close button always sits OUTSIDE the video so it never covers the player's own controls.
+   Short landscape screens: beside the video instead of above it. */
+@media (max-height: 600px) { .player .close { top: 0; right: 0; } .player:not(.vertical) .p-frame { max-width: calc(100% - 110px); } .player.vertical .close { right: -54px; } }
+
+/* ---------- entrance animations ---------- */
+html.anim .rv { opacity: 0; transform: translateY(26px); filter: blur(10px);
+  transition: opacity 1.1s cubic-bezier(.22,.7,.2,1), transform 1.2s cubic-bezier(.22,.7,.2,1), filter 1.1s ease;
+  transition-delay: var(--d, 0s); }
+html.anim .rv.in { opacity: 1; transform: none; filter: none; }
+html.anim .rv-photo { opacity: 0; transform: scale(1.05); filter: blur(18px);
+  transition: opacity 1.9s ease, transform 2.4s cubic-bezier(.22,.7,.2,1), filter 1.9s ease; transition-delay: var(--d, 0s); }
+html.anim .rv-photo.in { opacity: 1; transform: none; filter: none; }
+html.anim .rv-line { transform: scaleX(0); transform-origin: left; transition: transform 1.4s cubic-bezier(.22,.7,.2,1); transition-delay: var(--d, 0s); }
+html.anim .rv-line.in { transform: none; }
+html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  html.anim .rv, html.anim .rv-photo, html.anim .rv-line { opacity: 1; transform: none; filter: none; transition: none; }
+}
+
+/* mute / unmute button on every video */
+.snd-btn { position: absolute; z-index: 4; top: 12px; right: 12px; width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; padding: 0; cursor: pointer; color: #fff;
+  background: rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.3); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  transition: background .15s, border-color .15s, transform .15s; }
+.snd-btn:hover { background: rgba(0,0,0,.7); border-color: var(--accent); transform: scale(1.06); }
+.snd-btn svg { width: 17px; height: 17px; fill: currentColor; }
+.snd-btn svg .w { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.film .frame .thumb { transition: transform 6s ease-out; }
+.film .frame.hovering .thumb { transform: scale(1.06); }
+.film .frame .snd-btn { top: 10px; right: 10px; width: 30px; height: 30px; }
+
+/* services */
+.svc { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); border-top: 1px solid var(--line); }
+.svc > div { padding: 22px 22px 26px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+.svc h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.3rem; letter-spacing: -.015em; margin: 8px 0; }
+.svc p { margin: 0; color: var(--muted); font-size: 15px; }
+
+/* contact */
+.contact h2 { font-family: var(--font-title); font-weight: 800; font-stretch: 118%; font-variation-settings: "wdth" 118; font-size: clamp(2rem, 5.2vw, 4rem); letter-spacing: -.02em; line-height: 1.02; margin: 0 0 24px; max-width: 18ch; text-wrap: balance; }
+.mail { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.mail code { font-family: var(--font-mono); font-size: clamp(1rem, 2.4vw, 1.3rem); user-select: all; overflow-wrap: anywhere; }
+.contact-list { display: grid; gap: 0; border-top: 1px solid var(--line); max-width: 760px; }
+.contact-list .mail { padding-block: 18px; border-bottom: 1px solid var(--line); gap: 10px 18px; }
+.c-label { width: 92px; flex: none; }
+.c-val { font-family: var(--font-body); font-weight: 500; letter-spacing: -.005em; font-size: clamp(1.05rem, 2.4vw, 1.35rem); text-decoration: none; overflow-wrap: anywhere; margin-right: auto; }
+.c-val:hover { color: var(--accent); }
+.btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.btn svg { width: 16px; height: 16px; fill: currentColor; }
+.btn.btn-ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.btn.btn-ghost:hover { border-color: var(--accent); }
+@media (max-width: 560px) { .c-label { width: 100%; } }
+.btn { font: inherit; font-weight: 600; font-size: 14px; background: var(--accent); color: var(--on-accent); border: 0; border-radius: 999px; padding: 10px 18px; cursor: pointer; }
+footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); padding-top: 20px; }
+
+@media (max-width: 640px) {
+  .info { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .ruler i { animation: none; left: 30%; }
+}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <div id="setupNotice" class="setup-banner" style="display:none">
-      ⚠️ لم يتم تفعيل مفاتيح Firebase بعد. يرجى تعديل ملف <code>firebase-config.js</code> بالقيم الخاصة بمشروعك.
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#top">Portfolio</a>
+    <nav aria-label="Sections">
+      <a href="#shorts">Short-form</a>
+      <a href="#films">Long-form</a>
+      <a href="#services">Services</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <div class="hero" id="hero" data-layout="beside">
+      <figure class="portrait" id="portrait"></figure>
+      <div class="tools" aria-label="Tools: Premiere Pro, After Effects, CapCut">
+        <img class="tool t-pr" src="data:image/png;base64,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" alt="Premiere Pro" title="Premiere Pro" width="168" height="168">
+        <img class="tool t-ae" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKgAAACoCAYAAAB0S6W0AAAhI0lEQVR42u2deXBc15Xef/e+140G0AAIkuC+kyBBkCBIgAAp2iPalq2M5SrHWjgWTcXxFk9izxKXPeUaZxJZKU9sVzyTcjzlcnm8jDfZMhPJslyKyots0o4kK9xAkOC+CKS4gCtANHp77978cV8DIEWC/RpooEndr+oVuKC7X7/3vfOdc+455zoUDY9LwIEF0hyvaSzuFgjY5EBdcH8/BGwr1geNNSl/J2GbD+ib/39XBVQJe4/vVLgp+Gb25v+3yTE/t6qb3/+JIaiATfKNJ7VlDoi1IBrAbwY5F3Q1MNlYVmtQ70jDie4F0Qv6PIguYB/IndB9BLZ515N19EQdJUE3ObDVH/r7B5pAPAjiXaDWQLRy6CNy52qJeeeTdPihAc8HcQDEb8F/Fiq3D1nZ0RG1QII+Ls3PJxR8PAIDfwriE6DfBRHHkNEHdE7qg8/RojiuhcU4QoPQQ39GGEV0zA98wN8PfAfk9+AHl25uzIpG0OEf9NjDwH8Bd5X5exbAC95XWiK+mUirNQgFWoIrDVm90yD+CdQ/wQ8ThVhTEY7MjwtjNTfXg/M/wH2PsZaeCp4qS0oLQAckdBxwAf8wqM/CD382pMBPqDEk6PA3fOw/AF8EtwayvpFtIe1NsbgJUTUIHxzXUE19C/r+Bp69mq/k50HQ3BttqQbxDYhsNlKu/cDpsLDIx6ICMQnZvZDeAj/dBxvd6yP/0ATNkXPTbCh7BqJtkPZAOyCslFuEJaoHERf0FUh/EJ76xe1IKkeW9a0+fGARlP8K3DZIeYBryWlRGIRrUlK6FqLPwJYHDTk3uiEtaM7nfHQWRF4EZxlkPPMBFhZjIflSgPDA3wRPPnsrSypvTdpPxMH9mSWnRREsqQSljRo7T8Jj6ww5H5d5EHSjY6zn1X82Pqclp0XRSKpAVADPwJaZ8IS+kaTyjUHRNg82fwJijxqf05LTomhwwPMgMhP4JqChS9zwC8P9zq9r+DfLQTwNStho3WJ8LKnvQbQBGk/DUzuNoezSN1jQrmDl3/9HiMTA15acFuMUNDmQVSC+Yqrgtqqc1Mshad/qwwf+NUT+FDK+lXaLcbSiwkT20Umg/+twqRdDUfumCER2g9sYrK3b5UuLcTWj5hCAboMf7YZNUpqoHQ3R90K0EXzfktNiIswooCAiQX8yICwS3hask+p/h60mtpjwqD6rQWwKfFE/WDHa3ADyvqCe01pPiwm0otqHsirg4WFklJsgmiuHtpG7xQST1NfAJgJfU5hWDYUlp0UJQIIvgDXw/kUuvH8O0Gw6Nay8W5SCBVUK3ArQ90lw2sCpDopKrQW1KAWOBukm7pXA+sBw2gjeokSgRUDHJgk02gtiUWIWVJp4naUSxIwgiW/l3aLUiBqToGfYCN6ihEN64oPBk4VF6RFUxAOH1DLUoiQtqO1ttyhpglpYWIJaWFiCWliCWlhYglpYWIJaWIJaWFiCWliCWlhYguYHMTjsZLTlq/qG97MoRdxx00O0NjN0R08sgdYKrf3gMth6bUvQUVpOrZM0NraxefOjpNOjt35C+Hz3u9/i1KkjCFGG1paklqCjIqjHggWLWLZsPteugRyFg6IUVFXBW9/6Nn784y6EiFmCWoKOmqZorUkmFem0QsrCC7G0VvT1CVatauHppyeTTidtzGiDpNGjuroGKSVCSIQQBR9SOnieYNasKSxd2gikkdIS1BJ0lKc7ZcpUxkqJtVZICa2t6wCNVXhL0FH4jAopK5k+fRaeNzbpISEk6TSsWrWaysppaJ3FNhZYgoY/SSmANLNmzWXmzOlks3qMCCrIZhVTp8ZZuXJ1IPOWoJagBQRH4LFq1RoqKiRKjb0Wr127DnCszFuCFuYrClHOmjVtYybvQ9ZZkkrB8uWN1NbOQuu0XV2yBA0n71qnmTNnEfPnzyWd1mNOIN9X1NSU0dy8Bsgg7IBpS9Bw8p6ltbWN8vLiyLshKaxdew8QRWtlmWEJmm/07uO61bS0rCObzV/ew6wKSWmi+SVLljBz5gIr85ag+RMH0ixcuJQ5c2aQyeQv764rQj4IinjcobW1HchambcEzVt8aW1tJxLJ3ypqrTl8+EgoK2pSTtDSsg4hKoIqJwtL0BEIo5RHJDKJ5ua1ZDL5ybsQ4Ps+v/71/yGdTiFlfsQWQpBOa+bNm82CBfVonbpjlz5HWuK1BB3Diwxp6usbmDFjcl7Jea01jgO9vVfZt283PT3nQ1peRSwmgpzonWFBpZSDh7k+Gq19tPbQOnvD4Q97jTPsNZagBULT2tqO6+ZHMq01kQicPXuGTOYshw4dwHHCPBQmWFqzpo1odBJKeSV5A4WQgXXXKJVEqWsodQ2tMwjhEI3GqKysYfLk6dTWTmPy5OlUV08hGo0F/nYCpfpQKoHW3iDBSxElWW6Xk/fy8ik0N7eGKk4WAg4d2g/A4cNd+P67894SN7f0OWvWVJYuXcG+fS8jRGXJ1ImawE2jdRKtTXZj3rwlzJu3kDlz5lNXV0d19STi8Spc18V1XXSwJbBSinQ6TV9fHxcvnufcudc5evQIJ04cI5G4iOkoiCGlg9a6ZL5zyRJU6xTLlrVTV1fNwIDOa41cSkkyqTlwYB9QyfHjR7l4sY9Jk6rxvPwyAFqD45ilz337Xiopn1KpJCCYP38Z99zzVpqaVjN9+gzKynKZCHP4/tB3GY54vJy6ukksXToPIdrwfbh06RpHjhzglVd+T2fnXny/D6hASgellCXoCLeF9vZ7AuunuV2VkdaaaFRw+vR5zpw5hRAV9Pdf4Pjxo6xf35J3gYkJlqCpqZmKijoGBvoQwp0wiyKlRKksWqdZsKCR9773IZqaWigvh0zGHNmsusF3v0U+xB+6VrnframpYsOGdtavb+fUqTNs3/4btm37NZlMP1JWBgsjE2dNHVj1+dKznlmqqqbxZ3+2BceJBjJ1O4Iqysslr7zyCnv3/oFIpAKlksTjU2hpac47hyqEwPcVkybFOHGimzNnjiDlxPQrGSuWIB6fxKOPfoTHHvsoc+fOJJuFdFqhFKMq2jZWWZPJaDwPamuraW1tpqmpjQsXLnP+/HFMg+LE+acl5xnnoveVK1cxdWolnqfy9D8Fvg/79u0FRCBPEfbv30t/v4fjhP+q69ZtAOQEVDiJwHL20tDQwt/93d9z//3vwPc1AwNq0LKOVcmhCZIEmYymr89n7tw5fPrTn2XTpo/hOBqtvQkjackR1JDBobV1Xd7EMNG75OLFaxw5cgiIBQSN0tPzOt3d3USj+aebcjK/bFkjtbWzx3npUyCERqkEb3/7g3zmM3/LtGl19PX5g2QqpnFwHIdUSpNOK973vvfwyU9+lrKySJAhkG9ughp5zzBp0kyWLm3IO3rXWhGNwpEjB0kmLyKl8RnNzUzR1dUZpKpU3ufheYpJk8pobm5h/CqcDDm1TvHIIx/lIx/5t/i+WUBwnPGb1C6lQAhJb69Pe3szf/VX/4loNAqMf9qtxAhq1t6bm1uorY2FkneA3bv/H8GWOtfFgR0du0ildGjr4/vQ2rqe8apwMqWFSR566MM8+OAD9Pf7aM2EVfk7jkNfn8/q1cv40If+IpD6N7EFNSSI0NKyjnwzHFprXFdy5UqKQ4cOAEMBTU7mu7uPc+rUGaJRkbfMmwonTX39EmbOXFh0mTcB0TXuu+8hHnroPYGkT/xKj+M49Pb63HtvO/fd9z6UujauSf2SIWhO3qdNm099/dJA3mVeBI1G4cSJY/T2nkeIyHUklNJFqX72798bSuZzBDcVTm1FlfkcORsa1rFlyxYSCYUQTsmsYkkpGRhQPPLII8ycuRSlUuPmj5YQQSWQYdWq1VRVufi+yltOpISOjh2YMrkbX6QBh87OPUG7iAz10JgKp/YgJ+gX7cGsrp7Oxz7279EatBYFSanWGqUUSqnB1aDcoZRfcOLdpN6gsjLK5s0fDlwq/eYiqLFsMdra7sH3yfsGOY4kkfDp6toPRN4g4eZ9o5w4cZSzZy8SiYgQ0bwMKpzmMG/eEoox3CFH0Pe//8PMmDGJdNovyHIqpXAcQTwuqayURKMC1xVEIoJYTBCPO5SXy4CsuiArmkgompuX09x8D1onxkXq3dKwnmZpc/bsehYsWBD0Hcm8bkp5ueTQodfo6TmFENGbENTIfCZzhYMH9zN37sZQhc9aa2IxSXv7PZw8uZex7Js3uc4EK1few1ve0s61ayp0tG6yFYaYFy8mePnlXRw7dphz584zMHANx4lQUzOJ2bPn0tTUTH39UlwXkklVEMG0hgceeC+dnX8cl8CxRAgq0TrL6tWtVFZKrl1TeUWuJkCCzs49Qf1m1YgXraNjF/fdtzEUyYQQZDLQ3NzK00/X4HljN9xBa4XrlvPww48OFnWEs5qasjJBJuPx9NO/4MUXf0lv77lBt2boPBUdHYrnn/9fNDQ08fDDH2DZskUkEuFIajpgNUuXLmLJkiYOH96FlBVFXbMvCYnX2kfKOC0tbUHfUf7ynkxq9u3rGPFZM5JWxuHDB+jp6Qsp84JMRjFrVh3Llq0AxqaQWUqJ1gna2zeyZMkcUikVyj/OkfPSpct85Stf4Jlnvktv7xWkjCNlFVJWIEQ5UpYjZSVSViNElIMHd/OlL/1nXnxxO5WVMjS5ckbhrW/deJOU3l1IUHOj0sybt3hYW3F+0XskIjh3rodTp04A0REutkaICMnkRQ4d2k9ZWbimutxNaWtbP2bBgZkLVc473nF/UGkVjiSRCFy71s8//MMXOXq0A8epRQh3MEgygZIa9nc/cAfi+L7mX/7lf7J9+8sBScO1xqTTsGKFKaZRKlvc9FtphEgebW3ricVE3n5N7ibt39+B7/ffdhRj7hoadyC8C5JOw8qVw2/KaB/KJA0Nq1m8eH7eKbXr1UPwne98i3PnjuA4Nfi+l9dDp5SPEC5CRPjBD77J6dMXQi8De55iypQ4ixYtCdJvdy1BxWBbcVPTmqDvSIa4ULBnz868fEJzA6IcPNjFlStJXFeGuinZrGLatGpWrmwG0mOQB9SsX/+WvLsFrg8MBTt3dtDR8QekrMb3vdDWW4go6fQVnn/+2VAuz3BFaWhYWXSZn1CCmkAoxeLFDaHaiofk/TInThwFym7rS2mtESJKb+85jh49HMpqDIcZ1Vh4hdNQt8BUli9fGXqUuXk9vPjiC6NyN4xSVbBjxyucP99LNCpDXA9jHBYuXMzwlbu7VOIVra1tQXObyvviRqNw4MBe0ukrSBnJ8+Yad2Lv3l2hx4fnZjg1Nq5k0qRZQXWPKIigkKK+fhl1dTVksypUyisaFbz+eg+HDnUxVLVVCEE1UrqkUr2cPHk8VHNhTr2mTZtOeXl1sEYv7i6C5ixJNFobWt5B4vuwd+9uwqxq5GR+79499PZmcBwZ6uk3hcxlNDXlZL6Qm2LOt76+AdcllBXM+d1dXZ1oncB1o9d1dYY/HITwOXXqtVA+dW5lqaqqmtraWorZATuhBIUUy5atYObMKaHl/cKF3jcUh+TzWiGiXLlylmPHjoaO5o0PCG1tGzAVTroAy+UDZSxevBTPI3ROVWvo7NyNUtfwvL7Bjs5CDs/rvaFCKezDIqipMQQtlgWd8ER9a2t70BqsyTfYKSsTdHV1kkxeCtbIVcgHI0tn525aWhoLkvn6+nqmT5/P+fMnQ21fk2tnqa6eyqxZc0LNmsp9fjoNGzbcy4oVKxGi0P2djBV3XYdp02awaFE9ySShNqXIEbSiopJirsu7E2U9lcpSUVHHihXNIQMFEyTs3r0DIShoYobWUbq6OoNuURnSgiricZfW1jaef/4IQpTnPSYnt5XO1KlTqaoqL2hStFKwYUM7Y7UMrhSk0xQQ9GmkJChkzs+43FEE1TrN8uUrmT69Ou8lt6HOzQt0du5Gaxffz4SWSJCcOXOcY8eO0di4JPS6tOeZGU4vvPBMAevRirq6GbguoWoChsP0JY0dKUp5xM+EEDRHkvb2DQVYXqioqOBTn/rbQJIKkzilPOrq6gqS2UxGM3/+XObMWUJ394HAiqq8zh8UkydPxnEoOD1TSoQqds2qOxFfyNQ/zqChYUXoPKBSEI9X0tTUMKpuSyEgm6WgkeJKaSorJe3t6+nu7kSI/CTSEFJSUzOpoOKQUoNSkM1m70aCmrbi2tpY6Iqa3IXJtd+O9lwKzWVmMrB69VqeffanwU3K34cuK4sNC1buVBg1y2QyFLOAeYK0wqW1df2oLODo8n9yVH3lhqCa2bOnBbvUpUKXrd3pkNIk65PJRFFpNK5XyviQaSZPns2yZQ0hk/Olhdx6tJnIHGahQFJRUXkXbHcjgkESA5ilX10kUzYB/ueaNWupqYnS36/u6CGxpsJpNeXlU0gmEwjhjHijzPdXJBL9o/I/izl9zpyXGDG9ZBY8BNmsRyLRX1Q754631YEoa9a0DQ6yumPtR1DhNH36JJYvX8muXdsQIj4uM5zKyoo3Ldk07Q0dw4krxFCPflkZnD/vMTCQuDsImguOZsxYyJIlS0in7w5fTAhob9/Arl3b85RtTSqVGvxzIZ939OhJUqmBoFVmzKiJEILy8goikQixWPl1aTzPy+J5HslkksuXL+P7STo795FOJ97Q6n2HElQG8t5KPG4mVoznOJfiBApm6bGxsYmamln09l4Y8Wbl8qB9fVeD2flh0zqKigrJs89uZd++7UCcsa/HFAhhCOo4OZdFBATN4vtpTHGIClyB2N1Rbqe1jxAVrF5ttjO8WzZt9TxFbW2MVatWc7sKp9wCxeXLl/D9wq6BlFBf34AQERynDCGiY3rkWreTyX76+6+SSPSSSFwlnR7A9z2EiCBELOhzqii+ERgvS6N1hlmzFrBwYWEtDqUMpXIznG4ndQpwOH/+HCa/HZ6gvg9LlixD68hgn9FYHjlJN5NN3GGH6RIdGgShxmUC8zixRAAZWlvbg92K756tBnMyv3TpMurq5o1YyJwbLXnxYg99fQM4TrgEd+6zFi9exMyZCym8JjX/TMH15J2A6zte8u66VaxZ0xZ67ftWF6tYRyHwfUV1tRvMcEqPQFCNEC7Xrl2hp+cckQihp3wopaisdNm48T60vvt3xJPjYWG0TjF/fj3z5s0uaLdi1xWDRyRSnCP33oVG8tmskXmzS50a4XcdIMWJE0eH1cGGuZ6CZFLzJ39yL5Mnz0ep5F2RDZnAKF4APm1t64lGw5WY5aLW3/xmGy+99Cscp6IoUmNaGFIsXLiczZs3hy6DE8JUOC1YMI+5cxfT3X0QKctv4cqYqPjQoS7e/e77C/BDzQz9eLyMLVs+zNe+9gVABWk8bQka1rKYvqNJrFrVElrec81Z27b9htde2wNUUJw2VwF4nDzZzf33P0BtbU3e29YMPUyaigrJ2rXr6O7uBMpvKfNmyskhLl8eIB6vwPd16JK/gQFFW1szH/zgJ/n+978GlCFlpGgT+HIPwHg/BLK4BDUjuBcvbmDmzKmhh3aZDsazvP76a0hZi5QxpKwowlGO49TgedfYt6+joF6l3KjGNWvacN2aWxLFdFNGSCR62L9/b0GflSNpIqF45zvfxkc/+mlisShKXQv+b3SzRYc2VnCC/LUX7GSXZrwrsMbBedG0tLSFHlCQG0zb2dmB5/WR27mjWEfOb9y589Vg/KMIfVMzGc2cOdOpr19OPhVOf/jD7wr6rBtJunHjBj73uf9Ga+ufBBsw9KG1KYPL7cmZq94aftyswstcew+lBoL3GaC6upp3vvNhVq++B0iN62Bdt3jW01Stx2KTaW5uKWhAQSaTmxxS/BWnnPQePXqA8+evMHVqbeieIVPhJFi7dj0HDrw6om8tRDlHjnRy/Hg3ixbNI51WBUXkOZLOmTOLv/zLT3Hs2Gu88srv6ejYSU/POZTKLas6gT0Sg4bDfGd/WKAmEaKceLyWWbNmMm/eApYuXcGiRfUsWFDF1q2/ZM+ebUEHgb7zCap1moaGNqZNmxRqeltO3s+cOc+JE4cxk0N00QlqBhlcZs+eHTzwwLsKCJbMQ9XUtJpYbAqpVCIghr5pNO/713j++Z/z13/9F6OqsM+1oQAsWjSf+vr5PPjgo7z22glOnjzKqVOngtxr36DrIaVDeXkF8Xic6upq6upmMG3aDGbMmMHkyVOpqqoIpq9AMgmJhNnrc7wlvuhR/Nq16wfXnfO9AbmW1q6uTjyvDymrxjG5L9m9eyf33/+ugmV++vRJNDaaCicp4zd9uMwQr0p27fo9nZ33s3LlUgYGCi8/zJ1rOq0DS+6yfHk9K1fWA7ltE4dcGSEkjiOJRrluR2jPM0c2qwdJbybxuRMyM18Wy3oqZbYzXLFiVUHyPjQYbPxyfEa2Yhw7dpDTp3tC7Qoy3Oc2FU5vua21ydWHPvXU98lk/KCVWI/62pvcs5mi3N9vjmxW4zhycBdkM1Xl+t/p71ek03owqzDazoOSJiikaGxcxZQpYbYzHLKePT1XOXbMyPt4+Ts5mc9mr9LRsYNoNPxKT66QubFxJTU1M1Hq1kufSpkZod3d+3nuuV8Qj0t8f+yU4sb2lpvVet6sDUaUUDefLM6NNk65mQQXniTRKHR17SWdvjq4a9z4QQMue/bsCGpWw8v8UIXTGm63Xm5IWslzz/2YV1/dR1WVg3+nV3OXMkGHtxUvW7Y8tLybm2bmyU/ENtDG141x/PhhurtPU1ZW2AqNUrB27T3cvsLJbDujNXz721/lxIkzVFY6Y2pJLUHfIO9pmpvXMHlyeQHyLrl4sZ8jRw6Oq7xfL41mG+yOjl2hxkIOvd7IfH39UqZNm3/bUY25oWb9/b189atfoqfnMpWV0lrSYhDUECpCa2v+2xkOf21ZGRw8uJ9E4gJSRiZofdnI/O7dO0gmdQGRtVkvr6pyWb26hXwmMpupxzEuXTrHl770eU6ePD0o93fjGvuEEDQn73V1cwd3Kw7rw2kNe/bsmBB5Hy7zQpTR3X2M7u7TRKOioDys50Fb2z0IUZHXGrlJ5xiSfvnLj/PyyzuornaQUpSE5E+ImhVD3letWjO4nWG+id0heU/Q1bVvwuR96Ls4aD3Anj07iEQgbJFKLnm+YMF85swxxcX5WGLzcMQYGBjg61//73zvez/A8zLE43Kwkn0iHthcbvWOJqjxpWK0tq4jm71xG5SRD9/3cV3FkSMHSSR6JlDeB28LEGHnzlfp7/cHb1SYw/N8olEdZDO8EA+rCtosovzqV0/zhS98jpde+iPRqNlRzlSJ5VoudFEs5fCWjsrKCJGI4PXXT3HHriTl5H369HksX16P40BlZZiNqSQVFbnk/MT7XEqZwOXs2ROcPn2apqb5JJOE3M/IrNRs2HAvzz33v4PdOPJXFGOJqzlzpptvfOMr/Pa3Tdx77ztZs2YtVVVRfN+sEPm+ZqjLcihrMlJl/41/zg1jkFIOFm9LCYmER2fnAbZv386OHf83cFfUnUfQ3FiXVCrJyy+/SixWHmrPI9d16OnpYdeuV4DykggMhJAo5fP00z8hkfhXoetZjdvicOHChYLX2c2SqBk2dujQXg4d6mD69AW0trbT1LSGuXMXEI9HcV0HpUx6y/eNL6/UzVubHUcEQxhMjGB+mtel03D16lW6u0/S2bmHgwe7OHv2ZKAAFeN/D2DLGDPBBwrdz1IBZZTQJszB90iP0qrr4HuNTh5zPqxSaSADlDFlygzmzZvHnDkLmD17LpMnT6WyMk4sFqOsLEYk4r6BpNlsllQqycBAgkSin0uXLnHx4nnOnHmdM2dOc+XKJQYGrgSkjCBEWbB8re4GggqkLCy5bS6CLgmJv/G88p0Beuvvpcb4fCRaq6DuMxtcMwlEiUbLiUbLiEajOE5ujr0Yll3Ikk6nSaVSQTmeN8xFcIFcy3HuMybufhQhLNMFl8aVar7PtDqUTnrGnI8fkDWKEDnrbCqZMpkUmUxyhMyDCA5509ff+BkTCReLOxo36xMynaP5v7aUFwIsQe9S0t4tkPZ2WliCWlhYglpYglpYWIJaWFiCWliCWlhYglpYglpYWIJaWFiCWliCWlhYglq8uQhqpwNYlDJBdX9Qba3t5bAoRQuatJfBopQJet78sAbUojQJei7oUbHj1CxKDb4E0WGvg0VpQetA1U9IoNPIuxb2wliUBoQKMqC7JeiXwB8wsyWsI2pRUnhZQv1JYF+wF5H1Qy0mXN8BB7w08GsJTyjQLwQEtRbUYqKhgm74DvjRvtxS5zOQUYzHlm4WFre1oA6gfgFCB3vjPbkH1M6AuXbp02ICySkcyKRA/QBAwsac1fxa4ZvxWViMlbxHBKgX4KmTsMmRsM03VvTyTyFzCBwJ2gZLFhMBAZ4G8eXcPwSppY0OvJAG/h4cAcIGSxbjDR+iEryfw49egcclbPWDIGmbZ/4h+yRkXgXXsb6oxTj7nkA2BfwNw4aZ3lCwvNUH/QnQni3BsxhHfvoQdcD/Ivz4CGwK0p/XpZW2adjkwFOvw4oIlL0NPB+Erbq3KDY5Xcj8EeIfgUUCtqpbWVBlSFr/eUj/CspcY00tLIpCTmWCcu8qiMfgm1lovG4GvHyjL9Co4QkN0S2QPQ4R17DcwmJMyalBBr6n+gD88Kgxjk+oG8L6m2GTY/zRR1eAuw3klEDu7UqTxViRU0HEgfTH4cl/ho2uCdavxy38y62+IelP9oP/AOiL5s2s3FuMhawLTKYo/ZmRyDmCBb3Rkm5uAPc5cJdA2gNhZ9tbFEJODxwXpA/+n8MPvz0SOUewoDda0h8fBHUvZH8JMRdQdrXJIgwzAc8E3eIspN9tyLnJGYmckFf1UleQfvpJH+x9Ela44Gw0K05+8OZ2Dd/iVsTUPkjHrBJln4fUI/DTnUPqPDLyDHq6tFlp2qZh74vQ+DsQjRCda8ip/WA3M0tUi5sQU10B9Wn44aeg62q+5MzDB73Z72+S5s0/HoHUn4P/HyG62KyMesr0k2gZkNUS9s0l44HbJx2IANlrwHfB/0d48jVj5ODGVNJYEvSG4AngsUqQHwb1cZBNxij7wYE39DlaWAt713BRBwVFQUJdO8blcwJKZc8APwH/G2bp8kbOhLKIBWOYNc2dQPl9oN8H+u1Ag3mKhj9cpbdRrEUhCOrcB2NsH1DngZeAn4Hzc/je1SFeNOowVnOsCHoLogJsikJ0Jeh2kKtB1wOzgGlAzJL0ToUgyOBcAHEOeA3ETmAXqN3w5JWh393owttUocQcS4LeQFS4uSl/3IUjVZB1wdXgWbm/o5C7ZzEFqQHYmry56wdBsYces0eiOI/aJgk9wfuP/kmyKEVzmmsXmqbHkpTD8f8BFhiYIhObURIAAAAASUVORK5CYII=" alt="After Effects" title="After Effects" width="168" height="168">
+        <img class="tool t-cc" src="data:image/png;base64,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" alt="CapCut" title="CapCut" width="168" height="168">
+      </div>
+      <div class="hero-grid-text">
+        <div class="mono">Video editor &nbsp;·&nbsp; <span class="tc" id="tc">00:00:00:00</span></div>
+        <h1 id="name"><span class="nl" id="nl1">Omar</span> <span class="nl" id="nl2">Mostafa</span></h1>
+        <p class="lead">I edit short-form and long-form video for brands, creators and podcasts. Every cut is built to keep people watching to the last frame.</p>
+        <div class="langs" aria-label="Languages: English and Arabic"><span class="mono">Content in</span><span class="lang" title="English">ENG</span><span class="lang" title="Arabic">AR</span></div>
+        <div class="ruler" aria-hidden="true"><i></i></div>
+      </div>
     </div>
 
-    <header class="top">
-      <a href="#" class="brand" id="brandName">عمر مصطفى</a>
-      <nav>
-        <a href="#shorts">فيديوهات قصيرة</a>
-        <a href="#films">فيديوهات طويلة</a>
-        <a href="#gallery">معرض الأعمال</a>
-        <a href="#services">الخدمات</a>
-        <a href="#contact">تواصل</a>
-      </nav>
-    </header>
+    <section id="shorts" aria-labelledby="shorts-h">
+      <div class="sec-head">
+        <h2 id="shorts-h">Short-form</h2>
+        <span class="mono">9:16 &nbsp;·&nbsp; drag, swipe or use arrow keys</span>
+      </div>
 
-    <main>
-      <section class="hero" id="top">
-        <div class="hero-text">
-          <span class="mono" id="heroMeta">محرر فيديو ومونتير محترف</span>
-          <h1 id="heroName">عمر مصطفى</h1>
-          <p class="lead" id="heroBio">مرحباً بك في معرض أعمالي. متخصص في مونتاج الفيديوهات الرياضية والجيم (Fitness & Gym)، الإعلانات التجارية، والمحتوى الديناميكي عالي الجودة.</p>
-        </div>
-        <div class="hero-portrait">
-          <img id="profileImg" src="profile.jpg" alt="عمر مصطفى">
-        </div>
-      </section>
+      <div class="stage" id="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Short-form videos. Use left and right arrows to rotate, Enter to play.">
+        <div class="ring" id="ring"></div>
+      </div>
 
-      <section class="section" id="shorts">
-        <div class="sec-head">
-          <h2>فيديوهات قصيرة (9:16)</h2>
-          <span class="mono">اسحب أو استخدم الأسهم</span>
-        </div>
-        <div class="stage" id="stage">
-          <div class="ring" id="ring"></div>
+      <div class="info">
+        <div aria-live="polite">
+          <div class="mono"><span id="i-kind"></span> &nbsp;·&nbsp; <span id="i-dur" class="tc"></span></div>
+          <h3 id="i-title"></h3>
+          <p id="i-role"></p>
         </div>
         <div class="ctrl">
-          <button id="prev" aria-label="السابق">‹</button>
-          <button id="next" aria-label="التالي">›</button>
+          <span class="mono" id="i-count" style="margin-right:6px"></span>
+          <button type="button" id="prev" aria-label="Previous video"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button type="button" id="next" aria-label="Next video"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
         </div>
-      </section>
+      </div>
+      <div class="ticks" id="ticks"></div>
+    </section>
 
-      <section class="section" id="films">
-        <div class="sec-head"><h2>فيديوهات طويلة (16:9)</h2></div>
-        <div class="film-list" id="filmList"></div>
-      </section>
+    <section id="films" aria-labelledby="films-h">
+      <div class="sec-head">
+        <h2 id="films-h">Long-form</h2>
+        <span class="mono">16:9</span>
+      </div>
+      <div class="films" id="films-grid"></div>
+    </section>
 
-      <!-- معرض الأعمال والتصنيفات (Gym & All Works) -->
-      <section class="section" id="gallery">
-        <div class="sec-head">
-          <div>
-            <h2>معرض الأعمال وتصنيفات الفيديو</h2>
-            <p style="color:var(--muted);font-size:14px;margin-top:4px">تصفح سابقة الأعمال بمختلف المجالات (جيم ورياضة، ريلز، إعلانات، بودكاست)</p>
-          </div>
-          <span class="mono" id="videoCountBadge" style="background:var(--surface);padding:6px 14px;border-radius:12px;border:1px solid var(--line);color:var(--accent)">0 فيديو متاح</span>
+    <section id="services" aria-labelledby="svc-h">
+      <div class="sec-head"><h2 id="svc-h">What I do</h2></div>
+      <div class="svc">
+        <div><span class="mono">9:16 · 15–60 s</span><h3>Short-form edits</h3><p>Hooks, pacing, captions and sound for Reels, TikTok and Shorts.</p></div>
+        <div><span class="mono">16:9 · 2–20 min</span><h3>Long-form edits</h3><p>Brand films, interviews, podcasts and YouTube episodes with a clear story arc.</p></div>
+        <div><span class="mono">Titles · graphics</span><h3>Motion and titles</h3><p>Lower thirds, transitions and animated text that match your brand.</p></div>
+        <div><span class="mono">Grade · mix</span><h3>Color and sound</h3><p>Consistent color across clips, cleaned dialogue and a balanced final mix.</p></div>
+      </div>
+    </section>
+
+    <section id="contact" class="contact" aria-labelledby="contact-h">
+      <h2 id="contact-h">Got footage that needs cutting?</h2>
+      <div class="contact-list">
+        <div class="mail">
+          <span class="mono c-label">WhatsApp</span>
+          <a class="c-val" href="https://wa.me/201144826641" target="_blank" rel="noopener">+20 114 482 6641</a>
+          <a class="btn btn-wa" href="https://wa.me/201144826641" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18.2a8.2 8.2 0 01-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1112 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 01-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 00-.7.3 3 3 0 00-.9 2.2 5.2 5.2 0 001.1 2.7 11.8 11.8 0 004.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 001.8-1.2 2.2 2.2 0 00.1-1.3c0-.1-.2-.2-.5-.3z"/></svg>Message on WhatsApp</a>
         </div>
-
-        <!-- فلاتر التصنيفات وشريط البحث السريع -->
-        <div class="gallery-controls">
-          <div class="cat-tabs" id="catTabs">
-            <button class="cat-btn active" data-cat="all">🌟 الكل</button>
-            <button class="cat-btn" data-cat="gym">🏋️‍♂️ جيم ورياضة</button>
-            <button class="cat-btn" data-cat="shorts">⚡ ريلز وشورتس</button>
-            <button class="cat-btn" data-cat="commercials">🎬 إعلانات وماركات</button>
-            <button class="cat-btn" data-cat="podcasts">🎙️ بودكاست ومقابلات</button>
-          </div>
-          <div class="search-box">
-            <input type="text" id="gallerySearch" placeholder="🔍 ابحث بالاسم أو الكلمة المفتاحية...">
-          </div>
+        <div class="mail">
+          <span class="mono c-label">Email</span>
+          <a class="c-val" id="email" href="mailto:omaomar4111@gmail.com">omaomar4111@gmail.com</a>
+          <button class="btn btn-ghost" type="button" id="copy">Copy email</button>
         </div>
+      </div>
+    </section>
+  </main>
 
-        <!-- شبكة الفيديوهات -->
-        <div class="video-grid" id="videoGrid"></div>
-        
-        <div style="text-align:center;margin-top:28px">
-          <button class="btn secondary" id="loadMoreBtn" style="display:none;padding:12px 32px;font-size:14px">عرض المزيد من الفيديوهات ⟱</button>
-        </div>
-      </section>
+  <dialog class="player" id="player" aria-labelledby="p-title">
+    <button type="button" class="close" id="p-close" aria-label="Close player"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div class="p-frame" id="p-frame"></div>
+    <div class="p-meta"><h3 id="p-title"></h3><span class="mono" id="p-sub"></span></div>
+  </dialog>
 
-      <section class="section" id="services">
-        <div class="sec-head"><h2>ما أقدمه</h2></div>
-        <div class="services-grid">
-          <div class="service-card">
-            <span class="mono">9:16 · 15–60 ثانية</span>
-            <h3>مونتاج فيديوهات قصيرة</h3>
-            <p>خطافات، إيقاع، ترجمة ديناميكية، ومؤثرات صوتية للريلز، تيك توك، ويوتيوب شورتس.</p>
-          </div>
-          <div class="service-card">
-            <span class="mono">16:9 · 2–20 دقيقة</span>
-            <h3>مونتاج فيديوهات طويلة</h3>
-            <p>أفلام ترويجية، مقابلات، حلقات بودكاست، وثائقيات، وفيديوهات يوتيوب احترافية.</p>
-          </div>
-          <div class="service-card">
-            <span class="mono">عناوين · جرافيك</span>
-            <h3>موشن جرافيكس وعناوين</h3>
-            <p>تصميم عناوين متحركة (Lower Thirds)، انتقالات سلسة ومؤثرات بصرية تعزز الرسالة.</p>
-          </div>
-          <div class="service-card">
-            <span class="mono">تصحيح · هندسة صوت</span>
-            <h3>ألوان وصوتيات</h3>
-            <p>تصحيح ألوان سينمائي (Color Grading)، تنظيف الضوضاء، ومكساج صوتي نقي ومتوازن.</p>
-          </div>
-        </div>
-      </section>
+  <footer>
+    <span class="mono">© 2026 Omar Omar</span>
+    <span class="mono">Cut in frames, not minutes</span>
+  </footer>
+</div>
 
-      <section class="section" id="contact">
-        <div class="sec-head"><h2>تواصل معي</h2></div>
-        <p class="lead">متاح للمشاريع الجديدة والمستمرة — راسلني مباشرة لمناقشة فكرتك.</p>
-        <div class="contact-list" id="contactList">
-          <a href="https://wa.me/201144826641" class="contact-item" target="_blank" rel="noopener">
-            <span class="mono">واتساب</span>
-            <strong>01144826641</strong>
-          </a>
-          <a href="tel:01144826641" class="contact-item">
-            <span class="mono">اتصال مباشر</span>
-            <strong>01144826641</strong>
-          </a>
-          <a href="mailto:omaomar4111@gmail.com" class="contact-item">
-            <span class="mono">البريد الإلكتروني</span>
-            <strong>omaomar4111@gmail.com</strong>
-          </a>
-        </div>
-      </section>
-    </main>
 
-    <footer class="footer">
-      <p>© <span id="year"></span> <span id="footName">بورتفوليو</span>. جميع الحقوق محفوظة.</p>
-    </footer>
-  </div>
-
-  <!-- Lightbox -->
-  <div class="lightbox" id="lightbox">
-    <button class="close" id="lbClose" aria-label="إغلاق">✕</button>
-    <div class="box" id="lbBox"></div>
-  </div>
-
-  <!-- Firebase Scripts -->
+  <!-- Firebase Integration -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
-  <script>
-    // جلب الإعدادات من window.firebaseConfig أو firebaseConfig
-    const config = window.firebaseConfig || (typeof firebaseConfig !== 'undefined' ? firebaseConfig : null);
-    const isConfigValid = config && 
-                          config.apiKey && 
-                          config.apiKey !== "YOUR_API_KEY";
+  <script src="videos.js"></script>
 
-    if (!isConfigValid) {
-      document.getElementById('setupNotice').style.display = 'block';
-      console.warn("⚠️ برجاء وضع بيانات مشروع Firebase في ملف firebase-config.js");
-    }
+<script>
+/* Videos are edited in videos.js (shared with work.html). */
+const SHORTS = window.SHORTS || [];
+const FILMS = window.FILMS || [];
 
-    let db = null;
-    try {
-      if (!firebase.apps.length && isConfigValid) {
-        firebase.initializeApp(config);
+// Load dynamic videos from Firestore if configured
+(async function() {
+  try {
+    if (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      
+      const shortsSnap = await db.collection('shortVideos').get();
+      if (!shortsSnap.empty) {
+        const fireShorts = shortsSnap.docs.map(d => {
+          const v = d.data();
+          return {
+            title: v.title || 'Short Video',
+            kind: v.genre || 'Reels',
+            dur: v.duration || '0:30',
+            role: 'Edit · sound design · color',
+            poster: v.thumbnail || 'profile.jpg',
+            src: v.videoUrl || '',
+            hue: 190
+          };
+        });
+        if (fireShorts.length > 0) {
+          window.SHORTS = fireShorts;
+          // Re-render carousel if initialized
+          if (typeof renderDrum === 'function') renderDrum();
+        }
       }
-      if (firebase.apps.length) {
-        db = firebase.firestore();
-      }
-    } catch (err) {
-      console.error("Firebase init failed:", err);
-    }
 
-    // ========== تحميل الإعدادات ==========
-    async function loadSettings() {
-      if (!db) return;
-      try {
-        const doc = await db.collection('settings').doc('main').get();
-        if (!doc.exists) return;
-        const s = doc.data();
-        
-        const name = s.name || 'عمر مصطفى';
-        const title = s.title || 'محرر فيديو ومونتير محترف';
-        const bio = s.bio || 'مرحباً بك في معرض أعمالي. متخصص في مونتاج الفيديوهات الرياضية والجيم (Fitness & Gym)، الإعلانات التجارية، والمحتوى الديناميكي عالي الجودة.';
-
-        document.getElementById('brandName').textContent = name;
-        document.getElementById('footName').textContent = name;
-        document.getElementById('heroName').textContent = name;
-        document.getElementById('heroMeta').textContent = title;
-        document.getElementById('heroBio').textContent = bio;
-        document.title = name + ' — ' + title;
-
-        if (s.profileImage) {
-          document.getElementById('profileImg').src = s.profileImage;
-        } else {
-          document.getElementById('profileImg').src = 'profile.jpg';
+      const longsSnap = await db.collection('longVideos').get();
+      if (!longsSnap.empty) {
+        const fireLongs = longsSnap.docs.map(d => {
+          const v = d.data();
+          return {
+            title: v.title || 'Long Video',
+            kind: v.genre || 'Film',
+            dur: v.duration || '3:00',
+            poster: v.thumbnail || 'profile.jpg',
+            src: v.videoUrl || '',
+            hue: 210
+          };
+        });
+        if (fireLongs.length > 0) {
+          window.FILMS = fireLongs;
+          if (typeof renderFilms === 'function') renderFilms();
         }
-
-        // جهات الاتصال
-        const contacts = [];
-        const phone = s.phone || '01144826641';
-        const whatsapp = s.whatsapp || '201144826641';
-        const email = s.email || 'omaomar4111@gmail.com';
-
-        contacts.push({ label: 'اتصال', text: phone, href: 'tel:' + phone });
-        contacts.push({ label: 'واتساب', text: phone, href: 'https://wa.me/' + whatsapp.replace(/[^0-9]/g, '') });
-        contacts.push({ label: 'البريد الإلكتروني', text: email, href: 'mailto:' + email });
-
-        if (s.instagram) {
-          const handle = s.instagram.replace(/^@/, '');
-          contacts.push({ label: 'إنستغرام', text: '@' + handle, href: 'https://instagram.com/' + handle });
-        }
-        if (s.youtube) {
-          const ytUrl = s.youtube.startsWith('http') ? s.youtube : 'https://youtube.com/' + s.youtube;
-          contacts.push({ label: 'يوتيوب', text: s.youtube, href: ytUrl });
-        }
-
-        if (contacts.length) {
-          document.getElementById('contactList').innerHTML = contacts.map(c => `
-            <a href="${c.href}" class="contact-item" target="${c.href.startsWith('http') ? '_blank' : '_self'}" rel="noopener">
-              <span class="mono">${c.label}</span>
-              <strong>${c.text}</strong>
-            </a>
-          `).join('');
-        }
-      } catch (e) {
-        console.error('settings error:', e);
       }
     }
+  } catch(e) {
+    console.log('Using local videos.js catalog:', e);
+  }
+})();
 
-    // ========== تحميل الفيديوهات وقاعدة البيانات ==========
-    let allVideos = [];
-    let activeCategory = 'all';
-    let searchQuery = '';
-    let displayedCount = 0;
-    const PAGE_SIZE = 16;
 
-    async function loadShorts() {
-      if (!db) {
-        document.getElementById('ring').innerHTML = '';
-        document.getElementById('stage').innerHTML = '<div class="empty">بانتظار ربط قاعدة بيانات Firebase لعرض الفيديوهات</div>';
-        return;
-      }
-      try {
-        const snap = await db.collection('shortVideos').get();
-        const items = snap.docs.map(d => ({ id: d.id, isVertical: true, type: 'short', ...d.data() }));
-        items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-        
-        // عرض أحدث 15 فيديو في الكاروسيل ثلاثي الأبعاد
-        renderCarousel(items.slice(0, 15));
-        
-        items.forEach(it => { if (!allVideos.some(v => v.id === it.id)) allVideos.push(it); });
-        applyFiltersAndRender();
-      } catch (e) {
-        console.error('Error loading shorts:', e);
-      }
-    }
+/* Your photo. src: path or data URI of the image. layout: 'beside' (next to the name) or 'behind' (blurred behind the name).
+   position: which part of the photo stays in view, as 'x% y%'. */
+const PHOTO = { src: 'profile.jpg', layout: 'behind', position: '50% 20%', alt: 'Portrait of Omar Mostafa' };
 
-    async function loadLongs() {
-      if (!db) {
-        document.getElementById('filmList').innerHTML = '<div class="empty">بانتظار ربط قاعدة بيانات Firebase لعرض الفيديوهات</div>';
-        return;
-      }
-      try {
-        const snap = await db.collection('longVideos').get();
-        const items = snap.docs.map(d => ({ id: d.id, isVertical: false, type: 'long', ...d.data() }));
-        items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-        
-        // عرض قائمة الفيديوهات الطويلة المميزة
-        renderFilms(items.slice(0, 8));
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = (s) => document.querySelector(s);
+const secs = (d) => { const [m, s] = d.split(':').map(Number); return m * 60 + s; };
 
-        items.forEach(it => { if (!allVideos.some(v => v.id === it.id)) allVideos.push(it); });
-        applyFiltersAndRender();
-      } catch (e) {
-        console.error('Error loading longs:', e);
-      }
-    }
+/* ---------- hero photo ---------- */
+$('#hero').dataset.layout = PHOTO.layout;
+$('#portrait').style.setProperty('--pos', PHOTO.position);
+$('#portrait').innerHTML = PHOTO.src
+  ? `<img src="${PHOTO.src}" alt="${PHOTO.alt}">`
+  : `<div class="ph" role="img" aria-label="Photo placeholder"><svg viewBox="0 0 100 120"><circle cx="50" cy="38" r="22"/><path d="M6 120c0-30 20-48 44-48s44 18 44 48z"/></svg><span>Your photo here</span></div>`;
 
-    // ========== معرض الأعمال الكامل والفلاتر والتحميل التدريجي ==========
-    function applyFiltersAndRender(reset = true) {
-      if (reset) displayedCount = 0;
+/* ---------- name: both lines the same width ----------
+   Same letter height on both lines; the last name's letter width is adjusted until it matches the first name exactly. */
+function fitName() {
+  const a = $('#nl1'), b = $('#nl2');
+  const setW = (el, w) => { el.style.fontVariationSettings = `"wdth" ${w}`; el.style.fontStretch = w + '%'; };
+  a.style.fontSize = b.style.fontSize = '';
+  setW(a, 118); setW(b, 118);
+  const target = a.getBoundingClientRect().width;
+  let lo = 62, hi = 125;
+  for (let k = 0; k < 14; k++) {
+    const mid = (lo + hi) / 2; setW(b, mid);
+    if (b.getBoundingClientRect().width > target) hi = mid; else lo = mid;
+  }
+  setW(b, lo);
+  const wb = b.getBoundingClientRect().width;
+  if (wb > target + 0.5) {            // still too long even at the narrowest setting: shrink slightly
+    b.style.fontSize = (parseFloat(getComputedStyle(b).fontSize) * target / wb) + 'px';
+  } else if (wb < target - 0.5) {      // a hair short: close the gap with spacing
+    b.style.letterSpacing = `calc(-.01em + ${((target - wb) / (b.textContent.length - 1)).toFixed(2)}px)`;
+  }
+}
+fitName();
+if (document.fonts) { document.fonts.ready.then(fitName); document.fonts.addEventListener && document.fonts.addEventListener('loadingdone', fitName); }
+window.addEventListener('resize', fitName);
 
-      const q = searchQuery.toLowerCase().trim();
-      const filtered = allVideos.filter(v => {
-        const genre = (v.genre || '').toLowerCase();
-        const title = (v.title || '').toLowerCase();
+/* ---------- hero timecode (24 fps) ---------- */
+const tcEl = $('#tc');
+if (!reduced) {
+  const t0 = performance.now();
+  const pad = (n) => String(n).padStart(2, '0');
+  (function loop(now) {
+    const f = Math.floor((now - t0) / 1000 * 24);
+    tcEl.textContent = [Math.floor(f / 86400), Math.floor(f / 1440) % 60, Math.floor(f / 24) % 60, f % 24].map(pad).join(':');
+    requestAnimationFrame(loop);
+  })(performance.now());
+}
 
-        // تصفية حسب التصنيف
-        let matchCat = false;
-        if (activeCategory === 'all') matchCat = true;
-        else if (activeCategory === 'gym') {
-          matchCat = genre.includes('جيم') || genre.includes('رياض') || genre.includes('fitness') || genre.includes('gym') || title.includes('جيم') || title.includes('تمرين');
-        } else if (activeCategory === 'shorts') {
-          matchCat = v.isVertical || v.videoUrl.includes('/shorts/') || genre.includes('ريلز') || genre.includes('shorts');
-        } else if (activeCategory === 'commercials') {
-          matchCat = genre.includes('إعلان') || genre.includes('commercial') || title.includes('إعلان');
-        } else if (activeCategory === 'podcasts') {
-          matchCat = genre.includes('بودكاست') || genre.includes('podcast') || title.includes('بودكاست') || title.includes('حلقة');
-        }
+/* ---------- carousel ---------- */
+const ring = $('#ring'), stage = $('#stage');
+const N = SHORTS.length, step = 360 / N;
+const PLAY_SVG = '<svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg>';
 
-        // تصفية حسب البحث
-        let matchSearch = true;
-        if (q) {
-          matchSearch = title.includes(q) || genre.includes(q);
-        }
+/* thumbnails: a poster picture if given; otherwise '#t=0.1' makes phones show the video's first frame */
+const thumbSrc = (u) => (u && !u.includes('#')) ? u + '#t=0.1' : u;
+const thumbImg = (x) => x.poster ? `<img class="thumb" src="${x.poster}" alt="" loading="lazy" decoding="async">` : '';
+const posterAttr = (x) => x.poster ? ` poster="${x.poster}"` : '';
+ring.innerHTML = SHORTS.map((w, i) => `
+  <article class="card${w.src ? ' has-video' : ''}" style="--h:${w.hue}; --dur:${secs(w.dur)}s" aria-label="${w.title}">
+    <div class="screen">
+      <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
+      ${thumbImg(w)}
+      ${w.src ? `<video src="${w.poster ? w.src : thumbSrc(w.src)}"${posterAttr(w)} playsinline loop preload="metadata"></video>` : ''}
+      <span class="playbtn">${PLAY_SVG}</span>
+      ${w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
+      <div class="cap"><h3>${w.title}</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>${w.dur}</span></div></div>
+    </div>
+  </article>`).join('');
+const cards = [...ring.children];
 
-        return matchCat && matchSearch;
-      });
+$('#ticks').innerHTML = SHORTS.map((w, i) => `<button type="button" aria-label="Show ${w.title}"></button>`).join('');
+const ticks = [...$('#ticks').children];
 
-      document.getElementById('videoCountBadge').textContent = `${filtered.length} فيديو متاح`;
+let R = 300, idx = 0, angle = 0, target = 0, raf = 0, dragging = false, lastTouch = 0, hover = false;
+const active = () => ((idx % N) + N) % N;
 
-      const grid = document.getElementById('videoGrid');
-      if (reset) grid.innerHTML = '';
+/* Shows 5 cards at a time: the active one in the middle, two on each side.
+   Side cards sit slightly back, tilt gently, get a light blur, and fade out toward the edges. */
+let SPACING = 200, dragK = 0.35, spread = 1;
+const SIDE_BLUR = [0, 1.1, 2];   // px of blur: center, first neighbor, second neighbor
+function layout() {
+  const w = cards[0].offsetWidth, half = stage.clientWidth / 2;
+  SPACING = Math.max(w * 0.5, Math.min(w * 0.84, (half - w * 0.3) / 2));
+  dragK = step / SPACING;
+  ring.style.transform = 'none';
+  paint();
+}
+function paint() {
+  cards.forEach((c, i) => {
+    const d = ((((i * step - angle) % 360) + 540) % 360) - 180;
+    const sl = d / step, a = Math.abs(sl), sg = Math.sign(sl);
+    const sp = SPACING * spread;
+    const x = sg * (Math.min(a, 1) * sp + Math.max(0, a - 1) * sp * 0.86);
+    const scale = 1 - Math.min(a, 2.5) * 0.09;
+    const rot = -sg * Math.min(a, 1) * 9;
+    const blur = a <= 1 ? SIDE_BLUR[1] * a : SIDE_BLUR[1] + (SIDE_BLUR[2] - SIDE_BLUR[1]) * Math.min(a - 1, 1);
+    const op = a <= 2 ? 1 - a * 0.07 : Math.max(0, 0.86 * (1 - (a - 2) / 0.7));
+    c.style.transform = `translateX(${x.toFixed(1)}px) translateZ(${(-a * 40).toFixed(1)}px) rotateY(${rot.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
+    c.style.filter = blur > 0.05 ? `blur(${blur.toFixed(2)}px)` : 'none';
+    c.style.opacity = op.toFixed(3);
+    c.style.zIndex = String(100 - Math.round(a * 10));
+    c.style.visibility = op > 0.01 ? 'visible' : 'hidden';
+    c.style.pointerEvents = a < 2.4 ? '' : 'none';
+    c.style.setProperty('--dim', Math.min(a * 0.22, 0.5).toFixed(3));
+  });
+}
+function tick() {
+  if (reduced) angle = target; else angle += (target - angle) * 0.14;
+  if (!dragging && Math.abs(target - angle) < 0.05) angle = target;
+  paint();
+  raf = (dragging || angle !== target) ? requestAnimationFrame(tick) : 0;
+}
+const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
 
-      if (!filtered.length) {
-        grid.innerHTML = '<div class="empty" style="grid-column:1/-1">لا توجد فيديوهات مطابقة للبحث أو التصنيف المحدد.</div>';
-        document.getElementById('loadMoreBtn').style.display = 'none';
-        return;
-      }
-
-      const toShow = filtered.slice(displayedCount, displayedCount + PAGE_SIZE);
-      displayedCount += toShow.length;
-
-      toShow.forEach(v => {
-        const card = document.createElement('div');
-        card.className = 'vcard' + (v.isVertical ? ' vertical' : '');
-        
-        let thumb = v.thumbnail;
-        if (!thumb || thumb === 'profile.jpg') {
-          const ytMatch = (v.videoUrl || '').match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i);
-          if (ytMatch) thumb = `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`;
-          else thumb = 'profile.jpg';
-        }
-
-        card.innerHTML = `
-          <div class="vcard-thumb">
-            <img src="${thumb}" alt="${v.title || ''}" loading="lazy">
-            <div class="vcard-play"><i>▶</i></div>
-          </div>
-          <div class="vcard-body">
-            <span class="vcard-badge">${v.genre || (v.isVertical ? 'ريلز / شورتس' : 'فيديو طويل')}</span>
-            <div class="vcard-title">${v.title || 'بدون عنوان'}</div>
-            <div class="vcard-meta">
-              <span>${v.duration || ''}</span>
-              <span>${v.isVertical ? '9:16' : '16:9'}</span>
-            </div>
-          </div>
-        `;
-        card.addEventListener('click', () => openLightbox(v.videoUrl, v.isVertical));
-        grid.appendChild(card);
-      });
-
-      const loadMoreBtn = document.getElementById('loadMoreBtn');
-      if (displayedCount < filtered.length) {
-        loadMoreBtn.style.display = 'inline-block';
-        loadMoreBtn.textContent = `عرض المزيد (متبقي ${filtered.length - displayedCount} فيديو) ⟱`;
-      } else {
-        loadMoreBtn.style.display = 'none';
-      }
-    }
-
-    // أحداث الفلاتر والبحث
-    document.querySelectorAll('.cat-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeCategory = btn.dataset.cat;
-        applyFiltersAndRender(true);
-      });
+/* ---------- sound ----------
+   One sound setting for the whole site. It starts OFF; only the speaker icon on a video turns it on.
+   Once on, it stays on for every video (also after swiping); once muted, everything stays muted.
+   A page refresh starts muted again. */
+let soundOn = false;
+const SND_ON = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>';
+const SND_OFF = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w" d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></svg>';
+const audible = () => soundOn;
+function playWithSound(v) {
+  v.muted = !soundOn;
+  const pr = v.play();
+  if (pr) pr.catch(() => { v.muted = true; v.play().catch(() => {}); });
+}
+function refreshSound() {
+  document.querySelectorAll('.snd-btn').forEach((b) => {
+    b.innerHTML = soundOn ? SND_ON : SND_OFF;
+    b.setAttribute('aria-label', soundOn ? 'Mute' : 'Unmute');
+    b.setAttribute('aria-pressed', String(!soundOn));
+  });
+  document.querySelectorAll('.card video, .film .frame video').forEach((v) => { v.muted = !soundOn; });
+}
+function setSound(on) { soundOn = on; refreshSound(); }
+const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+function restartBar(card) {
+  const bar = card.querySelector('.bar i');
+  bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
+}
+cards.forEach((card) => {
+  const v = card.querySelector('video'), bar = card.querySelector('.bar i'), cur = card.querySelector('.cur');
+  if (v) {
+    v.muted = true;
+    v.addEventListener('timeupdate', () => {
+      if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + '%';
+      cur.textContent = fmt(v.currentTime);
     });
+  } else {
+    bar.addEventListener('animationend', () => { if (card.classList.contains('playing')) restartBar(card); });
+  }
+});
+function stopAll() {
+  cards.forEach((c) => {
+    c.classList.remove('playing', 'paused');
+    const v = c.querySelector('video');
+    if (v) { v.pause(); v.currentTime = 0; }
+    else restartBar(c);
+  });
+}
+/* The center video only plays while: the carousel is on screen, this tab is the one being viewed,
+   no pop-up / long-form preview is playing, and the visitor hasn't paused it themselves. */
+let stageVisible = !('IntersectionObserver' in window), userPaused = false, filmPreview = false, playerOpen = false;
+function syncShort() {
+  const c = cards[active()]; if (!c || !c.classList.contains('playing')) return;
+  const v = c.querySelector('video');
+  const want = stageVisible && !document.hidden && !playerOpen && !filmPreview && !userPaused;
+  const isPaused = c.classList.contains('paused');
+  if (want && isPaused) { c.classList.remove('paused'); if (v) playWithSound(v); }
+  else if (!want && !isPaused) { c.classList.add('paused'); if (v) v.pause(); }
+}
+function startCard(card) {
+  card.classList.add('playing', 'paused');   // syncShort starts it only if it should be playing
+  userPaused = false;
+  syncShort();
+}
+function togglePlay(card) {
+  if (!card.classList.contains('playing')) { startCard(card); return; }
+  userPaused = !card.classList.contains('paused');
+  syncShort();
+}
+function info() {
+  const w = SHORTS[active()];
+  $('#i-kind').textContent = w.kind;
+  $('#i-dur').textContent = w.dur;
+  $('#i-title').textContent = w.title;
+  $('#i-role').textContent = w.role;
+  $('#i-count').textContent = `${String(active() + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`;
+  ticks.forEach((t, i) => t.setAttribute('aria-current', i === active() ? 'true' : 'false'));
+}
+function go(i) {
+  const changed = i !== idx;
+  if (changed) stopAll();
+  idx = i; target = idx * step; info(); kick();
+  if (!reduced && (changed || !cards[active()].classList.contains('playing'))) startCard(cards[active()]);
+}
+function goToCard(k) {
+  let diff = ((k - active()) % N + N) % N;
+  if (diff > N / 2) diff -= N;
+  go(idx + diff);
+}
+const touched = () => { lastTouch = Date.now(); };
 
-    document.getElementById('gallerySearch').addEventListener('input', e => {
-      searchQuery = e.target.value;
-      applyFiltersAndRender(true);
+$('#prev').addEventListener('click', () => { touched(); go(idx - 1); });
+$('#next').addEventListener('click', () => { touched(); go(idx + 1); });
+ticks.forEach((t, i) => t.addEventListener('click', () => { touched(); goToCard(i); }));
+
+let sx = 0, sy = 0, st = 0, sa = 0, moved = false, scrolled = false, downCard = null;
+stage.addEventListener('pointerdown', (e) => {
+  if (e.target.closest('.snd-btn')) return;
+  dragging = true; moved = false; scrolled = false; sx = e.clientX; sy = e.clientY; st = performance.now(); sa = angle; touched();
+  downCard = e.target.closest('.card');
+  stage.setPointerCapture(e.pointerId); kick();
+});
+stage.addEventListener('pointermove', (e) => {
+  if (!dragging) return;
+  const dx = e.clientX - sx, dy = e.clientY - sy;
+  if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) scrolled = true;   // finger is scrolling the page
+  if (!scrolled && Math.abs(dx) > 6) moved = true;
+  if (moved) { angle = sa - dx * dragK; target = angle; }
+});
+/* A tap only counts if the finger barely moved, lifted normally, and wasn't held long.
+   Scrolling the page with a finger on the carousel never opens the pop-up. */
+function endDrag(e) {
+  if (!dragging) return;
+  dragging = false; touched();
+  const isTap = !moved && !scrolled && e && e.type === 'pointerup' && performance.now() - st < 600
+    && Math.hypot(e.clientX - sx, e.clientY - sy) < 10;
+  if (moved) { go(Math.round(angle / step)); }
+  else if (isTap && downCard) {
+    const k = cards.indexOf(downCard);
+    if (k === active()) openPlayer(k, 'short'); else goToCard(k);
+  }
+  kick();
+}
+stage.addEventListener('pointerup', endDrag);
+stage.addEventListener('pointercancel', endDrag);
+stage.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') { touched(); go(idx + 1); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft') { touched(); go(idx - 1); e.preventDefault(); }
+  else if (e.key === 'Enter') { touched(); openPlayer(active(), 'short'); e.preventDefault(); }
+  else if (e.key === ' ') { touched(); togglePlay(cards[active()]); e.preventDefault(); }
+});
+/* two-finger swipe on a trackpad (only while the cursor is over the carousel):
+   the cards follow your fingers, then settle on the nearest video when you stop */
+let wheelIdle = 0;
+stage.addEventListener('wheel', (e) => {
+  const dx = e.deltaMode === 1 ? e.deltaX * 16 : e.deltaX;
+  if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;   // mostly vertical: let the page scroll
+  e.preventDefault();                                      // stop the browser's back/forward swipe
+  touched();
+  angle += Math.max(-60, Math.min(60, dx)) * dragK;
+  target = angle;
+  paint();
+  clearTimeout(wheelIdle);
+  wheelIdle = setTimeout(() => go(Math.round(angle / step)), 140);
+}, { passive: false });
+stage.addEventListener('mouseenter', () => { hover = true; });
+stage.addEventListener('mouseleave', () => { hover = false; });
+
+window.addEventListener('resize', layout);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+let popupWasPlaying = false;
+document.addEventListener('visibilitychange', () => {
+  syncShort();
+  if (document.hidden) document.querySelectorAll('.film .frame video').forEach((v) => v.pause());
+  const pv = document.querySelector('#p-frame video');
+  if (pv) {
+    if (document.hidden) { popupWasPlaying = !pv.paused; pv.pause(); }
+    else if (popupWasPlaying) { pv.play().catch(() => {}); popupWasPlaying = false; }
+  }
+});
+layout(); info();
+if (!reduced) startCard(cards[0]);
+
+if ('IntersectionObserver' in window) {
+  new IntersectionObserver(([e]) => { stageVisible = e.isIntersecting; syncShort(); }, { threshold: 0.5 }).observe(stage);
+}
+
+/* ---------- long-form ----------
+   Desktop: hovering a film plays a silent preview; moving away pauses it.
+   Click / tap / Enter: opens the pop-up player with sound. Close with X, Esc, or a click outside. */
+const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+$('#films-grid').innerHTML = FILMS.map((f, i) => `
+  <article class="film">
+    <div class="frame${f.src ? ' has-video' : ''}" style="--h:${f.hue}" role="button" tabindex="0" data-i="${i}" aria-label="Play ${f.title}">
+      <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
+      ${thumbImg(f)}
+      ${f.src ? `<video src="${f.poster ? f.src : thumbSrc(f.src)}"${posterAttr(f)} muted playsinline loop preload="metadata"></video>` : ''}
+      <span class="playbtn">${PLAY_SVG}</span>
+      ${canHover ? '<span class="hint">Click to watch</span>' : ''}
+      ${f.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
+      <span class="dur">${f.dur}</span>
+      <div class="pbar"><i></i></div>
+    </div>
+    <h3>${f.title}</h3>
+    <p>${f.kind}</p>
+  </article>`).join('');
+
+document.querySelectorAll('.film .frame').forEach((fr) => {
+  const v = fr.querySelector('video'), bar = fr.querySelector('.pbar i');
+  if (v) v.addEventListener('timeupdate', () => { if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + '%'; });
+  if (canHover) {
+    fr.addEventListener('mouseenter', () => {
+      fr.classList.add('hovering');
+      if (v) { filmPreview = true; syncShort(); playWithSound(v); }
     });
-
-    document.getElementById('loadMoreBtn').addEventListener('click', () => {
-      applyFiltersAndRender(false);
+    fr.addEventListener('mouseleave', () => {
+      fr.classList.remove('hovering');
+      if (v) { v.pause(); filmPreview = false; syncShort(); }
+      else { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
     });
+  }
+  fr.addEventListener('click', (e) => { if (e.target.closest('.snd-btn')) return; openPlayer(+fr.dataset.i); });
+  fr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPlayer(+fr.dataset.i); } });
+});
 
-    // ========== الكاروسيل ثلاثي الأبعاد ==========
-    let currentAngle = 0;
-    let ringEl, stageEl, angleStep, cardCount;
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.snd-btn'); if (!b) return;
+  e.stopPropagation(); e.preventDefault();
+  setSound(!audible());
+}, true);
+refreshSound();
 
-    function renderCarousel(items) {
-      ringEl = document.getElementById('ring');
-      stageEl = document.getElementById('stage');
-      if (!ringEl || !stageEl) return;
-      ringEl.innerHTML = '';
+const player = $('#player'), pFrame = $('#p-frame');
+let lastFocus = null;
+function openPlayer(i, kind = 'film') {
+  const short = kind === 'short';
+  const f = short ? SHORTS[i] : FILMS[i];
+  const fromCard = short ? cards[i].querySelector('video') : null;
+  const startAt = fromCard ? fromCard.currentTime : 0;
+  player.classList.toggle('vertical', short);
+  lastFocus = document.activeElement;
+  // stop hover previews and the short-form card while the pop-up is open
+  document.querySelectorAll('.film .frame video').forEach((v) => v.pause());
+  playerOpen = true; syncShort();
+  pFrame.style.setProperty('--h', f.hue);
+  pFrame.innerHTML = f.src
+    ? `<video src="${f.src}"${posterAttr(f)} controls autoplay playsinline></video>`
+    : `<div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div><div class="p-empty"><span>Sample · add the video file to play it here</span></div>`;
+  $('#p-title').textContent = f.title;
+  $('#p-sub').textContent = `${f.kind} · ${f.dur}`;
+  document.documentElement.style.overflow = 'hidden';
+  player.showModal();
+  const pv = pFrame.querySelector('video');
+  if (pv) {
+    pv.muted = !soundOn;
+    if (startAt > 0.5) pv.addEventListener('loadedmetadata', () => { pv.currentTime = startAt; }, { once: true });
+    pv.play().catch(() => {});
+    pv.addEventListener('volumechange', () => { if (pv.muted === soundOn) setSound(!pv.muted); });
+  }
+}
+function closePlayer() {
+  if (!player.open) return;
+  player.close();
+}
+player.addEventListener('close', () => {
+  const pv = pFrame.querySelector('video'); if (pv) pv.pause();
+  pFrame.innerHTML = '';
+  document.documentElement.style.overflow = '';
+  playerOpen = false; filmPreview = false; syncShort();
+  if (lastFocus) lastFocus.focus({ preventScroll: true });
+});
+$('#p-close').addEventListener('click', closePlayer);
+// click or tap anywhere outside the video frame and title closes it
+player.addEventListener('click', (e) => {
+  if (e.target.closest('.p-frame, .p-meta, .close')) return;
+  closePlayer();
+});
+// Esc is handled by <dialog> natively; this covers browsers that don't
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePlayer(); });
 
-      if (!items.length) {
-        stageEl.innerHTML = '<div class="empty">لا توجد فيديوهات قصيرة بعد</div>';
-        return;
-      }
+/* ---------- copy email ---------- */
+if ($('#copy')) $('#copy').addEventListener('click', async () => {
+  const el = $('#email'), btn = $('#copy');
+  try { await navigator.clipboard.writeText(el.textContent); btn.textContent = 'Copied'; }
+  catch (e) {
+    const r = document.createRange(); r.selectNodeContents(el);
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Press Ctrl+C';
+  }
+  setTimeout(() => { btn.textContent = 'Copy email'; }, 1800);
+});
 
-      cardCount = items.length;
-      angleStep = 360 / cardCount;
-      const radius = Math.max(380, cardCount * 85);
+/* ---------- entrance animations ----------
+   Hero: soft blurred fade-in on load. Every section below: reveals as it scrolls into view. */
+(function () {
+  if (reduced || !('IntersectionObserver' in window)) return;
+  document.documentElement.classList.add('anim', 'anim-init');
+  const mark = (el, d, cls = 'rv') => { if (el) { el.classList.add(cls); el.style.setProperty('--d', d + 's'); } return el; };
 
-      items.forEach((video, i) => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        const thumb = video.thumbnail || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="533"><rect width="300" height="533" fill="%23222"/></svg>';
-        card.innerHTML = `
-          <div class="screen">
-            <img src="${thumb}" alt="${video.title || ''}" loading="lazy">
-            <div class="cap">
-              <h3>${video.title || ''}</h3>
-              <div class="dur">${video.duration || ''}</div>
-            </div>
-          </div>`;
-        card.style.transform = `rotateY(${i * angleStep}deg) translateZ(${radius}px)`;
-        card.addEventListener('click', () => openLightbox(video.videoUrl, true));
-        ringEl.appendChild(card);
-      });
-      currentAngle = 0;
-      ringEl.style.transform = 'rotateY(0deg)';
-    }
+  // hero (on load)
+  const hero = [
+    mark($('.top'), 0),
+    mark($('#portrait'), 0.1, 'rv-photo'),
+    mark($('.hero-grid-text > .mono'), 0.35),
+    mark($('#nl1'), 0.5),
+    mark($('#nl2'), 0.68),
+    mark($('.hero .lead'), 0.9),
+    mark($('.langs'), 1.05),
+    mark($('.ruler'), 1.2),
+    mark($('.tools'), 1.45)
+  ];
+  setTimeout(() => requestAnimationFrame(() => hero.forEach((el) => el && el.classList.add('in'))), 120);
 
-    function rotate(deg) {
-      if (!ringEl) return;
-      currentAngle += deg;
-      ringEl.style.transform = `rotateY(${currentAngle}deg)`;
-    }
+  // scroll reveals
+  const groups = [];
+  const add = (el, d, cls) => { if (el) { mark(el, d, cls); groups.push(el); } };
+  document.querySelectorAll('section .sec-head').forEach((h) => { add(h.querySelector('h2'), 0); add(h.querySelector('.mono'), 0.15); });
+  add($('#stage'), 0.1); add($('.info'), 0.35); add($('#ticks'), 0.5);
+  document.querySelectorAll('.film').forEach((f, i) => add(f, 0.1 + i * 0.14));
+  document.querySelectorAll('.svc > div').forEach((d, i) => add(d, 0.15 + i * 0.12));
+  add($('#contact-h'), 0);
+  document.querySelectorAll('.contact-list .mail').forEach((m, i) => add(m, 0.25 + i * 0.15));
+  add($('footer'), 0);
 
-    document.getElementById('prev').addEventListener('click', () => rotate(angleStep || 60));
-    document.getElementById('next').addEventListener('click', () => rotate(-(angleStep || 60)));
+  // start hidden without animating to the hidden state, then enable transitions
+  void document.body.offsetHeight;
+  document.documentElement.classList.remove('anim-init');
 
-    // سحب باللمس والماوس
-    let dragStart = 0, dragging = false;
-    function addDrag(el) {
-      el.addEventListener('mousedown', e => { dragStart = e.clientX; dragging = true; });
-      window.addEventListener('mouseup', e => {
-        if (!dragging) return;
-        dragging = false;
-        const d = e.clientX - dragStart;
-        if (d > 40) rotate(angleStep || 60);
-        if (d < -40) rotate(-(angleStep || 60));
-      });
-      el.addEventListener('touchstart', e => { dragStart = e.touches[0].clientX; }, { passive: true });
-      el.addEventListener('touchend', e => {
-        const d = e.changedTouches[0].clientX - dragStart;
-        if (d > 40) rotate(angleStep || 60);
-        if (d < -40) rotate(-(angleStep || 60));
-      });
-    }
+  // short-form cards start stacked and fan out when the carousel comes into view
+  spread = 0; paint();
+  function fanOut() {
+    const t0 = performance.now(), D = 1300;
+    (function step(now) {
+      const t = Math.min(1, (now - t0) / D);
+      spread = 1 - Math.pow(1 - t, 4);
+      paint();
+      if (t < 1) requestAnimationFrame(step);
+    })(t0);
+  }
 
-    // ========== قائمة الفيديوهات الطويلة ==========
-    function renderFilms(items) {
-      const list = document.getElementById('filmList');
-      if (!items.length) {
-        list.innerHTML = '<div class="empty">لا توجد فيديوهات طويلة بعد</div>';
-        return;
-      }
-      list.innerHTML = items.map((f, i) => `
-        <div class="film-item" data-url="${(f.videoUrl || '').replace(/"/g, '&quot;')}">
-          <span class="idx">${String(i + 1).padStart(2, '0')}</span>
-          <img class="thumb" src="${f.thumbnail || ''}" alt="${f.title || ''}" loading="lazy">
-          <div>
-            <h3>${f.title || ''}</h3>
-            <span class="mono">${f.genre || ''}</span>
-          </div>
-          <span class="dur">${f.duration || ''}</span>
-        </div>
-      `).join('');
-
-      list.querySelectorAll('.film-item').forEach(el => {
-        el.addEventListener('click', () => openLightbox(el.dataset.url, false));
-      });
-    }
-
-    // ========== شاشة العرض (Lightbox) ==========
-    function openLightbox(url, vertical) {
-      if (!url) return;
-      const lb = document.getElementById('lightbox');
-      const box = document.getElementById('lbBox');
-      lb.classList.toggle('vertical', !!vertical);
-
-      // دعم روابط يوتيوب العادية، الشورتس، والمختصرة
-      const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i);
-      if (ytMatch) {
-        box.innerHTML = `<iframe src="https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-      } else if (/\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(url) || url.includes('firebasestorage.googleapis.com')) {
-        box.innerHTML = `<video src="${url}" controls autoplay playsinline></video>`;
-      } else {
-        window.open(url, '_blank');
-        return;
-      }
-      lb.classList.add('open');
-    }
-
-    document.getElementById('lbClose').addEventListener('click', closeLightbox);
-    document.getElementById('lightbox').addEventListener('click', e => {
-      if (e.target.id === 'lightbox') closeLightbox();
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      if (e.target.id === 'stage') setTimeout(fanOut, 250);
+      io.unobserve(e.target);
     });
-    function closeLightbox() {
-      document.getElementById('lightbox').classList.remove('open');
-      document.getElementById('lbBox').innerHTML = '';
-    }
+  }, { threshold: 0.18, rootMargin: '0px 0px -6% 0px' });
+  groups.forEach((el) => io.observe(el));
+})();
+</script>
 
-    // تهيئة الصفحة
-    document.getElementById('year').textContent = new Date().getFullYear();
-    loadSettings();
-    loadShorts().then(() => {
-      const s = document.getElementById('stage');
-      if (s) addDrag(s);
-    });
-    loadLongs();
-  </script>
-</body>
-</html>
+</body></html>
