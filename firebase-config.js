@@ -1,12 +1,12 @@
-// إعدادات Firebase الخاصة بك
-// استبدل القيم هنا بالقيم التي نسختها من Firebase Console -> Project Settings -> Your apps -> Web app
+// إعدادات Firebase الخاصة بمشروع portfolio-35032
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBTdWIK87S3ONrccZSLNVXmmvtsqW0PR68",
+  authDomain: "portfolio-35032.firebaseapp.com",
+  projectId: "portfolio-35032",
+  storageBucket: "portfolio-35032.firebasestorage.app",
+  messagingSenderId: "32569057510",
+  appId: "1:32569057510:web:a13a696ae4de1c50b79b27",
+  measurementId: "G-3N9NSXWG30"
 };
 
 // تصدير للاستخدام في index.html و admin.html
