@@ -135,6 +135,74 @@
       font-size: .95rem;
     }
 
+    /* Gallery & Filters */
+    .gallery-controls {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .cat-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+    .cat-btn {
+      padding: 8px 18px; border-radius: 20px; border: 1px solid var(--line);
+      background: var(--surface); color: var(--muted); cursor: pointer;
+      font-size: 13px; font-weight: 500; transition: all .2s;
+    }
+    .cat-btn:hover { border-color: var(--accent); color: var(--fg); }
+    .cat-btn.active {
+      background: var(--accent); color: #17120a; border-color: var(--accent); font-weight: 700;
+    }
+    .search-box input {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 20px;
+      padding: 9px 18px; color: var(--fg); font-size: 13px; outline: none;
+      width: 260px; transition: border-color .2s;
+    }
+    .search-box input:focus { border-color: var(--accent); }
+    @media (max-width: 600px) { .search-box input { width: 100%; } }
+
+    .video-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .vcard {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 12px; overflow: hidden; cursor: pointer;
+      transition: transform .25s, border-color .25s; display: flex; flex-direction: column;
+    }
+    .vcard:hover { transform: translateY(-4px); border-color: var(--accent); }
+    .vcard-thumb {
+      position: relative; aspect-ratio: 16/9; background: #000; overflow: hidden;
+    }
+    .vcard.vertical .vcard-thumb { aspect-ratio: 9/16; max-height: 380px; }
+    .vcard-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+    .vcard:hover .vcard-thumb img { transform: scale(1.04); }
+    .vcard-play {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.35); opacity: 0; transition: opacity .2s;
+    }
+    .vcard-play i {
+      width: 44px; height: 44px; border-radius: 50%; background: var(--accent);
+      display: flex; align-items: center; justify-content: center; color: #17120a; font-size: 18px;
+    }
+    .vcard:hover .vcard-play { opacity: 1; }
+    .vcard-body {
+      padding: 14px; display: flex; flex-direction: column; gap: 6px; flex: 1;
+    }
+    .vcard-badge {
+      font-family: var(--font-mono); font-size: 11px; color: var(--accent);
+    }
+    .vcard-title {
+      font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--fg);
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .vcard-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: auto; padding-top: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+    }
+    .btn.secondary {
+      background: var(--surface); color: var(--fg); border: 1px solid var(--line);
+      border-radius: 8px; font-weight: 600; cursor: pointer; transition: all .2s;
+    }
+    .btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
+
     .services-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 24px;
@@ -208,6 +276,7 @@
       <nav>
         <a href="#shorts">فيديوهات قصيرة</a>
         <a href="#films">فيديوهات طويلة</a>
+        <a href="#gallery">معرض الأعمال</a>
         <a href="#services">الخدمات</a>
         <a href="#contact">تواصل</a>
       </nav>
@@ -242,6 +311,38 @@
       <section class="section" id="films">
         <div class="sec-head"><h2>فيديوهات طويلة (16:9)</h2></div>
         <div class="film-list" id="filmList"></div>
+      </section>
+
+      <!-- معرض الأعمال والتصنيفات (Gym & All Works) -->
+      <section class="section" id="gallery">
+        <div class="sec-head">
+          <div>
+            <h2>معرض الأعمال وتصنيفات الفيديو</h2>
+            <p style="color:var(--muted);font-size:14px;margin-top:4px">تصفح سابقة الأعمال بمختلف المجالات (جيم ورياضة، ريلز، إعلانات، بودكاست)</p>
+          </div>
+          <span class="mono" id="videoCountBadge" style="background:var(--surface);padding:6px 14px;border-radius:12px;border:1px solid var(--line);color:var(--accent)">0 فيديو متاح</span>
+        </div>
+
+        <!-- فلاتر التصنيفات وشريط البحث السريع -->
+        <div class="gallery-controls">
+          <div class="cat-tabs" id="catTabs">
+            <button class="cat-btn active" data-cat="all">🌟 الكل</button>
+            <button class="cat-btn" data-cat="gym">🏋️‍♂️ جيم ورياضة</button>
+            <button class="cat-btn" data-cat="shorts">⚡ ريلز وشورتس</button>
+            <button class="cat-btn" data-cat="commercials">🎬 إعلانات وماركات</button>
+            <button class="cat-btn" data-cat="podcasts">🎙️ بودكاست ومقابلات</button>
+          </div>
+          <div class="search-box">
+            <input type="text" id="gallerySearch" placeholder="🔍 ابحث بالاسم أو الكلمة المفتاحية...">
+          </div>
+        </div>
+
+        <!-- شبكة الفيديوهات -->
+        <div class="video-grid" id="videoGrid"></div>
+        
+        <div style="text-align:center;margin-top:28px">
+          <button class="btn secondary" id="loadMoreBtn" style="display:none;padding:12px 32px;font-size:14px">عرض المزيد من الفيديوهات ⟱</button>
+        </div>
       </section>
 
       <section class="section" id="services">
@@ -386,6 +487,13 @@
       }
     }
 
+    // ========== تحميل الفيديوهات وقاعدة البيانات ==========
+    let allVideos = [];
+    let activeCategory = 'all';
+    let searchQuery = '';
+    let displayedCount = 0;
+    const PAGE_SIZE = 16;
+
     async function loadShorts() {
       if (!db) {
         document.getElementById('ring').innerHTML = '';
@@ -394,14 +502,14 @@
       }
       try {
         const snap = await db.collection('shortVideos').get();
-        const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        // فرز زمني محلي لضمان التوافق
-        items.sort((a, b) => {
-          const tA = a.createdAt?.seconds || 0;
-          const tB = b.createdAt?.seconds || 0;
-          return tA - tB;
-        });
-        renderCarousel(items);
+        const items = snap.docs.map(d => ({ id: d.id, isVertical: true, type: 'short', ...d.data() }));
+        items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        
+        // عرض أحدث 15 فيديو في الكاروسيل ثلاثي الأبعاد
+        renderCarousel(items.slice(0, 15));
+        
+        items.forEach(it => { if (!allVideos.some(v => v.id === it.id)) allVideos.push(it); });
+        applyFiltersAndRender();
       } catch (e) {
         console.error('Error loading shorts:', e);
       }
@@ -414,17 +522,120 @@
       }
       try {
         const snap = await db.collection('longVideos').get();
-        const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        items.sort((a, b) => {
-          const tA = a.createdAt?.seconds || 0;
-          const tB = b.createdAt?.seconds || 0;
-          return tA - tB;
-        });
-        renderFilms(items);
+        const items = snap.docs.map(d => ({ id: d.id, isVertical: false, type: 'long', ...d.data() }));
+        items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        
+        // عرض قائمة الفيديوهات الطويلة المميزة
+        renderFilms(items.slice(0, 8));
+
+        items.forEach(it => { if (!allVideos.some(v => v.id === it.id)) allVideos.push(it); });
+        applyFiltersAndRender();
       } catch (e) {
         console.error('Error loading longs:', e);
       }
     }
+
+    // ========== معرض الأعمال الكامل والفلاتر والتحميل التدريجي ==========
+    function applyFiltersAndRender(reset = true) {
+      if (reset) displayedCount = 0;
+
+      const q = searchQuery.toLowerCase().trim();
+      const filtered = allVideos.filter(v => {
+        const genre = (v.genre || '').toLowerCase();
+        const title = (v.title || '').toLowerCase();
+
+        // تصفية حسب التصنيف
+        let matchCat = false;
+        if (activeCategory === 'all') matchCat = true;
+        else if (activeCategory === 'gym') {
+          matchCat = genre.includes('جيم') || genre.includes('رياض') || genre.includes('fitness') || genre.includes('gym') || title.includes('جيم') || title.includes('تمرين');
+        } else if (activeCategory === 'shorts') {
+          matchCat = v.isVertical || v.videoUrl.includes('/shorts/') || genre.includes('ريلز') || genre.includes('shorts');
+        } else if (activeCategory === 'commercials') {
+          matchCat = genre.includes('إعلان') || genre.includes('commercial') || title.includes('إعلان');
+        } else if (activeCategory === 'podcasts') {
+          matchCat = genre.includes('بودكاست') || genre.includes('podcast') || title.includes('بودكاست') || title.includes('حلقة');
+        }
+
+        // تصفية حسب البحث
+        let matchSearch = true;
+        if (q) {
+          matchSearch = title.includes(q) || genre.includes(q);
+        }
+
+        return matchCat && matchSearch;
+      });
+
+      document.getElementById('videoCountBadge').textContent = `${filtered.length} فيديو متاح`;
+
+      const grid = document.getElementById('videoGrid');
+      if (reset) grid.innerHTML = '';
+
+      if (!filtered.length) {
+        grid.innerHTML = '<div class="empty" style="grid-column:1/-1">لا توجد فيديوهات مطابقة للبحث أو التصنيف المحدد.</div>';
+        document.getElementById('loadMoreBtn').style.display = 'none';
+        return;
+      }
+
+      const toShow = filtered.slice(displayedCount, displayedCount + PAGE_SIZE);
+      displayedCount += toShow.length;
+
+      toShow.forEach(v => {
+        const card = document.createElement('div');
+        card.className = 'vcard' + (v.isVertical ? ' vertical' : '');
+        
+        let thumb = v.thumbnail;
+        if (!thumb || thumb === 'profile.jpg') {
+          const ytMatch = (v.videoUrl || '').match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i);
+          if (ytMatch) thumb = `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`;
+          else thumb = 'profile.jpg';
+        }
+
+        card.innerHTML = `
+          <div class="vcard-thumb">
+            <img src="${thumb}" alt="${v.title || ''}" loading="lazy">
+            <div class="vcard-play"><i>▶</i></div>
+          </div>
+          <div class="vcard-body">
+            <span class="vcard-badge">${v.genre || (v.isVertical ? 'ريلز / شورتس' : 'فيديو طويل')}</span>
+            <div class="vcard-title">${v.title || 'بدون عنوان'}</div>
+            <div class="vcard-meta">
+              <span>${v.duration || ''}</span>
+              <span>${v.isVertical ? '9:16' : '16:9'}</span>
+            </div>
+          </div>
+        `;
+        card.addEventListener('click', () => openLightbox(v.videoUrl, v.isVertical));
+        grid.appendChild(card);
+      });
+
+      const loadMoreBtn = document.getElementById('loadMoreBtn');
+      if (displayedCount < filtered.length) {
+        loadMoreBtn.style.display = 'inline-block';
+        loadMoreBtn.textContent = `عرض المزيد (متبقي ${filtered.length - displayedCount} فيديو) ⟱`;
+      } else {
+        loadMoreBtn.style.display = 'none';
+      }
+    }
+
+    // أحداث الفلاتر والبحث
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCategory = btn.dataset.cat;
+        applyFiltersAndRender(true);
+      });
+    });
+
+    document.getElementById('gallerySearch').addEventListener('input', e => {
+      searchQuery = e.target.value;
+      applyFiltersAndRender(true);
+    });
+
+    document.getElementById('loadMoreBtn').addEventListener('click', () => {
+      applyFiltersAndRender(false);
+    });
 
     // ========== الكاروسيل ثلاثي الأبعاد ==========
     let currentAngle = 0;

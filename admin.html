@@ -178,6 +178,7 @@
       <button class="tab active" data-tab="settings">بيانات الموقع</button>
       <button class="tab" data-tab="shorts">فيديوهات قصيرة (9:16)</button>
       <button class="tab" data-tab="longs">فيديوهات طويلة (16:9)</button>
+      <button class="tab" data-tab="bulk">⚡ استيراد جماعي (Bulk Import)</button>
     </div>
 
     <!-- الإعدادات -->
@@ -251,6 +252,62 @@
           <button class="btn" id="addLong">+ إضافة فيديو طويل</button>
         </div>
         <div id="longsList"><div id="loading">جاري التحميل…</div></div>
+      </div>
+    </div>
+
+    <!-- استيراد جماعي -->
+    <div class="panel" id="panel-bulk">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <h2 style="margin:0">⚡ استيراد روابط الفيديوهات دفعة واحدة (Bulk Import)</h2>
+          <span class="mono" style="color:var(--accent);font-size:12px">يدعم حتى 500 رابط مرة واحدة</span>
+        </div>
+        <p style="color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:20px">
+          الصق روابط يوتيوب (Shorts أو فيديوهات عادية). سيقوم النظام <strong>تلقائياً</strong> باستخراج الصور المصغرة (Thumbnails) بدقة عالية، وتحديد نوع الفيديو (قصير أو طويل)، وحفظهم جميعاً في ثوانٍ معدودة!
+        </p>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>نوع الفيديو المستهدف</label>
+            <select id="bulkTarget">
+              <option value="auto">تحديد تلقائي (حسب الرابط: shorts ➔ قصير، عادي ➔ طويل)</option>
+              <option value="shortVideos">فيديوهات قصيرة (Reels / Shorts / TikTok 9:16)</option>
+              <option value="longVideos">فيديوهات طويلة (YouTube 16:9)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>التصنيف الافتراضي (Niche / Category)</label>
+            <select id="bulkCategory">
+              <option value="جيم ورياضة (Fitness & Gym)">🏋️‍♂️ جيم ورياضة (Fitness & Gym)</option>
+              <option value="ريلز سريعة (Reels & Shorts)">⚡ ريلز سريعة (Reels & Shorts)</option>
+              <option value="إعلانات تجارية (Commercials)">🎬 إعلانات تجارية وماركات</option>
+              <option value="بودكاست ومقابلات (Podcasts)">🎙️ بودكاست ومقابلات</option>
+              <option value="موشن جرافيكس (Motion)">🎨 موشن جرافيكس وعناوين</option>
+              <option value="عام">📁 عام</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>الصق الروابط هنا (رابط في كل سطر) — أو بصيغة: <code>العنوان | الرابط | المدة</code></label>
+          <textarea id="bulkInput" style="min-height:220px;direction:ltr;font-family:monospace;font-size:13px" placeholder="https://www.youtube.com/shorts/5v2b6s...
+https://www.youtube.com/shorts/dK91p...
+تمرين ظهر حديد | https://www.youtube.com/shorts/xY72k... | 0:35
+https://www.youtube.com/watch?v=kY31..."></textarea>
+        </div>
+
+        <div class="field">
+          <label>أو ارفع ملف نصي يحتوي على الروابط (.txt أو .csv)</label>
+          <input type="file" id="bulkFile" accept=".txt,.csv">
+        </div>
+
+        <div class="progress" id="bulkProgress" style="height:8px;margin-bottom:12px"><i></i></div>
+        <div id="bulkStatus" style="font-size:13px;margin-bottom:16px;color:var(--accent);display:none;font-weight:600"></div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" id="bulkStartBtn">🚀 بدء الاستيراد الجماعي</button>
+          <button class="btn secondary" id="bulkClearBtn">مسح الحقول</button>
+        </div>
       </div>
     </div>
   </div>
@@ -702,6 +759,152 @@
       } catch (e) {
         toast('خطأ أثناء الحذف: ' + e.message, true);
       }
+    };
+
+    // ========== استيراد جماعي (Bulk Import) ==========
+    document.getElementById('bulkFile').onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        document.getElementById('bulkInput').value = ev.target.result;
+        toast('تم قراءة الملف بنجاح! راجع الروابط ثم اضغط بدء الاستيراد');
+      };
+      reader.readAsText(file);
+    };
+
+    document.getElementById('bulkClearBtn').onclick = () => {
+      document.getElementById('bulkInput').value = '';
+      document.getElementById('bulkFile').value = '';
+      document.getElementById('bulkStatus').style.display = 'none';
+      document.getElementById('bulkProgress').classList.remove('active');
+    };
+
+    document.getElementById('bulkStartBtn').onclick = async () => {
+      if (!db) { toast('Firebase غير متصل بعد', true); return; }
+      const rawText = document.getElementById('bulkInput').value.trim();
+      if (!rawText) { toast('يرجى لصق الروابط أولاً', true); return; }
+
+      const lines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      if (!lines.length) { toast('لا توجد روابط صالحة', true); return; }
+
+      const target = document.getElementById('bulkTarget').value;
+      const defaultCat = document.getElementById('bulkCategory').value;
+      const btn = document.getElementById('bulkStartBtn');
+      const progEl = document.getElementById('bulkProgress');
+      const bar = progEl.querySelector('i');
+      const statusEl = document.getElementById('bulkStatus');
+
+      btn.disabled = true;
+      progEl.classList.add('active');
+      bar.style.width = '0%';
+      statusEl.style.display = 'block';
+      statusEl.textContent = `جاري تحليل ${lines.length} رابط...`;
+
+      const ytRegex = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/i;
+      
+      let importedShorts = 0;
+      let importedLongs = 0;
+      const itemsToSave = [];
+
+      lines.forEach((line, idx) => {
+        const parts = line.split('|').map(p => p.trim());
+        let title = '';
+        let url = '';
+        let duration = '';
+        let genre = defaultCat;
+
+        if (parts.length >= 2 && parts[1].startsWith('http')) {
+          title = parts[0];
+          url = parts[1];
+          if (parts[2]) duration = parts[2];
+        } else if (parts[0].startsWith('http')) {
+          url = parts[0];
+          if (parts[1]) duration = parts[1];
+        } else {
+          url = line;
+        }
+
+        const ytMatch = url.match(ytRegex);
+        let thumbnail = '';
+        if (ytMatch) {
+          const videoId = ytMatch[1];
+          thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+        }
+
+        if (!url) return;
+
+        let coll = target;
+        if (coll === 'auto') {
+          if (url.includes('/shorts/') || defaultCat.includes('Shorts') || defaultCat.includes('ريلز')) {
+            coll = 'shortVideos';
+          } else {
+            coll = 'longVideos';
+          }
+        }
+
+        if (!title) {
+          title = `${defaultCat.replace(/\(.*?\)/g, '').trim()} #${idx + 1}`;
+        }
+
+        if (!duration) {
+          duration = (coll === 'shortVideos') ? '0:30' : '5:00';
+        }
+
+        itemsToSave.push({
+          coll,
+          data: {
+            title,
+            videoUrl: url,
+            thumbnail: thumbnail || 'profile.jpg',
+            duration,
+            genre,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          }
+        });
+      });
+
+      if (!itemsToSave.length) {
+        toast('لم يتم العثور على روابط صحيحة', true);
+        btn.disabled = false;
+        progEl.classList.remove('active');
+        statusEl.style.display = 'none';
+        return;
+      }
+
+      try {
+        const batchSize = 400;
+        for (let i = 0; i < itemsToSave.length; i += batchSize) {
+          const chunk = itemsToSave.slice(i, i + batchSize);
+          const batch = db.batch();
+
+          chunk.forEach(item => {
+            const docRef = db.collection(item.coll).doc();
+            batch.set(docRef, item.data);
+            if (item.coll === 'shortVideos') importedShorts++;
+            else importedLongs++;
+          });
+
+          await batch.commit();
+
+          const progressPercent = Math.min(100, Math.round(((i + chunk.length) / itemsToSave.length) * 100));
+          bar.style.width = progressPercent + '%';
+          statusEl.textContent = `جاري حفظ البيانات في Firebase: تم استيراد ${i + chunk.length} من أصل ${itemsToSave.length} فيديو (${progressPercent}%)...`;
+        }
+
+        toast(`تم الاستيراد بنجاح! (${importedShorts} قصير، ${importedLongs} طويل) ✓`);
+        statusEl.textContent = `✅ اكتمل الاستيراد بنجاح! تم حفظ ${importedShorts} فيديو قصير و ${importedLongs} فيديو طويل.`;
+        document.getElementById('bulkInput').value = '';
+
+        loadShorts();
+        loadLongs();
+      } catch (err) {
+        console.error('Bulk import error:', err);
+        toast('حدث خطأ أثناء الاستيراد: ' + err.message, true);
+        statusEl.textContent = '❌ خطأ: ' + err.message;
+      }
+
+      btn.disabled = false;
     };
   </script>
 </body>
