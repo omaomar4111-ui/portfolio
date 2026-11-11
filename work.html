@@ -433,8 +433,8 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
 
 <script>
 /* Videos are edited in videos.js (shared with work.html). */
-const SHORTS = window.SHORTS || [];
-const FILMS = window.FILMS || [];
+let SHORTS = window.SHORTS || [];
+let FILMS = window.FILMS || [];
 
 // Load dynamic videos from localStorage or Firestore
 (async function() {
@@ -452,13 +452,14 @@ const FILMS = window.FILMS || [];
       if (arr && arr.length > 0) {
         window.SHORTS = arr.map((v, i) => ({
           title: v.title || `Short #${i+1}`,
-          kind: v.genre || 'Gym & Fitness',
-          dur: v.duration || '0:30',
-          role: 'Edit · sound design · color',
-          poster: v.thumbnail || 'profile.jpg',
-          src: v.videoUrl || '',
-          hue: 190 + (i * 13) % 160
+          kind: v.genre || v.kind || 'Gym & Fitness',
+          dur: v.duration || v.dur || '0:30',
+          role: v.role || 'Edit · sound design · color',
+          poster: v.thumbnail || v.poster || 'profile.jpg',
+          src: v.videoUrl || v.src || '',
+          hue: v.hue || (190 + (i * 13) % 160)
         }));
+        SHORTS = window.SHORTS;
         if (typeof renderDrum === 'function') renderDrum();
       }
     }
@@ -468,12 +469,13 @@ const FILMS = window.FILMS || [];
       if (arr && arr.length > 0) {
         window.FILMS = arr.map((v, i) => ({
           title: v.title || `Film #${i+1}`,
-          kind: v.genre || 'Long-form Video',
-          dur: v.duration || '3:00',
-          poster: v.thumbnail || 'profile.jpg',
-          src: v.videoUrl || '',
-          hue: 210 + (i * 17) % 140
+          kind: v.genre || v.kind || 'Long-form Video',
+          dur: v.duration || v.dur || '3:00',
+          poster: v.thumbnail || v.poster || 'profile.jpg',
+          src: v.videoUrl || v.src || '',
+          hue: v.hue || (210 + (i * 17) % 140)
         }));
+        FILMS = window.FILMS;
         if (typeof renderFilms === 'function') renderFilms();
       }
     }
@@ -741,11 +743,12 @@ function togglePlay(card) {
   syncShort();
 }
 function info() {
-  const w = SHORTS[active()];
-  $('#i-kind').textContent = w.kind;
-  $('#i-dur').textContent = w.dur;
-  $('#i-title').textContent = w.title;
-  $('#i-role').textContent = w.role;
+  const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS;
+  const w = list[active()] || list[0] || {};
+  $('#i-kind').textContent = w.kind || '';
+  $('#i-dur').textContent = w.dur || '';
+  $('#i-title').textContent = w.title || '';
+  $('#i-role').textContent = w.role || '';
   $('#i-count').textContent = `${String(active() + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`;
   ticks.forEach((t, i) => t.setAttribute('aria-current', i === active() ? 'true' : 'false'));
 }
@@ -897,8 +900,9 @@ const player = $('#player'), pFrame = $('#p-frame');
 let lastFocus = null;
 function openPlayer(i, kind = 'film') {
   const short = kind === 'short';
-  const f = short ? SHORTS[i] : FILMS[i];
-  const fromCard = short ? cards[i].querySelector('video') : null;
+  const list = short ? ((window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS) : ((window.FILMS && window.FILMS.length) ? window.FILMS : FILMS);
+  const f = list[i] || list[0] || {};
+  const fromCard = (short && cards[i]) ? cards[i].querySelector('video') : null;
   const startAt = fromCard ? fromCard.currentTime : 0;
   player.classList.toggle('vertical', short);
   lastFocus = document.activeElement;
