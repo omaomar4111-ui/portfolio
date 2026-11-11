@@ -204,7 +204,7 @@
     </div>
 
     <header class="top">
-      <a href="#" class="brand" id="brandName">بورتفوليو</a>
+      <a href="#" class="brand" id="brandName">عمر مصطفى</a>
       <nav>
         <a href="#shorts">فيديوهات قصيرة</a>
         <a href="#films">فيديوهات طويلة</a>
@@ -216,12 +216,12 @@
     <main>
       <section class="hero" id="top">
         <div class="hero-text">
-          <span class="mono" id="heroMeta">محرر فيديو ومونتير</span>
-          <h1 id="heroName">بورتفوليو احترافي</h1>
-          <p class="lead" id="heroBio">مرحباً بك في معرض أعمالي في المونتاج وصناعة المحتوى المرئي.</p>
+          <span class="mono" id="heroMeta">محرر فيديو ومونتير محترف</span>
+          <h1 id="heroName">عمر مصطفى</h1>
+          <p class="lead" id="heroBio">مرحباً بك في معرض أعمالي. متخصص في مونتاج الفيديوهات الرياضية والجيم (Fitness & Gym)، الإعلانات التجارية، والمحتوى الديناميكي عالي الجودة.</p>
         </div>
         <div class="hero-portrait">
-          <img id="profileImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='500'><rect width='400' height='500' fill='%231a1a1a'/><text x='50%25' y='50%25' fill='%23666' font-size='20' text-anchor='middle'>صورة شخصية</text></svg>" alt="صورة">
+          <img id="profileImg" src="profile.jpg" alt="عمر مصطفى">
         </div>
       </section>
 
@@ -273,7 +273,20 @@
       <section class="section" id="contact">
         <div class="sec-head"><h2>تواصل معي</h2></div>
         <p class="lead">متاح للمشاريع الجديدة والمستمرة — راسلني مباشرة لمناقشة فكرتك.</p>
-        <div class="contact-list" id="contactList"></div>
+        <div class="contact-list" id="contactList">
+          <a href="https://wa.me/201144826641" class="contact-item" target="_blank" rel="noopener">
+            <span class="mono">واتساب</span>
+            <strong>01144826641</strong>
+          </a>
+          <a href="tel:01144826641" class="contact-item">
+            <span class="mono">اتصال مباشر</span>
+            <strong>01144826641</strong>
+          </a>
+          <a href="mailto:omaomar4111@gmail.com" class="contact-item">
+            <span class="mono">البريد الإلكتروني</span>
+            <strong>omaomar4111@gmail.com</strong>
+          </a>
+        </div>
       </section>
     </main>
 
@@ -324,9 +337,9 @@
         if (!doc.exists) return;
         const s = doc.data();
         
-        const name = s.name || 'اسمك';
-        const title = s.title || 'محرر فيديو ومونتير';
-        const bio = s.bio || 'مرحباً بك في معرض أعمالي في المونتاج وصناعة المحتوى المرئي.';
+        const name = s.name || 'عمر مصطفى';
+        const title = s.title || 'محرر فيديو ومونتير محترف';
+        const bio = s.bio || 'مرحباً بك في معرض أعمالي. متخصص في مونتاج الفيديوهات الرياضية والجيم (Fitness & Gym)، الإعلانات التجارية، والمحتوى الديناميكي عالي الجودة.';
 
         document.getElementById('brandName').textContent = name;
         document.getElementById('footName').textContent = name;
@@ -337,20 +350,20 @@
 
         if (s.profileImage) {
           document.getElementById('profileImg').src = s.profileImage;
+        } else {
+          document.getElementById('profileImg').src = 'profile.jpg';
         }
 
         // جهات الاتصال
         const contacts = [];
-        if (s.phone) {
-          contacts.push({ label: 'اتصال', text: s.phone, href: 'tel:' + s.phone });
-        }
-        if (s.whatsapp) {
-          const cleanWa = s.whatsapp.replace(/[^0-9]/g, '');
-          contacts.push({ label: 'واتساب', text: s.whatsapp, href: 'https://wa.me/' + cleanWa });
-        }
-        if (s.email) {
-          contacts.push({ label: 'البريد الإلكتروني', text: s.email, href: 'mailto:' + s.email });
-        }
+        const phone = s.phone || '01144826641';
+        const whatsapp = s.whatsapp || '201144826641';
+        const email = s.email || 'omaomar4111@gmail.com';
+
+        contacts.push({ label: 'اتصال', text: phone, href: 'tel:' + phone });
+        contacts.push({ label: 'واتساب', text: phone, href: 'https://wa.me/' + whatsapp.replace(/[^0-9]/g, '') });
+        contacts.push({ label: 'البريد الإلكتروني', text: email, href: 'mailto:' + email });
+
         if (s.instagram) {
           const handle = s.instagram.replace(/^@/, '');
           contacts.push({ label: 'إنستغرام', text: '@' + handle, href: 'https://instagram.com/' + handle });

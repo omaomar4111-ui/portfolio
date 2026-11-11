@@ -418,17 +418,21 @@
       try {
         const doc = await db.collection('settings').doc('main').get();
         const s = doc.exists ? doc.data() : {};
-        document.getElementById('setName').value = s.name || '';
-        document.getElementById('setTitle').value = s.title || '';
-        document.getElementById('setBio').value = s.bio || '';
-        document.getElementById('setPhone').value = s.phone || '';
-        document.getElementById('setWhatsapp').value = s.whatsapp || '';
-        document.getElementById('setEmail').value = s.email || '';
+        document.getElementById('setName').value = s.name || 'عمر مصطفى';
+        document.getElementById('setTitle').value = s.title || 'محرر فيديو ومونتير محترف';
+        document.getElementById('setBio').value = s.bio || 'مرحباً بك في معرض أعمالي. متخصص في مونتاج الفيديوهات الرياضية والجيم (Fitness & Gym)، الإعلانات التجارية، والمحتوى الديناميكي عالي الجودة.';
+        document.getElementById('setPhone').value = s.phone || '01144826641';
+        document.getElementById('setWhatsapp').value = s.whatsapp || '201144826641';
+        document.getElementById('setEmail').value = s.email || 'omaomar4111@gmail.com';
         document.getElementById('setInstagram').value = s.instagram || '';
         document.getElementById('setYoutube').value = s.youtube || '';
         if (s.profileImage) {
           const p = document.getElementById('setProfilePreview');
           p.src = s.profileImage;
+          p.style.display = 'block';
+        } else {
+          const p = document.getElementById('setProfilePreview');
+          p.src = 'profile.jpg';
           p.style.display = 'block';
         }
       } catch (e) {
