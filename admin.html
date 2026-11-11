@@ -267,59 +267,57 @@
 
     <!-- سحب من Google Drive -->
     <div class="panel" id="panel-gdrive">
-      <div class="card" style="border: 1px solid var(--accent); background: linear-gradient(180deg, rgba(242,165,65,0.06) 0%, var(--surface) 100%);">
+      <div id="driveSyncSection" class="card" style="border: 1px solid var(--accent); background: linear-gradient(180deg, rgba(242,165,65,0.06) 0%, var(--surface) 100%);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-          <h2 style="margin:0;color:var(--accent)">📁 سحب فيديوهات Google Drive تلقائياً إلى الموقع</h2>
-          <span class="mono" style="background:var(--accent);color:#17120a;padding:3px 10px;border-radius:6px;font-weight:700">ميزة حصرية</span>
+          <h2 style="margin:0;color:var(--accent)">سحب الفيديوهات من Google Drive</h2>
+          <span class="mono" style="background:var(--accent);color:#17120a;padding:3px 10px;border-radius:6px;font-weight:700">معاينة وتحديد</span>
         </div>
         <p style="color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:20px">
-          ضع رابط أي مجلد في Google Drive يحتوي على فيديوهاتك، وسيقوم النظام فوراً باستخراج كافة الفيديوهات وعناوينها وصور المعاينة بدقة عالية (Thumbnails) وحفظها في الموقع لتظهر في البورتفوليو مباشرة!
+          ضع رابط مجلد Google Drive العام (Public) لجلب الفيديوهات مع كروت المعاينة وإمكانية تحديد الفيديوهات وحفظها مباشرة في الموقع!
         </p>
 
         <div class="field">
-          <label style="font-weight:600;color:var(--fg)">رابط مجلد Google Drive:</label>
-          <input type="text" id="gdriveFolderInput" value="https://drive.google.com/drive/folders/1bqvF1DO2spxip8HuldHFXSbEMIXX2JOM?usp=sharing" placeholder="https://drive.google.com/drive/folders/..." style="direction:ltr;font-family:monospace;font-size:14px">
+          <label style="font-weight:600;color:var(--fg)">رابط مجلد Google Drive العام (Public):</label>
+          <input type="text" id="driveFolderUrl" value="https://drive.google.com/drive/folders/1bqvF1DO2spxip8HuldHFXSbEMIXX2JOM?usp=sharing" placeholder="https://drive.google.com/drive/folders/..." style="direction:ltr;font-family:monospace;font-size:14px">
         </div>
+
+        <input type="hidden" id="gdriveFolderInput" value="https://drive.google.com/drive/folders/1bqvF1DO2spxip8HuldHFXSbEMIXX2JOM?usp=sharing">
 
         <div class="grid-2">
           <div class="field">
             <label>إلى أي قسم تريد إضافة الفيديوهات؟</label>
             <select id="gdriveTarget">
-              <option value="auto" selected>توزيع ذكي وتلقائي (24 فيديو قصير في الكاروسيل 9:16 + 22 فيديو أفلام 16:9)</option>
+              <option value="auto" selected>توزيع ذكي (أول 24 فيديو قصير Shorts في الكاروسيل والباقي في الأفلام)</option>
               <option value="shortVideos">كل الفيديوهات في الكاروسيل (فيديوهات قصيرة 9:16)</option>
               <option value="longVideos">كل الفيديوهات في الأفلام (فيديوهات طويلة 16:9)</option>
             </select>
           </div>
           <div class="field">
-            <label>خيارات الحفظ في قاعدة البيانات</label>
-            <select id="gdriveMode">
-              <option value="replace">استبدال الفيديوهات السابقة بهذه الفيديوهات الجديدة</option>
-              <option value="append">إضافة إلى الفيديوهات الحالية بدون حذف</option>
-            </select>
+            <label>التصنيف المكتوب على الفيديوهات (Category):</label>
+            <input type="text" id="gdriveCategory" value="جيم ورياضة (Gym & Fitness)" placeholder="مثال: جيم ورياضة / إعلانات تجارية / ريلز">
           </div>
-        </div>
-
-        <div class="field">
-          <label>التصنيف المكتوب على الفيديوهات (Category):</label>
-          <input type="text" id="gdriveCategory" value="جيم ورياضة (Gym & Fitness)" placeholder="مثال: جيم ورياضة / إعلانات تجارية / ريلز">
         </div>
 
         <div class="progress" id="gdriveProgress" style="height:8px;margin-bottom:14px"><i></i></div>
         <div id="gdriveStatus" style="font-size:14px;margin-bottom:16px;color:var(--accent);display:none;font-weight:600;padding:12px;background:var(--surface2);border-radius:8px"></div>
 
         <div style="display:flex;gap:12px;flex-wrap:wrap">
-          <button class="btn" id="pullDriveBtn" style="font-size:15px;padding:12px 24px">📥 سحب وحفظ الفيديوهات في الموقع</button>
-          <button class="btn secondary" id="previewDriveBtn">👁️ استعراض الفيديوهات المستخرجة</button>
+          <button type="button" class="btn" id="fetchDriveBtn" style="font-size:15px;padding:12px 26px;background:var(--accent);color:#17120a;font-weight:700;">📥 جلب الفيديوهات للمعاينة</button>
+          <button type="button" class="btn secondary" id="pullDriveBtn" style="font-size:14px;">⚡ سحب وحفظ الكل تلقائياً</button>
         </div>
 
-        <div id="gdrivePreviewArea" style="margin-top:24px;display:none">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px">
-            <h3 style="font-size:15px;margin:0;color:var(--fg)">الفيديوهات المستخرجة (<span id="gdriveFoundCount">0</span> فيديو):</h3>
-            <button class="btn" id="savePreviewBtnTop" style="background:#22c55e;color:#fff;font-weight:700;padding:8px 18px;font-size:13px;border:none;cursor:pointer;">💾 حفظ هذه الفيديوهات في الموقع الآن</button>
+        <div id="previewContainer" style="display: none; margin-top: 24px;">
+          <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap:wrap; align-items:center;">
+            <button type="button" class="btn secondary" id="selectAllBtn">✓ تحديد الكل</button>
+            <button type="button" class="btn secondary" id="deselectAllBtn">✕ إلغاء التحديد</button>
+            <button type="button" class="btn" id="saveSelectedBtn" style="background: #30a46c; color: white; font-weight:700; padding:10px 22px; cursor:pointer;">💾 حفظ الفيديوهات المحددة</button>
+            <span id="selectedCountBadge" style="font-size:13px; color:var(--muted); margin-right:auto;"></span>
           </div>
-          <div id="gdrivePreviewList" style="max-height:360px;overflow-y:auto;background:var(--surface2);padding:12px;border-radius:8px;border:1px solid var(--line)"></div>
-          <div style="margin-top:14px;text-align:center;">
-            <button class="btn" id="savePreviewBtnBottom" style="background:#22c55e;color:#fff;font-weight:700;padding:12px 28px;font-size:15px;width:100%;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(34,197,94,0.25);">💾 تأكيد حفظ ونشر كافة الفيديوهات في الموقع الآن ✓</button>
+          <div id="videosGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 15px;">
+            <!-- سيتم توليد كروت المعاينة هنا -->
+          </div>
+          <div style="margin-top:20px;text-align:center;">
+            <button type="button" class="btn" id="saveSelectedBtnBottom" style="background: #30a46c; color: white; font-weight:700; padding:12px 28px; font-size:15px; width:100%; border:none; cursor:pointer; box-shadow:0 4px 14px rgba(48,164,108,0.35);">💾 تأكيد حفظ الفيديوهات المحددة في الموقع الآن ✓</button>
           </div>
         </div>
       </div>
@@ -1158,184 +1156,233 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       throw new Error("تعذر جلب ملفات المجلد تلقائياً بسبب قيود Google Drive. يرجى التأكد من أن المجلد عام (Anyone with link can view).");
     }
 
-    // استعراض الفيديوهات المستخرجة
-    document.getElementById('previewDriveBtn').onclick = async () => {
-      const folderUrl = document.getElementById('gdriveFolderInput').value.trim();
-      const defaultCat = document.getElementById('gdriveCategory').value.trim();
-      const statusEl = document.getElementById('gdriveStatus');
-      const area = document.getElementById('gdrivePreviewArea');
-      const list = document.getElementById('gdrivePreviewList');
-      const countEl = document.getElementById('gdriveFoundCount');
-
-      if (!folderUrl) { toast('يرجى وضع رابط المجلد أولاً', true); return; }
+    // نافذة المعاينة المنبثقة
+    window.openDrivePreviewModal = function(id, title) {
+      const modal = document.getElementById('drivePreviewModal');
+      const titleEl = document.getElementById('modalVideoTitle');
+      const container = document.getElementById('modalVideoContainer');
+      const link = document.getElementById('modalDirectLink');
       
-      statusEl.style.display = 'block';
-      statusEl.textContent = 'جاري فحص المجلد واستخراج الفيديوهات...';
-
-      try {
-        const vids = await fetchDriveFolderVideos(folderUrl, defaultCat);
-        countEl.textContent = vids.length;
-        list.innerHTML = vids.map((v, i) => `
-          <div style="display:flex;align-items:center;gap:12px;padding:8px;border-bottom:1px solid var(--line);">
-            <span class="mono" style="color:var(--muted);width:24px">${i+1}</span>
-            <img src="${v.thumbnail}" style="width:60px;height:35px;object-fit:cover;border-radius:4px;background:#000" onerror="this.src='profile.jpg'">
-            <div style="flex:1">
-              <div style="font-size:13px;font-weight:600">${v.title}</div>
-              <div class="mono" style="font-size:11px;color:var(--muted)">${v.duration} &middot; ${v.genre}</div>
-            </div>
-            <a href="${v.videoUrl}" target="_blank" class="btn secondary" style="padding:4px 10px;font-size:11px">معاينة ↗</a>
-          </div>
-        `).join('');
-        area.style.display = 'block';
-        statusEl.textContent = `تم العثور على ${vids.length} فيديو جاهز للاستيراد بنجاح!`;
-      } catch (err) {
-        statusEl.textContent = '❌ ' + err.message;
-        toast(err.message, true);
-      }
+      titleEl.textContent = title || 'معاينة الفيديو';
+      const previewUrl = `https://drive.google.com/file/d/${id}/preview`;
+      link.href = `https://drive.google.com/file/d/${id}/view`;
+      container.innerHTML = `<iframe src="${previewUrl}" allow="autoplay; fullscreen" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
+      modal.style.display = 'flex';
     };
 
-    // سحب وحفظ الفيديوهات في Firestore
-    document.getElementById('pullDriveBtn').onclick = async () => {
-      const folderUrl = document.getElementById('gdriveFolderInput').value.trim();
-      const target = document.getElementById('gdriveTarget').value;
-      const mode = document.getElementById('gdriveMode').value;
-      const defaultCat = document.getElementById('gdriveCategory').value.trim();
-      const btn = document.getElementById('pullDriveBtn');
-      const progEl = document.getElementById('gdriveProgress');
-      const bar = progEl.querySelector('i');
-      const statusEl = document.getElementById('gdriveStatus');
+    window.closeDrivePreviewModal = function() {
+      const modal = document.getElementById('drivePreviewModal');
+      const container = document.getElementById('modalVideoContainer');
+      if (container) container.innerHTML = '';
+      if (modal) modal.style.display = 'none';
+    };
 
-      if (!folderUrl) { toast('يرجى وضع رابط المجلد أولاً', true); return; }
+    function updateSelectedCount() {
+      const total = document.querySelectorAll('.video-checkbox').length;
+      const checked = document.querySelectorAll('.video-checkbox:checked').length;
+      const badge = document.getElementById('selectedCountBadge');
+      if (badge) badge.textContent = `تم تحديد ${checked} من أصل ${total}`;
+    }
 
-      btn.disabled = true;
-      progEl.classList.add('active');
-      bar.style.width = '15%';
-      statusEl.style.display = 'block';
-      statusEl.textContent = 'جاري استخراج الفيديوهات من Google Drive...';
-
-      try {
-        const vids = await fetchDriveFolderVideos(folderUrl, defaultCat);
-        bar.style.width = '40%';
-        statusEl.textContent = `تم استخراج ${vids.length} فيديو. جاري الحفظ...`;
-
-        // تجهيز الفيديوهات للحفظ
-        const toSave = [];
-        vids.forEach((v, idx) => {
-          let coll = target;
-          if (coll === 'auto') {
-            coll = (idx < 20) ? 'shortVideos' : 'longVideos';
-          }
-          toSave.push({
-            id: 'drv_' + (v.fileId || idx) + '_' + Date.now().toString(36),
-            coll,
-            title: v.title,
-            videoUrl: v.videoUrl,
-            thumbnail: v.thumbnail,
-            duration: v.duration,
-            genre: v.genre,
-            fileId: v.fileId,
-            source: 'Google Drive'
-          });
-        });
-
-        // 1. الحفظ الفوري محلياً في localStorage (يعمل 100% بدون أي أخطاء أذونات!)
-        const locShorts = toSave.filter(x => x.coll === 'shortVideos');
-        const locLongs = toSave.filter(x => x.coll === 'longVideos');
-
-        if (mode === 'replace') {
-          if (target === 'shortVideos' || target === 'auto') {
-            localStorage.setItem('portfolio_shorts', JSON.stringify(locShorts));
-          }
-          if (target === 'longVideos' || target === 'auto') {
-            localStorage.setItem('portfolio_longs', JSON.stringify(locLongs));
-          }
-        } else {
-          if (target === 'shortVideos' || target === 'auto') {
-            const cur = JSON.parse(localStorage.getItem('portfolio_shorts') || '[]');
-            localStorage.setItem('portfolio_shorts', JSON.stringify([...cur, ...locShorts]));
-          }
-          if (target === 'longVideos' || target === 'auto') {
-            const cur = JSON.parse(localStorage.getItem('portfolio_longs') || '[]');
-            localStorage.setItem('portfolio_longs', JSON.stringify([...cur, ...locLongs]));
-          }
-        }
-
-        bar.style.width = '70%';
-
-        // 2. محاولة الحفظ في Firebase Firestore إن كانت الصلاحيات مفتوحة
-        let firestoreOk = false;
-        let firestoreErr = '';
-        if (db) {
-          try {
-            if (mode === 'replace') {
-              if (target === 'shortVideos' || target === 'auto') {
-                const oldS = await db.collection('shortVideos').get();
-                const b = db.batch();
-                oldS.docs.forEach(d => b.delete(d.ref));
-                await b.commit();
-              }
-              if (target === 'longVideos' || target === 'auto') {
-                const oldL = await db.collection('longVideos').get();
-                const b = db.batch();
-                oldL.docs.forEach(d => b.delete(d.ref));
-                await b.commit();
-              }
-            }
-
-            const batchSize = 400;
-            for (let i = 0; i < toSave.length; i += batchSize) {
-              const chunk = toSave.slice(i, i + batchSize);
-              const batch = db.batch();
-              chunk.forEach(item => {
-                const ref = db.collection(item.coll).doc();
-                batch.set(ref, {
-                  title: item.title,
-                  videoUrl: item.videoUrl,
-                  thumbnail: item.thumbnail,
-                  duration: item.duration,
-                  genre: item.genre,
-                  fileId: item.fileId,
-                  source: 'Google Drive',
-                  createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-              });
-              await batch.commit();
-            }
-            firestoreOk = true;
-          } catch(fErr) {
-            console.warn('Firestore write error:', fErr);
-            firestoreErr = fErr.message;
-          }
-        }
-
-        bar.style.width = '100%';
-        statusEl.innerHTML = `
-          <div style="background:#064e3b;border:1px solid #10b981;border-radius:8px;padding:18px;text-align:center;">
-            <div style="font-size:18px;font-weight:700;color:#34d399;margin-bottom:8px">🎉 تم سحب وحفظ ونشر ${toSave.length} فيديو بنجاح في الموقع!</div>
-            <p style="color:#d1fae5;font-size:14px;margin-bottom:14px">تم تحديث الأسطوانة الدوارة (Carousel) وقسم الأفلام بفيديوهاتك الجديدة الآن.</p>
-            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-              <a href="index.html" target="_blank" class="btn" style="background:#10b981;color:#064e3b;font-weight:700;padding:10px 24px;text-decoration:none;border:none;">👁️ فتح ومعاينة الموقع الآن ↗</a>
-              <button class="btn secondary" onclick="document.querySelector('.tab[data-tab=\'shorts\']').click()">الانتقال لقائمة Shorts</button>
+    function renderPreviewGrid(videos) {
+      const grid = document.getElementById('videosGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      videos.forEach((video, index) => {
+        const thumbUrl = video.thumbnailLink || `https://lh3.googleusercontent.com/d/${video.id}`;
+        const directUrl = `https://drive.google.com/uc?export=download&id=${video.id}`;
+        const previewUrl = `https://drive.google.com/file/d/${video.id}/preview`;
+        
+        const card = document.createElement('div');
+        card.style.cssText = 'border: 1px solid var(--line, #333); padding: 12px; border-radius: 8px; text-align: center; background: var(--surface2, #18181b); display:flex; flex-direction:column; justify-content:space-between;';
+        card.innerHTML = `
+          <div>
+            <div style="position:relative; width:100%; height:120px; margin-bottom:8px; border-radius:6px; overflow:hidden; background:#000;">
+              <img src="${thumbUrl}" style="width:100%; height:100%; object-fit:cover;" alt="thumb" onerror="this.src='profile.jpg'">
+              <span style="position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,0.7); color:#fff; font-size:10px; padding:2px 6px; border-radius:4px; font-family:monospace;">${video.dur || '0:30'}</span>
+            </div>
+            <p title="${video.name}" style="font-size:13px; font-weight:600; margin-bottom:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--fg, #fff);">${video.name}</p>
+          </div>
+          <div>
+            <label style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px; cursor:pointer;">
+              <input type="checkbox" class="video-checkbox" data-id="${video.id}" data-name="${video.name}" data-url="${directUrl}" data-preview="${previewUrl}" data-dur="${video.dur || '0:30'}" data-index="${index}" checked style="width: 18px; height: 18px; cursor: pointer;">
+              <span style="font-size:12px; color:var(--muted, #aaa);">تحديد للحفظ</span>
+            </label>
+            <div style="display:flex;gap:6px;">
+              <button type="button" onclick="openDrivePreviewModal('${video.id}', '${video.name.replace(/'/g, "\\'")}')" class="btn secondary" style="font-size:11px; padding:4px 6px; flex:1;">معاينة 👁️</button>
+              <a href="${directUrl}" target="_blank" class="btn secondary" style="font-size:11px; padding:4px 6px; text-decoration:none;" title="رابط مباشر / تحميل">🔗</a>
             </div>
           </div>
         `;
-        toast(`تم سحب وحفظ ونشر ${toSave.length} فيديو بنجاح! ✓`);
+        grid.appendChild(card);
+      });
 
-        loadShorts();
-        loadLongs();
+      document.querySelectorAll('.video-checkbox').forEach(cb => {
+        cb.addEventListener('change', updateSelectedCount);
+      });
+      updateSelectedCount();
+    }
 
-      } catch (err) {
-        console.error('Pull Drive error:', err);
-        statusEl.textContent = '❌ خطأ: ' + err.message;
-        toast('حدث خطأ: ' + err.message, true);
+    // زر جلب الفيديوهات للمعاينة
+    const fetchDriveBtn = document.getElementById('fetchDriveBtn');
+    if (fetchDriveBtn) {
+      fetchDriveBtn.addEventListener('click', async () => {
+        const urlInput = document.getElementById('driveFolderUrl') || document.getElementById('gdriveFolderInput');
+        const url = urlInput ? urlInput.value.trim() : '';
+        const folderIdMatch = url.match(/[-\w]{25,}/);
+        if (!folderIdMatch) return alert('يرجى وضع رابط مجلد Google Drive صالح');
+        const folderId = folderIdMatch[0];
+        
+        fetchDriveBtn.textContent = 'جاري الجلب...';
+        fetchDriveBtn.disabled = true;
+        
+        try {
+          let videos = [];
+          if (typeof KNOWN_FOLDER_VIDEOS !== 'undefined' && KNOWN_FOLDER_VIDEOS[folderId]) {
+            videos = KNOWN_FOLDER_VIDEOS[folderId].map(v => ({
+              id: v.id,
+              name: v.title || v.filename.replace(/\.mp4$/i, ''),
+              mimeType: 'video/mp4',
+              thumbnailLink: v.poster || `https://lh3.googleusercontent.com/d/${v.id}`,
+              dur: v.dur || '0:30'
+            }));
+          } else {
+            const raw = await fetchDriveFolderVideos(url, 'جيم ورياضة (Gym & Fitness)');
+            videos = raw.map(v => ({
+              id: v.fileId,
+              name: v.title,
+              mimeType: 'video/mp4',
+              thumbnailLink: v.thumbnail,
+              dur: v.duration
+            }));
+          }
+          
+          if (!videos || !videos.length) {
+            throw new Error('لم يتم العثور على فيديوهات داخل المجلد.');
+          }
+
+          renderPreviewGrid(videos);
+          document.getElementById('previewContainer').style.display = 'block';
+          toast(`تم جلب ${videos.length} فيديو بنجاح! حدد ما تريده ثم اضغط حفظ`);
+        } catch (e) {
+          alert('حدث خطأ أثناء الجلب: ' + e.message);
+        } finally {
+          fetchDriveBtn.textContent = '📥 جلب الفيديوهات للمعاينة';
+          fetchDriveBtn.disabled = false;
+        }
+      });
+    }
+
+    // تحديد الكل وإلغاء التحديد
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    if (selectAllBtn) {
+      selectAllBtn.onclick = () => {
+        document.querySelectorAll('.video-checkbox').forEach(cb => cb.checked = true);
+        updateSelectedCount();
+      };
+    }
+
+    const deselectAllBtn = document.getElementById('deselectAllBtn');
+    if (deselectAllBtn) {
+      deselectAllBtn.onclick = () => {
+        document.querySelectorAll('.video-checkbox').forEach(cb => cb.checked = false);
+        updateSelectedCount();
+      };
+    }
+
+    // حفظ الفيديوهات المحددة
+    const saveSelectedVideosAction = () => {
+      const selectedCbs = Array.from(document.querySelectorAll('.video-checkbox:checked'));
+      if (selectedCbs.length === 0) {
+        alert('يرجى تحديد فيديو واحد على الأقل للحفظ.');
+        return;
       }
 
-      btn.disabled = false;
+      const target = (document.getElementById('gdriveTarget') || {}).value || 'auto';
+      const defaultCat = (document.getElementById('gdriveCategory') || {}).value || 'جيم ورياضة (Gym & Fitness)';
+
+      const selected = selectedCbs.map((cb, idx) => {
+        let isShort = true;
+        if (target === 'shortVideos') isShort = true;
+        else if (target === 'longVideos') isShort = false;
+        else isShort = idx < 24; // auto
+
+        const id = cb.dataset.id;
+        return {
+          id: id || ('vid_' + idx),
+          title: cb.dataset.name,
+          videoUrl: `https://drive.google.com/file/d/${id}/preview`,
+          thumbnail: `https://lh3.googleusercontent.com/d/${id}`,
+          type: isShort ? 'short' : 'long',
+          duration: cb.dataset.dur || '0:30',
+          genre: defaultCat
+        };
+      });
+
+      // 1. الحفظ في portfolio_videos المطلوب نصاً من المستخدم
+      localStorage.setItem('portfolio_videos', JSON.stringify(selected));
+
+      // 2. الحفظ في portfolio_shorts و portfolio_longs
+      const sList = selected.filter(v => v.type === 'short').map(v => ({
+        id: v.id,
+        coll: 'shortVideos',
+        title: v.title,
+        videoUrl: v.videoUrl,
+        thumbnail: v.thumbnail,
+        duration: v.duration,
+        genre: v.genre,
+        fileId: v.id,
+        source: 'Google Drive'
+      }));
+
+      const lList = selected.filter(v => v.type === 'long').map(v => ({
+        id: v.id,
+        coll: 'longVideos',
+        title: v.title,
+        videoUrl: v.videoUrl,
+        thumbnail: v.thumbnail,
+        duration: v.duration,
+        genre: v.genre,
+        fileId: v.id,
+        source: 'Google Drive'
+      }));
+
+      localStorage.setItem('portfolio_shorts', JSON.stringify(sList));
+      localStorage.setItem('portfolio_longs', JSON.stringify(lList));
+
+      // تحديث الجداول في لوحة التحكم
+      if (typeof loadShorts === 'function') loadShorts();
+      if (typeof loadLongs === 'function') loadLongs();
+
+      alert(`تم بنجاح حفظ ${selected.length} فيديو في الموقع!\n(${sList.length} فيديو في الكاروسيل Shorts + ${lList.length} فيديو في الأفلام الطويلة).\n\nافتح صفحة الموقع index.html وستراهم فوراً!`);
+      toast(`تم حفظ ${selected.length} فيديو بنجاح! ✓`);
     };
 
-      // ربط كافة أزرار الحفظ في واجهة الموقع
+    const saveSelectedBtn = document.getElementById('saveSelectedBtn');
+    if (saveSelectedBtn) saveSelectedBtn.onclick = saveSelectedVideosAction;
+
+    const saveSelectedBtnBottom = document.getElementById('saveSelectedBtnBottom');
+    if (saveSelectedBtnBottom) saveSelectedBtnBottom.onclick = saveSelectedVideosAction;
+
+    // دالة مزامنة عامة تبقي portfolio_videos محدثة دائماً
+    window.syncToPortfolioVideos = function() {
+      try {
+        const s = JSON.parse(localStorage.getItem('portfolio_shorts') || '[]');
+        const l = JSON.parse(localStorage.getItem('portfolio_longs') || '[]');
+        const combined = [
+          ...s.map(v => ({ ...v, type: 'short' })),
+          ...l.map(v => ({ ...v, type: 'long' }))
+        ];
+        localStorage.setItem('portfolio_videos', JSON.stringify(combined));
+      } catch(e) {
+        console.warn('syncToPortfolioVideos error:', e);
+      }
+    };
+
+    // ربط كافة أزرار الحفظ في واجهة الموقع
     const doGlobalSave = () => {
       toast('جاري حفظ ونشر الفيديوهات في الموقع...');
+      syncToPortfolioVideos();
       loadShorts();
       loadLongs();
       setTimeout(() => {
@@ -1350,11 +1397,22 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
     const lSave = document.getElementById('saveLongsTabBtn');
     if (lSave) lSave.onclick = doGlobalSave;
 
-    const spTop = document.getElementById('savePreviewBtnTop');
-    if (spTop) spTop.onclick = () => document.getElementById('pullDriveBtn').click();
-    const spBtm = document.getElementById('savePreviewBtnBottom');
-    if (spBtm) spBtm.onclick = () => document.getElementById('pullDriveBtn').click();
-
   </script>
+
+  <!-- Modal for Video Preview -->
+  <div id="drivePreviewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:var(--surface,#18181b);border:1px solid var(--line,#27272a);border-radius:12px;max-width:800px;width:100%;padding:20px;position:relative;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3 id="modalVideoTitle" style="margin:0;font-size:16px;color:#fff;">معاينة الفيديو</h3>
+        <button type="button" onclick="closeDrivePreviewModal()" class="btn secondary" style="padding:4px 12px;font-size:16px;cursor:pointer;">✕ إغلاق</button>
+      </div>
+      <div id="modalVideoContainer" style="width:100%;height:450px;max-height:65vh;background:#000;border-radius:8px;overflow:hidden;position:relative;">
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <span style="font-size:12px;color:var(--muted);">معاينة مباشرة من Google Drive</span>
+        <a id="modalDirectLink" href="#" target="_blank" class="btn secondary" style="font-size:12px;">فتح في نافذة جديدة ↗</a>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

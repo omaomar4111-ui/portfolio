@@ -435,33 +435,69 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
 // Synchronously load saved videos from localStorage immediately BEFORE anything renders
 (function() {
   try {
-    const locShorts = localStorage.getItem('portfolio_shorts');
-    if (locShorts) {
-      const arr = JSON.parse(locShorts);
-      if (Array.isArray(arr) && arr.length > 0) {
-        window.SHORTS = arr.map((v, i) => ({
-          title: v.title || `Short #${i+1}`,
-          kind: v.genre || v.kind || 'Gym & Fitness',
-          dur: v.duration || v.dur || '0:30',
-          role: v.role || 'Edit · sound design · color',
-          poster: v.thumbnail || v.poster || 'profile.jpg',
-          src: v.videoUrl || v.src || '',
-          hue: v.hue || (180 + (i * 13) % 170)
-        }));
+    // 1. First priority: Check portfolio_videos (saved by Drive sync or bulk save)
+    const locVideos = localStorage.getItem('portfolio_videos');
+    if (locVideos) {
+      const allVids = JSON.parse(locVideos);
+      if (Array.isArray(allVids) && allVids.length > 0) {
+        const s = allVids.filter(v => v.type === 'short' || (!v.type && allVids.indexOf(v) < 24));
+        const l = allVids.filter(v => v.type === 'long' || (!v.type && allVids.indexOf(v) >= 24));
+        if (s.length > 0) {
+          window.SHORTS = s.map((v, i) => ({
+            title: v.title || `Short #${i+1}`,
+            kind: v.genre || v.kind || 'Gym & Fitness',
+            dur: v.duration || v.dur || '0:30',
+            role: v.role || 'Edit · sound design · color',
+            poster: v.thumbnail || v.poster || 'profile.jpg',
+            src: v.videoUrl || v.src || '',
+            hue: v.hue || (180 + (i * 13) % 170)
+          }));
+        }
+        if (l.length > 0) {
+          window.FILMS = l.map((v, i) => ({
+            title: v.title || `Film #${i+1}`,
+            kind: v.genre || v.kind || 'Long-form Video',
+            dur: v.duration || v.dur || '3:00',
+            poster: v.thumbnail || v.poster || 'profile.jpg',
+            src: v.videoUrl || v.src || '',
+            hue: v.hue || (200 + (i * 17) % 150)
+          }));
+        }
       }
     }
-    const locLongs = localStorage.getItem('portfolio_longs');
-    if (locLongs) {
-      const arr = JSON.parse(locLongs);
-      if (Array.isArray(arr) && arr.length > 0) {
-        window.FILMS = arr.map((v, i) => ({
-          title: v.title || `Film #${i+1}`,
-          kind: v.genre || v.kind || 'Long-form Video',
-          dur: v.duration || v.dur || '3:00',
-          poster: v.thumbnail || v.poster || 'profile.jpg',
-          src: v.videoUrl || v.src || '',
-          hue: v.hue || (200 + (i * 17) % 150)
-        }));
+
+    // 2. Second priority / fallback: Check portfolio_shorts and portfolio_longs
+    if (!window.SHORTS || !window.SHORTS.length) {
+      const locShorts = localStorage.getItem('portfolio_shorts');
+      if (locShorts) {
+        const arr = JSON.parse(locShorts);
+        if (Array.isArray(arr) && arr.length > 0) {
+          window.SHORTS = arr.map((v, i) => ({
+            title: v.title || `Short #${i+1}`,
+            kind: v.genre || v.kind || 'Gym & Fitness',
+            dur: v.duration || v.dur || '0:30',
+            role: v.role || 'Edit · sound design · color',
+            poster: v.thumbnail || v.poster || 'profile.jpg',
+            src: v.videoUrl || v.src || '',
+            hue: v.hue || (180 + (i * 13) % 170)
+          }));
+        }
+      }
+    }
+    if (!window.FILMS || !window.FILMS.length) {
+      const locLongs = localStorage.getItem('portfolio_longs');
+      if (locLongs) {
+        const arr = JSON.parse(locLongs);
+        if (Array.isArray(arr) && arr.length > 0) {
+          window.FILMS = arr.map((v, i) => ({
+            title: v.title || `Film #${i+1}`,
+            kind: v.genre || v.kind || 'Long-form Video',
+            dur: v.duration || v.dur || '3:00',
+            poster: v.thumbnail || v.poster || 'profile.jpg',
+            src: v.videoUrl || v.src || '',
+            hue: v.hue || (200 + (i * 17) % 150)
+          }));
+        }
       }
     }
   } catch(e) {
@@ -537,6 +573,25 @@ const posterAttr = (x) => x.poster ? ` poster="${x.poster}"` : '';
 
 let cards = [];
 let ticks = [];
+let R = 300, idx = 0, angle = 0, target = 0, raf = 0, dragging = false, lastTouch = 0, hover = false;
+let SPACING = 200, dragK = 0.35, spread = 1;
+const SIDE_BLUR = [0, 1.1, 2];   // px of blur: center, first neighbor, second neighbor
+const active = () => ((idx % N) + N) % N;
+
+function attachCardListeners() {
+  cards.forEach((card) => {
+    const v = card.querySelector('video'), bar = card.querySelector('.bar i'), cur = card.querySelector('.cur');
+    if (v) {
+      v.muted = !soundOn;
+      v.addEventListener('timeupdate', () => {
+        if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + '%';
+        cur.textContent = fmt(v.currentTime);
+      });
+    } else if (bar) {
+      bar.addEventListener('animationend', () => { if (card.classList.contains('playing')) restartBar(card); });
+    }
+  });
+}
 
 function renderDrum(newItems) {
   if (newItems && Array.isArray(newItems)) window.SHORTS = newItems;
@@ -566,20 +621,13 @@ function renderDrum(newItems) {
     ticks.forEach((t, i) => t.addEventListener('click', () => { touched(); goToCard(i); }));
   }
 
+  attachCardListeners();
   layout();
   info();
   if (!reduced && cards[0]) startCard(cards[0]);
 }
 
 renderDrum();
-
-let R = 300, idx = 0, angle = 0, target = 0, raf = 0, dragging = false, lastTouch = 0, hover = false;
-const active = () => ((idx % N) + N) % N;
-
-/* Shows 5 cards at a time: the active one in the middle, two on each side.
-   Side cards sit slightly back, tilt gently, get a light blur, and fade out toward the edges. */
-let SPACING = 200, dragK = 0.35, spread = 1;
-const SIDE_BLUR = [0, 1.1, 2];   // px of blur: center, first neighbor, second neighbor
 function layout() {
   if (!cards || !cards.length || !cards[0]) return;
   const w = cards[0].offsetWidth, half = stage.clientWidth / 2;
@@ -830,6 +878,37 @@ function renderFilms(newItems) {
 
 renderFilms();
 
+window.renderCarousel = function(videos) {
+  if (!videos || !videos.length) return;
+  const mapped = videos.map((v, i) => ({
+    title: v.title || `Short #${i+1}`,
+    kind: v.genre || v.kind || 'Gym & Fitness',
+    dur: v.duration || v.dur || '0:30',
+    role: v.role || 'Edit · sound design · color',
+    poster: v.thumbnail || v.poster || 'profile.jpg',
+    src: v.videoUrl || v.src || '',
+    hue: v.hue || (180 + (i * 13) % 170)
+  }));
+  window.SHORTS = mapped;
+  SHORTS = mapped;
+  renderDrum(mapped);
+};
+
+window.renderLongVideos = function(videos) {
+  if (!videos || !videos.length) return;
+  const mapped = videos.map((v, i) => ({
+    title: v.title || `Film #${i+1}`,
+    kind: v.genre || v.kind || 'Long-form Video',
+    dur: v.duration || v.dur || '3:00',
+    poster: v.thumbnail || v.poster || 'profile.jpg',
+    src: v.videoUrl || v.src || '',
+    hue: v.hue || (200 + (i * 17) % 150)
+  }));
+  window.FILMS = mapped;
+  FILMS = mapped;
+  renderFilms(mapped);
+};
+
 document.addEventListener('click', (e) => {
   const b = e.target.closest('.snd-btn'); if (!b) return;
   e.stopPropagation(); e.preventDefault();
@@ -969,6 +1048,18 @@ if ($('#copy')) $('#copy').addEventListener('click', async () => {
   }, { threshold: 0.18, rootMargin: '0px 0px -6% 0px' });
   groups.forEach((el) => io.observe(el));
 })();
-</script>
 
+// Master Prompt: Read and render portfolio_videos on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+    const savedVideos = JSON.parse(localStorage.getItem('portfolio_videos')) || [];
+    if (savedVideos.length > 0) {
+        if (typeof renderCarousel === 'function') {
+            renderCarousel(savedVideos.filter(v => v.type === 'short'));
+        }
+        if (typeof renderLongVideos === 'function') {
+            renderLongVideos(savedVideos.filter(v => v.type === 'long'));
+        }
+    }
+});
+</script>
 </body></html>
