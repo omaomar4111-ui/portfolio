@@ -173,7 +173,7 @@ section { padding-block: clamp(36px, 6vw, 72px); }
   box-shadow: 0 24px 50px -20px rgba(0,0,0,.6);
 }
 .screen::after { content: ""; position: absolute; inset: 0; background: #000; opacity: calc(var(--dim, 0) * .62); pointer-events: none; border-radius: inherit; }
-.art { position: absolute; inset: 0;
+.art { position: absolute; inset: 0; z-index: 0;
   background:
     radial-gradient(90% 55% at 25% 15%, hsl(var(--h) 85% 62% / .85), transparent 65%),
     radial-gradient(70% 50% at 80% 85%, hsl(calc(var(--h) + 50) 80% 55% / .5), transparent 70%),
@@ -238,7 +238,7 @@ section { padding-block: clamp(36px, 6vw, 72px); }
 
 .player { padding: 0; border: 0; background: transparent; color: var(--fg); width: min(1100px, 92vw); max-width: none; max-height: 92vh; overflow: visible; }
 .player::backdrop { background: rgba(4, 5, 8, .84); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-.player[open] { animation: pop .22s ease-out; }
+.player[open] { animation: pop .22s ease-out; position: fixed; inset: 0; margin: auto; z-index: 99999; }
 @keyframes pop { from { opacity: 0; transform: scale(.96); } }
 .player .p-frame { position: relative; aspect-ratio: 16 / 9; max-height: calc(92vh - 90px); margin-inline: auto; border-radius: 8px; overflow: hidden; background: #050506; outline: 1px solid var(--line); box-shadow: 0 40px 80px -30px rgba(0,0,0,.8); }
 .player .p-frame video, .player .p-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; background: #000; }
@@ -283,7 +283,7 @@ html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transiti
 .snd-btn:hover { background: rgba(0,0,0,.7); border-color: var(--accent); transform: scale(1.06); }
 .snd-btn svg { width: 17px; height: 17px; fill: currentColor; }
 .snd-btn svg .w { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-.thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; border-radius: inherit; }
 .film .frame .thumb { transition: transform 6s ease-out; }
 .film .frame.hovering .thumb { transform: scale(1.06); }
 .film .frame .snd-btn { top: 10px; right: 10px; width: 30px; height: 30px; }
@@ -591,7 +591,11 @@ const PLAY_SVG = '<svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg>';
 
 /* thumbnails: a poster picture if given; otherwise '#t=0.1' makes phones show the video's first frame */
 const thumbSrc = (u) => (u && !u.includes('#')) ? u + '#t=0.1' : u;
-const thumbImg = (x) => x.poster ? `<img class="thumb" src="${x.poster}" alt="" loading="lazy" decoding="async">` : '';
+const thumbImg = (x) => {
+  const p = x.thumbnail || x.poster || (x.fileId ? 'https://drive.google.com/thumbnail?id=' + x.fileId + '&sz=w600' : (x.id ? 'https://drive.google.com/thumbnail?id=' + x.id + '&sz=w600' : ''));
+  if (!p) return '';
+  return '<img class="thumb" src="' + p + '" alt="' + (x.title || '') + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t){this.dataset.t=1;this.src=\'https://drive.google.com/thumbnail?id=' + (x.fileId || x.id) + '&sz=w600\';}">';
+};
 const posterAttr = (x) => x.poster ? ` poster="${x.poster}"` : '';
 
 let cards = [];
@@ -653,7 +657,7 @@ function attachCardListeners() {
       });
     }
 
-    // Direct click handler on the card itself
+    // Direct click handler on the card itself - tap any card to open and play
     card.style.cursor = 'pointer';
     card.addEventListener('click', (e) => {
       if (e.target.closest('.snd-btn')) return;
@@ -661,11 +665,7 @@ function attachCardListeners() {
       e.stopPropagation();
       console.log("Clicked video:", video.videoUrl || video.src);
       touched();
-      if (i === active()) {
-        safeOpenPlayer(i, 'short');
-      } else {
-        goToCard(i);
-      }
+      safeOpenPlayer(i, 'short');
     });
 
     const v = card.querySelector('video'), bar = card.querySelector('.bar i'), cur = card.querySelector('.cur');
@@ -881,11 +881,7 @@ function endDrag(e) {
       const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS;
       const video = list[k] || {};
       console.log("Clicked video:", video.videoUrl || video.src);
-      if (isPlayBtn || k === active()) {
-        safeOpenPlayer(k, 'short');
-      } else {
-        goToCard(k);
-      }
+      safeOpenPlayer(k, 'short');
     }
   }
   kick();
