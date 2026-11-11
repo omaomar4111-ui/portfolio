@@ -240,6 +240,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
           <h2 style="margin:0">قائمة الفيديوهات القصيرة (Reels / Shorts / TikTok)</h2>
           <button class="btn" id="addShort">+ إضافة فيديو قصير</button>
+        <button class="btn secondary" id="resetShortsBtn" style="font-size:12px;">🔄 استعادة فيديوهات Drive (24 فيديو)</button>
         </div>
         <div id="shortsList"><div id="loading">جاري التحميل…</div></div>
       </div>
@@ -251,6 +252,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
           <h2 style="margin:0">قائمة الفيديوهات الطويلة (أفلام، بودكاست، وثائقي)</h2>
           <button class="btn" id="addLong">+ إضافة فيديو طويل</button>
+        <button class="btn secondary" id="resetLongsBtn" style="font-size:12px;">🔄 استعادة فيديوهات Drive (22 فيديو)</button>
         </div>
         <div id="longsList"><div id="loading">جاري التحميل…</div></div>
       </div>
@@ -416,6 +418,7 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
   <script src="firebase-config.js"></script>
+  <script src="videos.js"></script>
   <script>
     // جلب الإعدادات من window.firebaseConfig أو firebaseConfig
     const config = window.firebaseConfig || (typeof firebaseConfig !== 'undefined' ? firebaseConfig : null);
@@ -595,6 +598,31 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
     };
 
     // ========== تحميل قوائم الفيديوهات ==========
+    const DB_VERSION = 'v_gym_46';
+    if (localStorage.getItem('portfolio_db_version') !== DB_VERSION) {
+      localStorage.removeItem('portfolio_shorts');
+      localStorage.removeItem('portfolio_longs');
+      localStorage.setItem('portfolio_db_version', DB_VERSION);
+    }
+
+    // أزرار استعادة فيديوهات Drive الأصلية
+    setTimeout(() => {
+      const rs = document.getElementById('resetShortsBtn');
+      if (rs) rs.onclick = () => {
+        if (!confirm('هل تريد استعادة فيديوهات Shorts الـ 24 الأصلية؟')) return;
+        localStorage.removeItem('portfolio_shorts');
+        loadShorts();
+        toast('تمت استعادة الفيديوهات بنجاح ✓');
+      };
+      const rl = document.getElementById('resetLongsBtn');
+      if (rl) rl.onclick = () => {
+        if (!confirm('هل تريد استعادة فيديوهات Longs الـ 22 الأصلية؟')) return;
+        localStorage.removeItem('portfolio_longs');
+        loadLongs();
+        toast('تمت استعادة الفيديوهات بنجاح ✓');
+      };
+    }, 500);
+
     async function loadShorts() {
       let docs = [];
       if (db) {
@@ -612,6 +640,20 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
           docs = JSON.parse(localStorage.getItem('portfolio_shorts') || '[]');
         } catch(e) {}
       }
+      // إذا كانت القائمة فارغة، نحمل تلقائياً من videos.js (24 فيديو جيم)
+      if (!docs.length && window.SHORTS && window.SHORTS.length) {
+        docs = window.SHORTS.map((v, i) => ({
+          id: 'short_' + (i + 1),
+          title: v.title,
+          videoUrl: v.src,
+          thumbnail: v.poster,
+          duration: v.dur,
+          genre: v.kind,
+          source: 'Google Drive'
+        }));
+        try { localStorage.setItem('portfolio_shorts', JSON.stringify(docs)); } catch(e) {}
+      }
+
       const list = document.getElementById('shortsList');
       if (!docs.length) {
         list.innerHTML = '<div class="empty">لا توجد فيديوهات قصيرة مضافة بعد</div>';
@@ -624,7 +666,7 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
           <img src="${v.thumbnail || ''}" alt="" onerror="this.src='profile.jpg'">
           <div class="info">
             <h3>${v.title || '(بدون عنوان)'}</h3>
-            <span class="mono">${v.duration || 'غير محدد'}</span>
+            <span class="mono">${v.duration || 'غير محدد'} · ${v.genre || 'Gym & Fitness'}</span>
           </div>
           <div class="actions">
             <button class="btn secondary" onclick="editVideo('shortVideos','${v.id}')">تعديل</button>
@@ -651,6 +693,20 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
           docs = JSON.parse(localStorage.getItem('portfolio_longs') || '[]');
         } catch(e) {}
       }
+      // إذا كانت القائمة فارغة، نحمل تلقائياً من videos.js (22 فيديو جيم)
+      if (!docs.length && window.FILMS && window.FILMS.length) {
+        docs = window.FILMS.map((v, i) => ({
+          id: 'long_' + (i + 1),
+          title: v.title,
+          videoUrl: v.src,
+          thumbnail: v.poster,
+          duration: v.dur,
+          genre: v.kind,
+          source: 'Google Drive'
+        }));
+        try { localStorage.setItem('portfolio_longs', JSON.stringify(docs)); } catch(e) {}
+      }
+
       const list = document.getElementById('longsList');
       if (!docs.length) {
         list.innerHTML = '<div class="empty">لا توجد فيديوهات طويلة مضافة بعد</div>';
@@ -794,15 +850,39 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
           data.genre = document.getElementById('vGenre').value.trim();
         }
 
-        if (id) {
-          await db.collection(type).doc(id).update(data);
-        } else {
-          data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-          await db.collection(type).add(data);
+        // 1. الحفظ الفوري محلياً في localStorage
+        const locKey = (type === 'shortVideos') ? 'portfolio_shorts' : 'portfolio_longs';
+        try {
+          const arr = JSON.parse(localStorage.getItem(locKey) || '[]');
+          if (id) {
+            const idx = arr.findIndex(x => x.id === id);
+            if (idx !== -1) arr[idx] = { ...arr[idx], ...data };
+            else arr.push({ id, ...data });
+          } else {
+            const newId = 'vid_' + Date.now().toString(36);
+            arr.unshift({ id: newId, ...data });
+          }
+          localStorage.setItem(locKey, JSON.stringify(arr));
+        } catch(e) {
+          console.warn('localStorage error:', e);
+        }
+
+        // 2. محاولة الحفظ في Firestore في الخلفية إن أمكن
+        if (db) {
+          try {
+            if (id) {
+              await db.collection(type).doc(id).set(data, { merge: true });
+            } else {
+              data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+              await db.collection(type).add(data);
+            }
+          } catch(e) {
+            console.warn('Firestore optional save error:', e);
+          }
         }
 
         closeModal();
-        toast('تم الحفظ بنجاح ✓');
+        toast('تم حفظ الفيديو بنجاح ✓');
         if (type === 'shortVideos') loadShorts(); else loadLongs();
       } catch (e) {
         toast('خطأ أثناء الحفظ: ' + e.message, true);
@@ -815,16 +895,29 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
     document.getElementById('addLong').onclick = () => openModal('longVideos', null);
 
     window.editVideo = async (type, id) => {
+      const locKey = (type === 'shortVideos') ? 'portfolio_shorts' : 'portfolio_longs';
+      let item = null;
       try {
-        const doc = await db.collection(type).doc(id).get();
-        if (doc.exists) openModal(type, { id, ...doc.data() });
-      } catch (e) {
-        toast('خطأ في جلب بيانات الفيديو: ' + e.message, true);
+        const arr = JSON.parse(localStorage.getItem(locKey) || '[]');
+        item = arr.find(x => x.id === id);
+      } catch(e) {}
+
+      if (!item && db) {
+        try {
+          const doc = await db.collection(type).doc(id).get();
+          if (doc.exists) item = { id, ...doc.data() };
+        } catch (e) {}
+      }
+
+      if (item) {
+        openModal(type, item);
+      } else {
+        toast('تعذر جلب بيانات هذا الفيديو', true);
       }
     };
 
     window.deleteVideo = async (type, id) => {
-      if (!confirm('هل أنت متأكد من رغبتك في حذف هذا الفيديو؟')) return;
+      if (!confirm('هل أنت متأكد من رغبتك في حذف هذا الفيديو من الموقع؟')) return;
       // حذف من localStorage
       const locKey = (type === 'shortVideos') ? 'portfolio_shorts' : 'portfolio_longs';
       try {
@@ -841,7 +934,7 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
           console.warn('Firestore delete error:', e);
         }
       }
-      toast('تم حذف الفيديو بنجاح');
+      toast('تم حذف الفيديو بنجاح ✓');
       if (type === 'shortVideos') loadShorts(); else loadLongs();
     };
 

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
-<title>Omar Omar Portfolio</title>
+<title>Omar Mostafa Portfolio</title>
 <!-- ===== Browser tab icon + link preview (WhatsApp, Facebook, LinkedIn, X...) =====
      Upload icon.png, favicon-32.png, apple-touch-icon.png and preview.jpg next to index.html.
      To use your own icon: replace those three icon files with yours (same names).
@@ -12,9 +12,9 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="description" content="Omar Omar, video editor. Short-form and long-form editing for brands, creators and podcasts, in English and Arabic.">
+<meta name="description" content="Omar Mostafa, video editor. Short-form and long-form editing for brands, creators and podcasts, in English and Arabic.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Omar Omar Portfolio">
+<meta property="og:title" content="Omar Mostafa Portfolio">
 <meta property="og:description" content="Video editor. Short-form and long-form editing for brands, creators and podcasts, in English and Arabic.">
 <meta property="og:url" content="https://omaomar4111-ui.github.io/portfolio/">
 <meta property="og:image" content="https://omaomar4111-ui.github.io/portfolio/preview.jpg">
@@ -409,7 +409,13 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
   <dialog class="player" id="player" aria-labelledby="p-title">
     <button type="button" class="close" id="p-close" aria-label="Close player"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     <div class="p-frame" id="p-frame"></div>
-    <div class="p-meta"><h3 id="p-title"></h3><span class="mono" id="p-sub"></span></div>
+    <div class="p-meta">
+      <div>
+        <h3 id="p-title"></h3>
+        <span class="mono" id="p-sub"></span>
+      </div>
+      <a id="p-drive-link" href="#" target="_blank" rel="noopener" class="btn" style="padding:6px 14px;font-size:12px;margin-left:auto;text-decoration:none;display:none;">مشاهدة في Drive ↗</a>
+    </div>
   </dialog>
 
   <footer>
@@ -432,6 +438,12 @@ const FILMS = window.FILMS || [];
 
 // Load dynamic videos from localStorage or Firestore
 (async function() {
+  const DB_VERSION = 'v_gym_46';
+  if (localStorage.getItem('portfolio_db_version') !== DB_VERSION) {
+    localStorage.removeItem('portfolio_shorts');
+    localStorage.removeItem('portfolio_longs');
+    localStorage.setItem('portfolio_db_version', DB_VERSION);
+  }
   // 1. Check localStorage first (instant & reliable)
   try {
     const locShorts = localStorage.getItem('portfolio_shorts');
@@ -895,7 +907,7 @@ function openPlayer(i, kind = 'film') {
   playerOpen = true; syncShort();
   pFrame.style.setProperty('--h', f.hue);
   if (f.src && (f.src.includes('drive.google.com') || f.src.includes('youtube.com') || f.src.includes('youtu.be'))) {
-    pFrame.innerHTML = `<iframe src="${f.src}" allow="autoplay; fullscreen" allowfullscreen style="width:100%;height:100%;border:none;border-radius:14px;background:#000;"></iframe>`;
+    pFrame.innerHTML = `<iframe src="${f.src}" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:8px;background:#000;"></iframe>`;
   } else if (f.src) {
     pFrame.innerHTML = `<video src="${f.src}"${posterAttr(f)} controls autoplay playsinline></video>`;
   } else {
@@ -903,6 +915,15 @@ function openPlayer(i, kind = 'film') {
   }
   $('#p-title').textContent = f.title;
   $('#p-sub').textContent = `${f.kind} · ${f.dur}`;
+  const dLink = $('#p-drive-link');
+  if (dLink) {
+    if (f.src && f.src.includes('drive.google.com')) {
+      dLink.href = f.src.replace('/preview', '/view');
+      dLink.style.display = 'inline-flex';
+    } else {
+      dLink.style.display = 'none';
+    }
+  }
   document.documentElement.style.overflow = 'hidden';
   player.showModal();
   const pv = pFrame.querySelector('video');

@@ -1,34 +1,405 @@
-/* ================= EDIT YOUR VIDEOS HERE =================
-   This one file feeds BOTH pages: index.html and work.html.
-   One line = one video. Copy a line to add a video, delete a line to remove one.
-   title : the name shown on the card
-   kind  : the category shown under the carousel / under the film (e.g. 'Brand ad')
-   dur   : the length shown on the card, as 'minutes:seconds'
-   role  : (short-form only) what you did on it, shown under the carousel
-   src   : the video link, in quotes. Either a file in the same folder ('videos/aurora.mp4')
-           or a direct .mp4 link from your video host. Leave '' to show the colored placeholder.
-   poster: (optional) thumbnail picture shown before the video plays, e.g. 'thumbs/aurora.jpg' or a full
-           https link. Leave '' and the site shows the first frame of the video instead.
-   hue   : placeholder color (0-360), only used while src and poster are empty
-   sample: no longer used, safe to ignore
-   Keep the commas between lines and the quotes around text.
-   ========================================================== */
+/* ================= OMAR MOSTAFA - GYM & FITNESS PORTFOLIO =================
+   46 Gym & Fitness Videos extracted from Google Drive folder:
+   https://drive.google.com/drive/folders/1bqvF1DO2spxip8HuldHFXSbEMIXX2JOM
+   
+   window.SHORTS : 24 Short-form vertical reels (9:16 carousel)
+   window.FILMS  : 22 Long-form training & workout sessions (16:9 grid)
+   ========================================================================== */
+
 window.SHORTS = [
-  { title: 'Beauty Event Jeddah',          kind: 'Event recap',    dur: '1:00', hue: 190, role: 'Edit · sound design · color',         poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/mayam.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/Mayam%20Reel%201.mp4', sample: true },
-  { title: 'Talking Head Content',         kind: 'Marketing tips', dur: '0:42', hue: 24,  role: 'Edit · motion tracking · captions',   poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/ugc%202.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/Bishoy%20Media%20Buyer%2011%20Fhd.mp4', sample: true },
-  { title: 'Talking Head Doctor',          kind: 'Medical info',   dur: '0:38', hue: 340, role: 'Edit · color · motion',               poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/ugc%203%20doctor.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/Fc%20Clinic%20Reel%204%20PORTFOLIO.mp4', sample: true },
-  { title: 'Jewelry Store',                kind: 'Store ad',       dur: '0:16', hue: 210, role: 'Edit · b-roll · color',               poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/jewelery%20store.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/Louis%20Jewl%20Bag%20PORTFOLIO.mp4', sample: true },
-  { title: 'Food Plates Speed Ramps',      kind: 'Restaurant ad',  dur: '0:17', hue: 150, role: 'Edit · sound design · speed ramps',   poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/food%20speed%20ramps.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/Lustro%20Ramps%20Reel%20Final%20PORTFOLIO.mp4', sample: true },
-  { title: 'Talking Head Business',        kind: 'Business ad',    dur: '0:27', hue: 285, role: 'Edit · b-roll · color',               poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/ugc%201.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/Arabic%20Reel%20Final%20PORTFOLIO.mp4', sample: true },
-  { title: 'Cars Business Promo',          kind: 'Business ad',    dur: '0:27', hue: 48,  role: 'Edit · hooks · b-roll',               poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/seat.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/Seat%20Sharkia%20Edit.mp4', sample: true },
-  { title: 'Cards Game Promo',             kind: 'Entertainment',  dur: '1:38', hue: 190, role: 'Edit · stop motion · motion design',  poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/eyad.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/Eb3thaloo%202Ool%20Ameeme%20X%20Eyad%20Final%20PORTFOLIO.mp4', sample: true },
-  { title: 'Dental Clinic Promo',          kind: 'Business ad',    dur: '0:21', hue: 8,   role: 'Edit · b-roll · color',               poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/clinic.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/Lucid%20Dental%20Center%20PORTFOLIO.mp4', sample: true },
-  { title: 'Tech Podcast',                 kind: 'Podcast',        dur: '0:44', hue: 120, role: 'Edit · captions · multi-cam',         poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/apple.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/iSupport%20reel%202.mp4', sample: true },
-  { title: 'Salon Business Promo',         kind: 'Business ad',    dur: '0:45', hue: 255, role: 'Edit · beat-synced cuts · color',     poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/salon.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/Triv%20X%20Zizo%20PORTFOLIO.mp4', sample: true }
+  {
+    title: "Gym Workout #01",
+    kind: "Gym & Fitness",
+    dur: "0:30",
+    role: "Edit · sound design · color",
+    poster: "https://lh3.googleusercontent.com/d/1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p",
+    src: "https://drive.google.com/file/d/1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p/preview",
+    hue: 180
+  },
+  {
+    title: "Gym Workout #02",
+    kind: "Workout Reel",
+    dur: "0:45",
+    role: "Edit · beat-synced cuts · color",
+    poster: "https://lh3.googleusercontent.com/d/1NhfGU2oH0eIDFEQT3MuRoyUjyBRJPU86",
+    src: "https://drive.google.com/file/d/1NhfGU2oH0eIDFEQT3MuRoyUjyBRJPU86/preview",
+    hue: 193
+  },
+  {
+    title: "Gym Workout #03",
+    kind: "Fitness Motivation",
+    dur: "0:30",
+    role: "Edit · sound design · speed ramps",
+    poster: "https://lh3.googleusercontent.com/d/1enjQ7TFz2pXpQ6NvzM8QGeQXLOwOZxoz",
+    src: "https://drive.google.com/file/d/1enjQ7TFz2pXpQ6NvzM8QGeQXLOwOZxoz/preview",
+    hue: 206
+  },
+  {
+    title: "Gym Workout #04",
+    kind: "Strength & Conditioning",
+    dur: "0:45",
+    role: "Edit · sound effects · pacing",
+    poster: "https://lh3.googleusercontent.com/d/1MbAZiAVfOTaov6dmg2HQ0Wa1rOkk_4tU",
+    src: "https://drive.google.com/file/d/1MbAZiAVfOTaov6dmg2HQ0Wa1rOkk_4tU/preview",
+    hue: 219
+  },
+  {
+    title: "Gym Workout #05",
+    kind: "Bodybuilding",
+    dur: "0:30",
+    role: "Edit · color grading · music",
+    poster: "https://lh3.googleusercontent.com/d/1T103gitCkp-yKMRkbxOGynhFngWCxn28",
+    src: "https://drive.google.com/file/d/1T103gitCkp-yKMRkbxOGynhFngWCxn28/preview",
+    hue: 232
+  },
+  {
+    title: "Gym Workout #06",
+    kind: "CrossFit & Power",
+    dur: "0:45",
+    role: "Edit · dynamic transitions · audio",
+    poster: "https://lh3.googleusercontent.com/d/1D6p5EgaAuzIWZqTrg9jthdKVjPNtpqow",
+    src: "https://drive.google.com/file/d/1D6p5EgaAuzIWZqTrg9jthdKVjPNtpqow/preview",
+    hue: 245
+  },
+  {
+    title: "Gym Workout #07",
+    kind: "Athlete Training",
+    dur: "0:30",
+    role: "Edit · motion · sound design",
+    poster: "https://lh3.googleusercontent.com/d/1wnozfWxvgS-AVtDGdmUGZJ3kDtHbPU7C",
+    src: "https://drive.google.com/file/d/1wnozfWxvgS-AVtDGdmUGZJ3kDtHbPU7C/preview",
+    hue: 258
+  },
+  {
+    title: "Gym Workout #08",
+    kind: "Personal Trainer Promo",
+    dur: "0:45",
+    role: "Edit · hooks · typography",
+    poster: "https://lh3.googleusercontent.com/d/1pFRCDqXVktdVIuA2Srz2eYdsTOOBioTm",
+    src: "https://drive.google.com/file/d/1pFRCDqXVktdVIuA2Srz2eYdsTOOBioTm/preview",
+    hue: 271
+  },
+  {
+    title: "Gym Workout #09",
+    kind: "Gym & Fitness",
+    dur: "0:30",
+    role: "Edit · sound design · color",
+    poster: "https://lh3.googleusercontent.com/d/1kP_KTUdxdufO1wl-_p4p7loOaV__t6C-",
+    src: "https://drive.google.com/file/d/1kP_KTUdxdufO1wl-_p4p7loOaV__t6C-/preview",
+    hue: 284
+  },
+  {
+    title: "Gym Workout #10",
+    kind: "Workout Reel",
+    dur: "0:45",
+    role: "Edit · beat-synced cuts · color",
+    poster: "https://lh3.googleusercontent.com/d/18fxiOcqT59Kxh_XOMCHXJHi90v1Tk-cw",
+    src: "https://drive.google.com/file/d/18fxiOcqT59Kxh_XOMCHXJHi90v1Tk-cw/preview",
+    hue: 297
+  },
+  {
+    title: "Gym Workout #11",
+    kind: "Fitness Motivation",
+    dur: "0:30",
+    role: "Edit · sound design · speed ramps",
+    poster: "https://lh3.googleusercontent.com/d/18BUOsu0v4v7btivuIJdoASWdfiQe_jap",
+    src: "https://drive.google.com/file/d/18BUOsu0v4v7btivuIJdoASWdfiQe_jap/preview",
+    hue: 310
+  },
+  {
+    title: "Gym Workout #12",
+    kind: "Strength & Conditioning",
+    dur: "0:45",
+    role: "Edit · sound effects · pacing",
+    poster: "https://lh3.googleusercontent.com/d/1s4cLPLRdoLPcV_-0vJuT4lN4uEUE8Q98",
+    src: "https://drive.google.com/file/d/1s4cLPLRdoLPcV_-0vJuT4lN4uEUE8Q98/preview",
+    hue: 323
+  },
+  {
+    title: "Gym Workout #13",
+    kind: "Bodybuilding",
+    dur: "0:30",
+    role: "Edit · color grading · music",
+    poster: "https://lh3.googleusercontent.com/d/1pvGS8JBYAEBjf6_mv_lZkqv6NqC72ccs",
+    src: "https://drive.google.com/file/d/1pvGS8JBYAEBjf6_mv_lZkqv6NqC72ccs/preview",
+    hue: 336
+  },
+  {
+    title: "Gym Workout #14",
+    kind: "CrossFit & Power",
+    dur: "0:45",
+    role: "Edit · dynamic transitions · audio",
+    poster: "https://lh3.googleusercontent.com/d/1bwdUowGHhnKxO3HyZ9iajiC2buQESVaI",
+    src: "https://drive.google.com/file/d/1bwdUowGHhnKxO3HyZ9iajiC2buQESVaI/preview",
+    hue: 349
+  },
+  {
+    title: "Gym Workout #15",
+    kind: "Athlete Training",
+    dur: "0:30",
+    role: "Edit · motion · sound design",
+    poster: "https://lh3.googleusercontent.com/d/1X0i8pcoem8xu4QHzl7GWUo7J-hr3PQ68",
+    src: "https://drive.google.com/file/d/1X0i8pcoem8xu4QHzl7GWUo7J-hr3PQ68/preview",
+    hue: 192
+  },
+  {
+    title: "Gym Workout #16",
+    kind: "Personal Trainer Promo",
+    dur: "0:45",
+    role: "Edit · hooks · typography",
+    poster: "https://lh3.googleusercontent.com/d/1mqHpFOnrmIcxL77mknoSJan300gWQTQI",
+    src: "https://drive.google.com/file/d/1mqHpFOnrmIcxL77mknoSJan300gWQTQI/preview",
+    hue: 205
+  },
+  {
+    title: "Gym Workout #17",
+    kind: "Gym & Fitness",
+    dur: "0:30",
+    role: "Edit · sound design · color",
+    poster: "https://lh3.googleusercontent.com/d/1lPmjzW_AKWFWPu66lsFkdNKjEIvery5V",
+    src: "https://drive.google.com/file/d/1lPmjzW_AKWFWPu66lsFkdNKjEIvery5V/preview",
+    hue: 218
+  },
+  {
+    title: "Gym Workout #18",
+    kind: "Workout Reel",
+    dur: "0:45",
+    role: "Edit · beat-synced cuts · color",
+    poster: "https://lh3.googleusercontent.com/d/1w-3R_QTb0uZvU5V60QxiG-cP8AQ5r_8V",
+    src: "https://drive.google.com/file/d/1w-3R_QTb0uZvU5V60QxiG-cP8AQ5r_8V/preview",
+    hue: 231
+  },
+  {
+    title: "Gym Workout #19",
+    kind: "Fitness Motivation",
+    dur: "0:30",
+    role: "Edit · sound design · speed ramps",
+    poster: "https://lh3.googleusercontent.com/d/1YRdmvXHYb2TqwKUbtZecQAvoYv8ycro8",
+    src: "https://drive.google.com/file/d/1YRdmvXHYb2TqwKUbtZecQAvoYv8ycro8/preview",
+    hue: 244
+  },
+  {
+    title: "Gym Workout #20",
+    kind: "Strength & Conditioning",
+    dur: "0:45",
+    role: "Edit · sound effects · pacing",
+    poster: "https://lh3.googleusercontent.com/d/1sNxNekdynmxyw-dinLDiqjws73WM_FtA",
+    src: "https://drive.google.com/file/d/1sNxNekdynmxyw-dinLDiqjws73WM_FtA/preview",
+    hue: 257
+  },
+  {
+    title: "Gym Workout #21",
+    kind: "Bodybuilding",
+    dur: "0:30",
+    role: "Edit · color grading · music",
+    poster: "https://lh3.googleusercontent.com/d/1BzO8cgO8uCrF1P_TcV-XvkZXc6fBPjBX",
+    src: "https://drive.google.com/file/d/1BzO8cgO8uCrF1P_TcV-XvkZXc6fBPjBX/preview",
+    hue: 270
+  },
+  {
+    title: "Gym Workout #22",
+    kind: "CrossFit & Power",
+    dur: "0:45",
+    role: "Edit · dynamic transitions · audio",
+    poster: "https://lh3.googleusercontent.com/d/1ljGXDrSmscnbZQ2zQ9ze8S_Xn_seUJkn",
+    src: "https://drive.google.com/file/d/1ljGXDrSmscnbZQ2zQ9ze8S_Xn_seUJkn/preview",
+    hue: 283
+  },
+  {
+    title: "Gym Workout #23",
+    kind: "Athlete Training",
+    dur: "0:30",
+    role: "Edit · motion · sound design",
+    poster: "https://lh3.googleusercontent.com/d/1k0dkJNJf10qNsrn4V5s5Dv6M0apqAWZ-",
+    src: "https://drive.google.com/file/d/1k0dkJNJf10qNsrn4V5s5Dv6M0apqAWZ-/preview",
+    hue: 296
+  },
+  {
+    title: "Gym Workout #24",
+    kind: "Personal Trainer Promo",
+    dur: "0:45",
+    role: "Edit · hooks · typography",
+    poster: "https://lh3.googleusercontent.com/d/1wk4X1xm2WK_dta8mf52Bl_vFm7K-Fltn",
+    src: "https://drive.google.com/file/d/1wk4X1xm2WK_dta8mf52Bl_vFm7K-Fltn/preview",
+    hue: 309
+  }
 ];
+
 window.FILMS = [
-  { title: 'Marriage Story Short Film',    kind: 'Documentary',   dur: '3:47', hue: 210,  poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/marriage.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/Abd%20Elelah%20Short%20Wed%20Film%20Final%20222.mp4', sample: true },  
-  { title: 'Udacity Educational Content',  kind: 'Educational',  dur: '3:39',  hue: 24,  poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/udacity.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/udacity%20video%20jave%20web%20dev.mp4', sample: true },
-  { title: 'Product Feedback from Clients',    kind: 'Interview',   dur: '2:46', hue: 210, poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/reeq%20elnahl.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/Reeq%20Alnahl%20Final%20With%20Captions%20PORTFOLIO.mp4', sample: true },
-  { title: 'Politics News YouTube',             kind: 'News', dur: '7:48',  hue: 300, poster: 'https://pub-be1388614de444c581c12a700d1bf992.r2.dev/politics.jpg', src: 'https://pub-34bb1b1a86f74630a4091e4c415dc302.r2.dev/street%20politics%20video.mp4', sample: true }
+  {
+    title: "Gym Session #25",
+    kind: "Long-form Gym",
+    dur: "2:15",
+    poster: "https://lh3.googleusercontent.com/d/1EhHl2y93rlpwGCI2pgYzQCbfUISiqLtO",
+    src: "https://drive.google.com/file/d/1EhHl2y93rlpwGCI2pgYzQCbfUISiqLtO/preview",
+    hue: 200
+  },
+  {
+    title: "Gym Session #26",
+    kind: "Full Workout Film",
+    dur: "3:22",
+    poster: "https://lh3.googleusercontent.com/d/1DCo_duLGgKu1cSEBp8rEvYZDn6JC0vvf",
+    src: "https://drive.google.com/file/d/1DCo_duLGgKu1cSEBp8rEvYZDn6JC0vvf/preview",
+    hue: 217
+  },
+  {
+    title: "Gym Session #27",
+    kind: "Long-form Gym",
+    dur: "4:29",
+    poster: "https://lh3.googleusercontent.com/d/1mb7HSDzuZfJw7Unx1uhw8S3qjleuROAu",
+    src: "https://drive.google.com/file/d/1mb7HSDzuZfJw7Unx1uhw8S3qjleuROAu/preview",
+    hue: 234
+  },
+  {
+    title: "Gym Session #28",
+    kind: "Full Workout Film",
+    dur: "5:36",
+    poster: "https://lh3.googleusercontent.com/d/1LaPUQ-v9uBCLocyBUQQXjw_QuJYenbSc",
+    src: "https://drive.google.com/file/d/1LaPUQ-v9uBCLocyBUQQXjw_QuJYenbSc/preview",
+    hue: 251
+  },
+  {
+    title: "Gym Session #29",
+    kind: "Long-form Gym",
+    dur: "2:43",
+    poster: "https://lh3.googleusercontent.com/d/1W-B7HsUSHq3jSgKUFSgNDMUdJmDSwl_s",
+    src: "https://drive.google.com/file/d/1W-B7HsUSHq3jSgKUFSgNDMUdJmDSwl_s/preview",
+    hue: 268
+  },
+  {
+    title: "Gym Session #30",
+    kind: "Full Workout Film",
+    dur: "3:50",
+    poster: "https://lh3.googleusercontent.com/d/1o4S_Q1X0XlKq2P13hC6OuLZpcDbhoY9F",
+    src: "https://drive.google.com/file/d/1o4S_Q1X0XlKq2P13hC6OuLZpcDbhoY9F/preview",
+    hue: 285
+  },
+  {
+    title: "Gym Session #31",
+    kind: "Long-form Gym",
+    dur: "4:17",
+    poster: "https://lh3.googleusercontent.com/d/1Hk-SV19UW0GKx_DcEnegqBQzHhcpspN4",
+    src: "https://drive.google.com/file/d/1Hk-SV19UW0GKx_DcEnegqBQzHhcpspN4/preview",
+    hue: 302
+  },
+  {
+    title: "Gym Session #32",
+    kind: "Full Workout Film",
+    dur: "5:24",
+    poster: "https://lh3.googleusercontent.com/d/1EXtxJ0sS75FoezPVZnuUCsj4CjuWrbTD",
+    src: "https://drive.google.com/file/d/1EXtxJ0sS75FoezPVZnuUCsj4CjuWrbTD/preview",
+    hue: 319
+  },
+  {
+    title: "Gym Session #33",
+    kind: "Long-form Gym",
+    dur: "2:31",
+    poster: "https://lh3.googleusercontent.com/d/1NdOZ2Ll5VfyAn8YRMjfsHc07gmaYt5-S",
+    src: "https://drive.google.com/file/d/1NdOZ2Ll5VfyAn8YRMjfsHc07gmaYt5-S/preview",
+    hue: 336
+  },
+  {
+    title: "Gym Session #34",
+    kind: "Full Workout Film",
+    dur: "3:38",
+    poster: "https://lh3.googleusercontent.com/d/1eeGk6_5UadpLLcduG_83G9ufW1JqKXhf",
+    src: "https://drive.google.com/file/d/1eeGk6_5UadpLLcduG_83G9ufW1JqKXhf/preview",
+    hue: 203
+  },
+  {
+    title: "Gym Session #35",
+    kind: "Long-form Gym",
+    dur: "4:45",
+    poster: "https://lh3.googleusercontent.com/d/1pihiUMqQbVBYTBKPfQIuR1_Lm7R9ig3w",
+    src: "https://drive.google.com/file/d/1pihiUMqQbVBYTBKPfQIuR1_Lm7R9ig3w/preview",
+    hue: 220
+  },
+  {
+    title: "Gym Session #36",
+    kind: "Full Workout Film",
+    dur: "5:52",
+    poster: "https://lh3.googleusercontent.com/d/14hbbuXkJuIMqj29FQTxKTgLn5wLOI9PH",
+    src: "https://drive.google.com/file/d/14hbbuXkJuIMqj29FQTxKTgLn5wLOI9PH/preview",
+    hue: 237
+  },
+  {
+    title: "Gym Session #37",
+    kind: "Long-form Gym",
+    dur: "2:19",
+    poster: "https://lh3.googleusercontent.com/d/1MHoUHNt_E5A5sCzvthVRScyCEGM6uByT",
+    src: "https://drive.google.com/file/d/1MHoUHNt_E5A5sCzvthVRScyCEGM6uByT/preview",
+    hue: 254
+  },
+  {
+    title: "Gym Session #38",
+    kind: "Full Workout Film",
+    dur: "3:26",
+    poster: "https://lh3.googleusercontent.com/d/1VX26DddIDHYvcKxAjHHzE4A5Mf0HMTOx",
+    src: "https://drive.google.com/file/d/1VX26DddIDHYvcKxAjHHzE4A5Mf0HMTOx/preview",
+    hue: 271
+  },
+  {
+    title: "Gym Session #39",
+    kind: "Long-form Gym",
+    dur: "4:33",
+    poster: "https://lh3.googleusercontent.com/d/1WMwZ_XkQs7bCxyi6s6R-fsS0rlYtVzqs",
+    src: "https://drive.google.com/file/d/1WMwZ_XkQs7bCxyi6s6R-fsS0rlYtVzqs/preview",
+    hue: 288
+  },
+  {
+    title: "Gym Session #40",
+    kind: "Full Workout Film",
+    dur: "5:40",
+    poster: "https://lh3.googleusercontent.com/d/1fhKUnHZk-kdmaN7ws852c5sO3wFyd3-v",
+    src: "https://drive.google.com/file/d/1fhKUnHZk-kdmaN7ws852c5sO3wFyd3-v/preview",
+    hue: 305
+  },
+  {
+    title: "Gym Session #41",
+    kind: "Long-form Gym",
+    dur: "2:47",
+    poster: "https://lh3.googleusercontent.com/d/1cNj2ljnmPSykPT5le8ZJJzW63ShXvA8H",
+    src: "https://drive.google.com/file/d/1cNj2ljnmPSykPT5le8ZJJzW63ShXvA8H/preview",
+    hue: 322
+  },
+  {
+    title: "Gym Session #42",
+    kind: "Full Workout Film",
+    dur: "3:54",
+    poster: "https://lh3.googleusercontent.com/d/1baPw-N01Qd0rthwZxHFulv7A1tQ0S5A3",
+    src: "https://drive.google.com/file/d/1baPw-N01Qd0rthwZxHFulv7A1tQ0S5A3/preview",
+    hue: 339
+  },
+  {
+    title: "Gym Session #43",
+    kind: "Long-form Gym",
+    dur: "4:21",
+    poster: "https://lh3.googleusercontent.com/d/1HrE_HnuEPnb0u6GRMdZ82Iz75WjZXgqh",
+    src: "https://drive.google.com/file/d/1HrE_HnuEPnb0u6GRMdZ82Iz75WjZXgqh/preview",
+    hue: 206
+  },
+  {
+    title: "Gym Session #44",
+    kind: "Full Workout Film",
+    dur: "5:28",
+    poster: "https://lh3.googleusercontent.com/d/1jV-IDwzCo1bq0y1yYgOPf87ouilNsiCg",
+    src: "https://drive.google.com/file/d/1jV-IDwzCo1bq0y1yYgOPf87ouilNsiCg/preview",
+    hue: 223
+  },
+  {
+    title: "Gym Session #45",
+    kind: "Long-form Gym",
+    dur: "2:35",
+    poster: "https://lh3.googleusercontent.com/d/1zmqS2qZz7Don10tY37bFokBQvICJVuwQ",
+    src: "https://drive.google.com/file/d/1zmqS2qZz7Don10tY37bFokBQvICJVuwQ/preview",
+    hue: 240
+  },
+  {
+    title: "Gym Session #46",
+    kind: "Full Workout Film",
+    dur: "3:42",
+    poster: "https://lh3.googleusercontent.com/d/1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5",
+    src: "https://drive.google.com/file/d/1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5/preview",
+    hue: 257
+  }
 ];
