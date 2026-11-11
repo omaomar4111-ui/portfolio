@@ -241,7 +241,8 @@ section { padding-block: clamp(36px, 6vw, 72px); }
 .player[open] { animation: pop .22s ease-out; }
 @keyframes pop { from { opacity: 0; transform: scale(.96); } }
 .player .p-frame { position: relative; aspect-ratio: 16 / 9; max-height: calc(92vh - 90px); margin-inline: auto; border-radius: 8px; overflow: hidden; background: #050506; outline: 1px solid var(--line); box-shadow: 0 40px 80px -30px rgba(0,0,0,.8); }
-.player .p-frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.player .p-frame video, .player .p-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; background: #000; }
+.player .p-frame video { object-fit: contain; }
 .player .p-frame .art b { font-size: clamp(120px, 22vw, 260px); top: 14%; }
 .player .p-empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; color: #fff; }
 .player .p-empty span { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: rgba(0,0,0,.55); padding: 8px 12px; border-radius: 4px; }
@@ -585,8 +586,73 @@ let SPACING = 200, dragK = 0.35, spread = 1;
 const SIDE_BLUR = [0, 1.1, 2];   // px of blur: center, first neighbor, second neighbor
 const active = () => ((idx % N) + N) % N;
 
+// Helper to sanitize Google Drive & YouTube links into direct iframe embed URLs
+function getCleanEmbedUrl(url) {
+  if (!url) return '';
+  let str = String(url).trim();
+  if (str.includes('drive.google.com') || str.includes('drive.usercontent.google.com')) {
+    const m1 = str.match(/\/file\/d\/([a-zA-Z0-9_-]{25,})/);
+    if (m1) return 'https://drive.google.com/file/d/' + m1[1] + '/preview';
+    const m2 = str.match(/[?&](?:id|docid)=([a-zA-Z0-9_-]{25,})/);
+    if (m2) return 'https://drive.google.com/file/d/' + m2[1] + '/preview';
+    const m3 = str.match(/[a-zA-Z0-9_-]{25,}/);
+    if (m3) return 'https://drive.google.com/file/d/' + m3[0] + '/preview';
+  }
+  if (str.includes('youtube.com') || str.includes('youtu.be')) {
+    const vMatch = str.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+    if (vMatch) return 'https://www.youtube.com/embed/' + vMatch[1] + '?autoplay=1';
+    const sMatch = str.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+    if (sMatch) return 'https://www.youtube.com/embed/' + sMatch[1] + '?autoplay=1';
+    const bMatch = str.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+    if (bMatch) return 'https://www.youtube.com/embed/' + bMatch[1] + '?autoplay=1';
+    const eMatch = str.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
+    if (eMatch) return 'https://www.youtube.com/embed/' + eMatch[1] + '?autoplay=1';
+  }
+  return str;
+}
+
+let lastOpenPlayerTime = 0;
+function safeOpenPlayer(i, kind = 'short') {
+  const now = performance.now();
+  if (now - lastOpenPlayerTime < 400) return;
+  lastOpenPlayerTime = now;
+  openPlayer(i, kind);
+}
+
 function attachCardListeners() {
-  cards.forEach((card) => {
+  cards.forEach((card, i) => {
+    const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS;
+    const video = list[i] || {};
+    const videoUrl = video.videoUrl || video.src || '';
+
+    // Direct click handler on the play button
+    const playBtn = card.querySelector('.playbtn');
+    if (playBtn) {
+      playBtn.style.cursor = 'pointer';
+      playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        console.log("Clicked video:", video.videoUrl || video.src);
+        touched();
+        safeOpenPlayer(i, 'short');
+      });
+    }
+
+    // Direct click handler on the card itself
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.snd-btn')) return;
+      if (moved) return; // user was actively dragging carousel
+      e.stopPropagation();
+      console.log("Clicked video:", video.videoUrl || video.src);
+      touched();
+      if (i === active()) {
+        safeOpenPlayer(i, 'short');
+      } else {
+        goToCard(i);
+      }
+    });
+
     const v = card.querySelector('video'), bar = card.querySelector('.bar i'), cur = card.querySelector('.cur');
     if (v) {
       v.muted = !soundOn;
@@ -765,31 +831,47 @@ $('#prev').addEventListener('click', () => { touched(); go(idx - 1); });
 $('#next').addEventListener('click', () => { touched(); go(idx + 1); });
 ticks.forEach((t, i) => t.addEventListener('click', () => { touched(); goToCard(i); }));
 
-let sx = 0, sy = 0, st = 0, sa = 0, moved = false, scrolled = false, downCard = null;
+let sx = 0, sy = 0, st = 0, sa = 0, moved = false, scrolled = false, downCard = null, downTarget = null;
 stage.addEventListener('pointerdown', (e) => {
   if (e.target.closest('.snd-btn')) return;
-  dragging = true; moved = false; scrolled = false; sx = e.clientX; sy = e.clientY; st = performance.now(); sa = angle; touched();
+  dragging = true; moved = false; scrolled = false;
+  sx = e.clientX; sy = e.clientY; st = performance.now(); sa = angle; touched();
   downCard = e.target.closest('.card');
-  stage.setPointerCapture(e.pointerId); kick();
+  downTarget = e.target;
+  kick();
 });
 stage.addEventListener('pointermove', (e) => {
   if (!dragging) return;
   const dx = e.clientX - sx, dy = e.clientY - sy;
-  if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) scrolled = true;   // finger is scrolling the page
-  if (!scrolled && Math.abs(dx) > 6) moved = true;
-  if (moved) { angle = sa - dx * dragK; target = angle; }
+  if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) scrolled = true; // finger is scrolling vertically
+  if (!scrolled && Math.abs(dx) > 6) {
+    if (!moved) {
+      moved = true;
+      try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+    angle = sa - dx * dragK;
+    target = angle;
+  }
 });
-/* A tap only counts if the finger barely moved, lifted normally, and wasn't held long.
-   Scrolling the page with a finger on the carousel never opens the pop-up. */
+/* A tap only counts if the finger barely moved and wasn't scrolling. */
 function endDrag(e) {
   if (!dragging) return;
   dragging = false; touched();
-  const isTap = !moved && !scrolled && e && e.type === 'pointerup' && performance.now() - st < 600
-    && Math.hypot(e.clientX - sx, e.clientY - sy) < 10;
-  if (moved) { go(Math.round(angle / step)); }
-  else if (isTap && downCard) {
+  if (moved) {
+    go(Math.round(angle / step));
+  } else if (!scrolled && downCard) {
     const k = cards.indexOf(downCard);
-    if (k === active()) openPlayer(k, 'short'); else goToCard(k);
+    if (k !== -1) {
+      const isPlayBtn = downTarget && (downTarget.closest('.playbtn') || (e && e.target && e.target.closest && e.target.closest('.playbtn')));
+      const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS;
+      const video = list[k] || {};
+      console.log("Clicked video:", video.videoUrl || video.src);
+      if (isPlayBtn || k === active()) {
+        safeOpenPlayer(k, 'short');
+      } else {
+        goToCard(k);
+      }
+    }
   }
   kick();
 }
@@ -929,45 +1011,69 @@ function openPlayer(i, kind = 'film') {
   const short = kind === 'short';
   const list = short ? ((window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS) : ((window.FILMS && window.FILMS.length) ? window.FILMS : FILMS);
   const f = list[i] || list[0] || {};
-  const fromCard = (short && cards[i]) ? cards[i].querySelector('video') : null;
-  const startAt = fromCard ? fromCard.currentTime : 0;
+  const rawUrl = f.videoUrl || f.src || f.url || '';
+  const embedUrl = getCleanEmbedUrl(rawUrl);
+
+  console.log("Clicked video:", rawUrl);
+  console.log("openPlayer:", { index: i, kind, title: f.title, rawUrl, embedUrl });
+
   player.classList.toggle('vertical', short);
   lastFocus = document.activeElement;
-  // stop hover previews and the short-form card while the pop-up is open
+  // stop hover previews and carousel video while pop-up is open
   document.querySelectorAll('.film .frame video').forEach((v) => v.pause());
   playerOpen = true; syncShort();
-  pFrame.style.setProperty('--h', f.hue);
-  if (f.src && (f.src.includes('drive.google.com') || f.src.includes('youtube.com') || f.src.includes('youtu.be'))) {
-    pFrame.innerHTML = `<iframe src="${f.src}" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:8px;background:#000;"></iframe>`;
-  } else if (f.src) {
-    pFrame.innerHTML = `<video src="${f.src}"${posterAttr(f)} controls autoplay playsinline></video>`;
+  pFrame.style.setProperty('--h', f.hue || 210);
+
+  const isEmbed = embedUrl && (embedUrl.includes('drive.google.com') || embedUrl.includes('youtube.com') || embedUrl.includes('youtu.be'));
+
+  if (isEmbed) {
+    pFrame.innerHTML = `<iframe src="${embedUrl}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:8px;background:#000;"></iframe>`;
+  } else if (embedUrl) {
+    pFrame.innerHTML = `<video src="${embedUrl}"${posterAttr(f)} controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;"></video>`;
   } else {
-    pFrame.innerHTML = `<div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div><div class="p-empty"><span>Sample · add the video file to play it here</span></div>`;
+    pFrame.innerHTML = `<div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div><div class="p-empty"><span>فيديو تجريبي · أضف رابط الفيديو لتشغيله هنا</span></div>`;
   }
-  $('#p-title').textContent = f.title;
-  $('#p-sub').textContent = `${f.kind} · ${f.dur}`;
+
+  $('#p-title').textContent = f.title || 'فيديو';
+  $('#p-sub').textContent = `${f.kind || f.genre || 'فيديو'} · ${f.dur || f.duration || '0:30'}`;
   const dLink = $('#p-drive-link');
   if (dLink) {
-    if (f.src && f.src.includes('drive.google.com')) {
-      dLink.href = f.src.replace('/preview', '/view');
+    if (rawUrl && rawUrl.includes('drive.google.com')) {
+      dLink.href = rawUrl.replace('/preview', '/view');
       dLink.style.display = 'inline-flex';
     } else {
       dLink.style.display = 'none';
     }
   }
   document.documentElement.style.overflow = 'hidden';
-  player.showModal();
+  if (typeof player.showModal === 'function') {
+    try {
+      player.showModal();
+    } catch (_) {
+      player.setAttribute('open', '');
+      player.style.display = 'block';
+    }
+  } else {
+    player.setAttribute('open', '');
+    player.style.display = 'block';
+  }
   const pv = pFrame.querySelector('video');
   if (pv) {
     pv.muted = !soundOn;
-    if (startAt > 0.5) pv.addEventListener('loadedmetadata', () => { pv.currentTime = startAt; }, { once: true });
     pv.play().catch(() => {});
     pv.addEventListener('volumechange', () => { if (pv.muted === soundOn) setSound(!pv.muted); });
   }
 }
 function closePlayer() {
-  if (!player.open) return;
-  player.close();
+  pFrame.innerHTML = '';
+  try {
+    if (player.open) player.close();
+  } catch(_) {}
+  player.removeAttribute('open');
+  player.style.display = '';
+  document.documentElement.style.overflow = '';
+  playerOpen = false; filmPreview = false; syncShort();
+  if (lastFocus) lastFocus.focus({ preventScroll: true });
 }
 player.addEventListener('close', () => {
   pFrame.innerHTML = '';
@@ -1114,7 +1220,8 @@ function startFirestoreSync() {
           dur: v.duration || '0:30',
           role: v.role || 'Edit · sound design · color',
           poster: v.thumbnail || `https://lh3.googleusercontent.com/d/${v.fileId || ''}`,
-          src: v.videoUrl || `https://drive.google.com/file/d/${v.fileId || ''}/preview`,
+          src: getCleanEmbedUrl(v.videoUrl || (v.fileId ? `https://drive.google.com/file/d/${v.fileId}/preview` : '')),
+          videoUrl: getCleanEmbedUrl(v.videoUrl || (v.fileId ? `https://drive.google.com/file/d/${v.fileId}/preview` : '')),
           hue: 180 + (vids.length * 13) % 170,
           createdAt: v.createdAt
         });

@@ -842,7 +842,7 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
         const thumbFile = document.getElementById('vThumb').files[0];
         const vidFile = document.getElementById('vFile').files[0];
         let thumbnail = document.getElementById('vThumbPreview').dataset.newUrl || '';
-        let videoUrl = document.getElementById('vUrl').value.trim();
+        let videoUrl = getCleanEmbedUrl(document.getElementById('vUrl').value.trim());
 
         if (vidFile) {
           const sizeMB = vidFile.size / (1024 * 1024);
@@ -1067,6 +1067,7 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
           duration = (coll === 'shortVideos') ? '0:30' : '5:00';
         }
 
+        url = getCleanEmbedUrl(url);
         itemsToSave.push({
           coll,
           data: {
@@ -1204,7 +1205,7 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       titleEl.textContent = title || 'معاينة الفيديو';
       const previewUrl = `https://drive.google.com/file/d/${id}/preview`;
       link.href = `https://drive.google.com/file/d/${id}/view`;
-      container.innerHTML = `<iframe src="${previewUrl}" allow="autoplay; fullscreen" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
+      container.innerHTML = `<iframe src="${previewUrl}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="width:100%;height:100%;border:none;"></iframe>`;
       modal.style.display = 'flex';
     };
 
@@ -1243,7 +1244,7 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
           </div>
           <div>
             <label style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px; cursor:pointer;">
-              <input type="checkbox" class="video-checkbox" data-id="${video.id}" data-name="${video.name}" data-url="${directUrl}" data-preview="${previewUrl}" data-dur="${video.dur || '0:30'}" data-index="${index}" checked style="width: 18px; height: 18px; cursor: pointer;">
+              <input type="checkbox" class="video-checkbox" data-id="${video.id}" data-name="${video.name}" data-url="${previewUrl}" data-preview="${previewUrl}" data-dur="${video.dur || '0:30'}" data-index="${index}" checked style="width: 18px; height: 18px; cursor: pointer;">
               <span style="font-size:12px; color:var(--muted, #aaa);">تحديد للحفظ</span>
             </label>
             <div style="display:flex;gap:6px;">
