@@ -429,27 +429,16 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
-  <script src="videos.js"></script>
+  <script src="videos.js?v=20261111_gym46_v2"></script>
 
 <script>
-/* Videos are edited in videos.js (shared with work.html). */
-let SHORTS = window.SHORTS || [];
-let FILMS = window.FILMS || [];
-
-// Load dynamic videos from localStorage or Firestore
-(async function() {
-  const DB_VERSION = 'v_gym_46';
-  if (localStorage.getItem('portfolio_db_version') !== DB_VERSION) {
-    localStorage.removeItem('portfolio_shorts');
-    localStorage.removeItem('portfolio_longs');
-    localStorage.setItem('portfolio_db_version', DB_VERSION);
-  }
-  // 1. Check localStorage first (instant & reliable)
+// Synchronously load saved videos from localStorage immediately BEFORE anything renders
+(function() {
   try {
     const locShorts = localStorage.getItem('portfolio_shorts');
     if (locShorts) {
       const arr = JSON.parse(locShorts);
-      if (arr && arr.length > 0) {
+      if (Array.isArray(arr) && arr.length > 0) {
         window.SHORTS = arr.map((v, i) => ({
           title: v.title || `Short #${i+1}`,
           kind: v.genre || v.kind || 'Gym & Fitness',
@@ -457,79 +446,31 @@ let FILMS = window.FILMS || [];
           role: v.role || 'Edit · sound design · color',
           poster: v.thumbnail || v.poster || 'profile.jpg',
           src: v.videoUrl || v.src || '',
-          hue: v.hue || (190 + (i * 13) % 160)
+          hue: v.hue || (180 + (i * 13) % 170)
         }));
-        SHORTS = window.SHORTS;
-        if (typeof renderDrum === 'function') renderDrum();
       }
     }
     const locLongs = localStorage.getItem('portfolio_longs');
     if (locLongs) {
       const arr = JSON.parse(locLongs);
-      if (arr && arr.length > 0) {
+      if (Array.isArray(arr) && arr.length > 0) {
         window.FILMS = arr.map((v, i) => ({
           title: v.title || `Film #${i+1}`,
           kind: v.genre || v.kind || 'Long-form Video',
           dur: v.duration || v.dur || '3:00',
           poster: v.thumbnail || v.poster || 'profile.jpg',
           src: v.videoUrl || v.src || '',
-          hue: v.hue || (210 + (i * 17) % 140)
+          hue: v.hue || (200 + (i * 17) % 150)
         }));
-        FILMS = window.FILMS;
-        if (typeof renderFilms === 'function') renderFilms();
-      }
-    }
-  } catch(e) {}
-
-  // 2. Sync from Firebase Firestore in background
-  try {
-    if (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
-      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-      
-      const shortsSnap = await db.collection('shortVideos').get();
-      if (!shortsSnap.empty) {
-        const fireShorts = shortsSnap.docs.map((d, i) => {
-          const v = d.data();
-          return {
-            title: v.title || 'Short Video',
-            kind: v.genre || 'Reels',
-            dur: v.duration || '0:30',
-            role: 'Edit · sound design · color',
-            poster: v.thumbnail || 'profile.jpg',
-            src: v.videoUrl || '',
-            hue: 190 + (i * 13) % 160
-          };
-        });
-        if (fireShorts.length > 0) {
-          window.SHORTS = fireShorts;
-          if (typeof renderDrum === 'function') renderDrum();
-        }
-      }
-
-      const longsSnap = await db.collection('longVideos').get();
-      if (!longsSnap.empty) {
-        const fireLongs = longsSnap.docs.map((d, i) => {
-          const v = d.data();
-          return {
-            title: v.title || 'Long Video',
-            kind: v.genre || 'Film',
-            dur: v.duration || '3:00',
-            poster: v.thumbnail || 'profile.jpg',
-            src: v.videoUrl || '',
-            hue: 210 + (i * 17) % 140
-          };
-        });
-        if (fireLongs.length > 0) {
-          window.FILMS = fireLongs;
-          if (typeof renderFilms === 'function') renderFilms();
-        }
       }
     }
   } catch(e) {
-    console.log('Firestore fetch skipped:', e);
+    console.warn('localStorage read error:', e);
   }
 })();
+
+let SHORTS = window.SHORTS || [];
+let FILMS = window.FILMS || [];
 
 
 /* Your photo. src: path or data URI of the image. layout: 'beside' (next to the name) or 'behind' (blurred behind the name).
