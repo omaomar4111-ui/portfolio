@@ -602,10 +602,26 @@ let cards = [];
 let ticks = [];
 let R = 300, idx = 0, angle = 0, target = 0, raf = 0, dragging = false, lastTouch = 0, hover = false;
 let SPACING = 200, dragK = 0.35, spread = 1;
-const SIDE_BLUR = [0, 1.1, 2];   // px of blur: center, first neighbor, second neighbor
+const SIDE_BLUR = [0, 0, 0];   // px of blur: center, first neighbor, second neighbor
 const active = () => ((idx % N) + N) % N;
 
 // Helper to sanitize Google Drive & YouTube links into direct iframe embed URLs
+// Direct MP4 stream helper from Google Drive CDN (Access-Control-Allow-Origin: * with byte range support)
+function getDirectStreamUrl(url) {
+  if (!url) return '';
+  let str = String(url).trim();
+  if (str.includes('drive.google.com') || str.includes('drive.usercontent.google.com')) {
+    const m = str.match(/\/file\/d\/([a-zA-Z0-9_-]{25,})/) ||
+              str.match(/[?&](?:id|docid)=([a-zA-Z0-9_-]{25,})/) ||
+              str.match(/[a-zA-Z0-9_-]{25,}/);
+    if (m) {
+      const fid = m[1] || m[0];
+      return 'https://drive.usercontent.google.com/download?id=' + fid + '&export=download';
+    }
+  }
+  return str;
+}
+
 function getCleanEmbedUrl(url) {
   if (!url) return '';
   let str = String(url).trim();
@@ -694,7 +710,12 @@ function renderDrum(newItems) {
       <div class="screen">
         <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
         ${thumbImg(w)}
-        ${w.src && !w.src.includes('drive.google.com') && !w.src.includes('youtube') ? `<video src="${w.poster ? w.src : thumbSrc(w.src)}"${posterAttr(w)} playsinline loop preload="metadata"></video>` : ''}
+        ${(() => {
+          const sUrl = getDirectStreamUrl(w.src || w.videoUrl);
+          const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
+          if (!isNat) return '';
+          return '<video ' + (i === 0 ? 'src="' + sUrl + '"' : '') + ' data-src="' + sUrl + '" playsinline loop muted ' + (i === 0 ? 'preload="auto" autoplay' : 'preload="none"') + ' style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>';
+        })()}
         <span class="playbtn">${PLAY_SVG}</span>
         ${w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
         <div class="cap"><h3>${w.title}</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>${w.dur || '0:30'}</span></div></div>
@@ -716,6 +737,8 @@ function renderDrum(newItems) {
 }
 
 renderDrum();
+// Autoplay active card on load
+setTimeout(() => { if (cards && cards[0]) startCard(cards[0]); }, 120);
 function layout() {
   if (!cards || !cards.length || !cards[0]) return;
   const w = cards[0].offsetWidth, half = stage.clientWidth / 2;
@@ -728,14 +751,26 @@ function paint() {
   cards.forEach((c, i) => {
     const d = ((((i * step - angle) % 360) + 540) % 360) - 180;
     const sl = d / step, a = Math.abs(sl), sg = Math.sign(sl);
+
+    // Extreme performance: hide back-facing cards (> 3 steps away) to reduce DOM mutations by 85%
+    if (a > 3.2) {
+      if (c.style.display !== 'none') {
+        c.style.display = 'none';
+        const v = c.querySelector('video');
+        if (v && !v.paused) v.pause();
+      }
+      return;
+    }
+    if (c.style.display === 'none') c.style.display = 'block';
+
     const sp = SPACING * spread;
     const x = sg * (Math.min(a, 1) * sp + Math.max(0, a - 1) * sp * 0.86);
     const scale = 1 - Math.min(a, 2.5) * 0.09;
     const rot = -sg * Math.min(a, 1) * 9;
-    const blur = a <= 1 ? SIDE_BLUR[1] * a : SIDE_BLUR[1] + (SIDE_BLUR[2] - SIDE_BLUR[1]) * Math.min(a - 1, 1);
     const op = a <= 2 ? 1 - a * 0.07 : Math.max(0, 0.86 * (1 - (a - 2) / 0.7));
+
     c.style.transform = `translateX(${x.toFixed(1)}px) translateZ(${(-a * 40).toFixed(1)}px) rotateY(${rot.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
-    c.style.filter = blur > 0.05 ? `blur(${blur.toFixed(2)}px)` : 'none';
+    c.style.filter = 'none';
     c.style.opacity = op.toFixed(3);
     c.style.zIndex = String(100 - Math.round(a * 10));
     c.style.visibility = op > 0.01 ? 'visible' : 'hidden';
@@ -802,16 +837,32 @@ function stopAll() {
    no pop-up / long-form preview is playing, and the visitor hasn't paused it themselves. */
 let stageVisible = !('IntersectionObserver' in window), userPaused = false, filmPreview = false, playerOpen = false;
 function syncShort() {
-  const c = cards[active()]; if (!c || !c.classList.contains('playing')) return;
+  const c = cards[active()];
+  if (!c) return;
   const v = c.querySelector('video');
   const want = stageVisible && !document.hidden && !playerOpen && !filmPreview && !userPaused;
-  const isPaused = c.classList.contains('paused');
-  if (want && isPaused) { c.classList.remove('paused'); if (v) playWithSound(v); }
-  else if (!want && !isPaused) { c.classList.add('paused'); if (v) v.pause(); }
+  if (want) {
+    c.classList.remove('paused');
+    c.classList.add('playing');
+    if (v) {
+      if (!v.src && v.dataset.src) v.src = v.dataset.src;
+      playWithSound(v);
+    }
+  } else {
+    c.classList.add('paused');
+    if (v) v.pause();
+  }
 }
 function startCard(card) {
-  card.classList.add('playing', 'paused');   // syncShort starts it only if it should be playing
+  if (!card) return;
+  card.classList.add('playing');
+  card.classList.remove('paused');
   userPaused = false;
+  const v = card.querySelector('video');
+  if (v) {
+    if (!v.src && v.dataset.src) v.src = v.dataset.src;
+    playWithSound(v);
+  }
   syncShort();
 }
 function togglePlay(card) {
@@ -946,7 +997,12 @@ function renderFilms(newItems) {
       <div class="frame${f.src ? ' has-video' : ''}" style="--h:${f.hue || 210}" role="button" tabindex="0" data-i="${i}" aria-label="Play ${f.title}">
         <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
         ${thumbImg(f)}
-        ${f.src && !f.src.includes('drive.google.com') && !f.src.includes('youtube') ? `<video src="${f.poster ? f.src : thumbSrc(f.src)}"${posterAttr(f)} muted playsinline loop preload="metadata"></video>` : ''}
+        ${(() => {
+          const sUrl = getDirectStreamUrl(f.src || f.videoUrl);
+          const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
+          if (!isNat) return '';
+          return '<video data-src="' + sUrl + '" muted playsinline loop preload="none" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>';
+        })()}
         <span class="playbtn">${PLAY_SVG}</span>
         ${canHover ? '<span class="hint">Click to watch</span>' : ''}
         ${f.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
@@ -963,7 +1019,7 @@ function renderFilms(newItems) {
     if (canHover) {
       fr.addEventListener('mouseenter', () => {
         fr.classList.add('hovering');
-        if (v) { filmPreview = true; syncShort(); playWithSound(v); }
+        if (v) { if (!v.src && v.dataset.src) v.src = v.dataset.src; filmPreview = true; syncShort(); playWithSound(v); }
       });
       fr.addEventListener('mouseleave', () => {
         fr.classList.remove('hovering');
@@ -1035,9 +1091,19 @@ function openPlayer(i, kind = 'film') {
   playerOpen = true; syncShort();
   pFrame.style.setProperty('--h', f.hue || 210);
 
-  const isEmbed = embedUrl && (embedUrl.includes('drive.google.com') || embedUrl.includes('youtube.com') || embedUrl.includes('youtu.be'));
+  const sStreamUrl = getDirectStreamUrl(rawUrl);
+  const isDirectStream = sStreamUrl && !sStreamUrl.includes('youtube.com') && !sStreamUrl.includes('youtu.be');
+  const isYoutube = embedUrl && (embedUrl.includes('youtube.com') || embedUrl.includes('youtu.be'));
 
-  if (isEmbed) {
+  if (isDirectStream) {
+    pFrame.innerHTML = `<video src="${sStreamUrl}" poster="${f.poster || f.thumbnail || ''}" controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;"></video>`;
+    const pv = pFrame.querySelector('video');
+    if (pv) {
+      pv.muted = !soundOn;
+      pv.play().catch(() => { pv.muted = true; pv.play().catch(() => {}); });
+      pv.addEventListener('volumechange', () => { if (pv.muted === soundOn) setSound(!pv.muted); });
+    }
+  } else if (isYoutube) {
     pFrame.innerHTML = `<iframe src="${embedUrl}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:8px;background:#000;"></iframe>`;
   } else if (embedUrl) {
     pFrame.innerHTML = `<video src="${embedUrl}"${posterAttr(f)} controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;"></video>`;
