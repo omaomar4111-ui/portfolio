@@ -6,7 +6,266 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+/* =========================================================================
+   TikTok / Reels Style Vertical Scroll Feed CSS
+   ========================================================================= */
+.feed-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-block: 20px 40px;
+}
+.feed-top-bar {
+  width: min(92vw, 420px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: rgba(14, 15, 20, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  margin-bottom: 14px;
+  z-index: 10;
+}
+.feed-mute-btn {
+  padding: 6px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 999px;
+}
+.feed-container {
+  position: relative;
+  width: 100%;
+  height: min(86vh, 760px);
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 28px;
+  border: 1px solid var(--line);
+  background: #060608;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: 30px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.feed-container::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+.feed-track {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+.feed-card {
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  flex: 0 0 auto;
+  position: relative;
+  width: min(88vw, 380px);
+  height: min(78vh, 680px);
+  aspect-ratio: 9 / 16;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #08080c;
+  border: 2px solid #1a1b22;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  opacity: 0.45;
+  transform: scale(0.92);
+  cursor: pointer;
+  user-select: none;
+}
+.feed-card.active {
+  opacity: 1;
+  transform: scale(1);
+  border-color: var(--accent);
+  box-shadow: 0 25px 60px -10px rgba(242, 165, 65, 0.28), 0 0 0 1px var(--accent);
+  z-index: 5;
+}
+.feed-media-box {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  border-radius: inherit;
+}
+.feed-media-box video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  z-index: 2;
+}
+.feed-media-box iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #000;
+  border-radius: inherit;
+  z-index: 2;
+}
+.feed-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  transition: opacity 0.3s ease;
+}
+.feed-card.playing .feed-thumb {
+  opacity: 0;
+  pointer-events: none;
+}
+.feed-art-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(90% 55% at 25% 15%, hsl(var(--h) 85% 62% / .85), transparent 65%),
+    radial-gradient(70% 50% at 80% 85%, hsl(calc(var(--h) + 50) 80% 55% / .5), transparent 70%),
+    linear-gradient(165deg, hsl(var(--h) 55% 20%), hsl(calc(var(--h) + 30) 45% 8%));
+}
+.feed-art-bg b {
+  position: absolute;
+  right: 14px;
+  top: 36%;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 7rem;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,.2);
+  letter-spacing: -.05em;
+}
+.feed-overlay-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 25%, transparent 60%, rgba(0,0,0,0.85) 100%);
+  z-index: 3;
+  pointer-events: none;
+}
+.feed-meta-overlay {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 4;
+  color: #fff;
+  pointer-events: auto;
+}
+.feed-meta-overlay h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1.2;
+  margin: 0 0 6px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+.feed-meta-overlay p {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  margin: 0 0 8px;
+  color: rgba(255,255,255,0.85);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+}
+.feed-progress-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.feed-progress-bar i {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.1s linear;
+}
+.feed-card-play-btn {
+  position: absolute;
+  z-index: 4;
+  top: 50%;
+  left: 50%;
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.4);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.25s ease;
+}
+.feed-card-play-btn:hover {
+  transform: scale(1.1);
+}
+.feed-card-play-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+  margin-left: 3px;
+}
+.feed-card.playing:not(.paused) .feed-card-play-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+.feed-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 4;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(0,0,0,0.6);
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+}
+.feed-dur-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 4;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  background: rgba(0,0,0,0.6);
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+}
+@media (max-width: 600px) {
+  .feed-card {
+    width: min(94vw, 360px);
+    height: min(76vh, 600px);
+  }
+}
+
+</style>
 <title>Omar Mostafa Portfolio</title>
 <!-- ===== Browser tab icon + link preview (WhatsApp, Facebook, LinkedIn, X...) =====
      Upload icon.png, favicon-32.png, apple-touch-icon.png and preview.jpg next to index.html.
@@ -424,7 +683,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
     <a class="brand" href="#top">Portfolio</a>
     <nav aria-label="Sections">
       <a href="#shorts">Short-form</a>
-      <a href="#films">Long-form</a>
+      
       <a href="#services">Services</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -450,29 +709,25 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
     <section id="shorts" aria-labelledby="shorts-h">
       <div class="sec-head">
         <h2 id="shorts-h">Short-form</h2>
-        <span class="mono">9:16 &nbsp;·&nbsp; drag, swipe or use arrow keys</span>
+        <span class="mono">9:16 &nbsp;·&nbsp; scroll or swipe down to watch</span>
       </div>
 
-      <div class="stage" id="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Short-form videos. Use left and right arrows to rotate, Enter to play.">
-        <div class="ring" id="ring"></div>
-      </div>
-
-      <div class="info">
-        <div aria-live="polite">
-          <div class="mono"><span id="i-kind"></span> &nbsp;·&nbsp; <span id="i-dur" class="tc"></span></div>
-          <h3 id="i-title"></h3>
-          <p id="i-role"></p>
+      <div class="feed-wrapper">
+        <div class="feed-top-bar">
+          <div class="feed-indicator"><span id="feed-count" class="mono">01 / 46</span></div>
+          <div class="feed-sound-toggle">
+            <button type="button" class="btn btn-ghost feed-mute-btn" id="feed-mute-all" aria-label="Toggle Sound">
+              <span id="feed-sound-icon">🔊 Sound ON</span>
+            </button>
+          </div>
         </div>
-        <div class="ctrl">
-          <span class="mono" id="i-count" style="margin-right:6px"></span>
-          <button type="button" id="prev" aria-label="Previous video"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
-          <button type="button" id="next" aria-label="Next video"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+        <div class="feed-container" id="feed-container" tabindex="0" role="region" aria-label="Vertical Video Feed">
+          <div class="feed-track" id="feed-track"></div>
         </div>
       </div>
-      <div class="ticks" id="ticks"></div>
     </section>
 
-    <section id="films" aria-labelledby="films-h">
+    <section id="films" aria-labelledby="films-h" style="display:none;">
       <div class="sec-head">
         <h2 id="films-h">Long-form</h2>
         <span class="mono">16:9</span>
@@ -515,7 +770,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
         <h3 id="p-title"></h3>
         <span class="mono" id="p-sub"></span>
       </div>
-      <a id="p-drive-link" href="#" target="_blank" rel="noopener" class="btn" style="padding:6px 14px;font-size:12px;margin-left:auto;text-decoration:none;display:none;">مشاهدة في Drive ↗</a>
+      
     </div>
   </dialog>
 
@@ -749,39 +1004,248 @@ const thumbImg = (x, isLazy = false) => {
 };
 
 // =========================================================================
-// 3D Carousel & Lightbox State Variables (Top Level)
+// TikTok / Reels Style Vertical Scroll Feed & Autoplay Engine
 // =========================================================================
-const ring = document.getElementById('ring') || $('#ring');
-const stage = document.getElementById('stage') || $('#stage');
-let cards = [];
-let ticks = [];
-let N = (window.SHORTS && window.SHORTS.length) ? window.SHORTS.length : INITIAL_GYM_VIDEOS.length;
-let step = N ? 360 / N : 7.8261;
-let R = 1550;
-let idx = 0;
-let angle = 0;
-let target = 0;
-let raf = 0;
-let dragging = false;
-let sx = 0, sy = 0, st = 0, sa = 0;
-let moved = false;
-let scrolled = false;
-let downCard = null;
-let downTarget = null;
-let lastTouch = 0;
-let hover = false;
-let soundOn = false;
+const feedContainer = document.getElementById('feed-container');
+const feedTrack = document.getElementById('feed-track');
+const feedCountEl = document.getElementById('feed-count');
+const feedMuteBtn = document.getElementById('feed-mute-all');
+const feedSoundIcon = document.getElementById('feed-sound-icon');
+
+let feedCards = [];
+let soundOn = true;
 let playerOpen = false;
-let stageVisible = true;
-let userPaused = false;
-let filmPreview = false;
-let lastOpenPlayerTime = 0;
+let userPausedMap = new Map();
+let currentActiveCard = null;
+let feedObserver = null;
 
-const active = () => ((Math.round(angle / step) % N) + N) % N;
+// Sound toggle button for feed
+if (feedMuteBtn) {
+  feedMuteBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    refreshFeedSound();
+  });
+}
 
-// =========================================================================
-// Modal Lightbox Player (Google Drive iframe & Direct video)
-// =========================================================================
+function refreshFeedSound() {
+  if (feedSoundIcon) {
+    feedSoundIcon.textContent = soundOn ? '🔊 Sound ON' : '🔇 Muted';
+  }
+  if (feedMuteBtn) {
+    feedMuteBtn.setAttribute('aria-label', soundOn ? 'Mute all videos' : 'Unmute videos');
+  }
+  feedCards.forEach(card => {
+    const v = card.querySelector('video');
+    if (v) v.muted = !soundOn;
+  });
+}
+
+// Render 46 vertical cards in the TikTok feed
+function renderVerticalFeed(newItems) {
+  if (newItems && Array.isArray(newItems) && newItems.length) {
+    window.SHORTS = newItems;
+    SHORTS = newItems;
+  }
+  const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
+  if (!list.length || !feedTrack) return;
+
+  feedTrack.innerHTML = list.map((w, i) => {
+    const safeTitle = escapeHTML(w.title || `Gym Workout #${String(i + 1).padStart(2, '0')}`);
+    const safeDur = escapeHTML(w.dur || w.duration || '0:30');
+    const safeKind = escapeHTML(w.kind || w.genre || 'Gym & Fitness');
+    const safeRole = escapeHTML(w.role || 'Edit · sound design · color');
+    const sUrl = sanitizeUrl(getDirectStreamUrl(w.src || w.videoUrl));
+    const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
+    const fid = extractDriveId(w.fileId || w.id || w.videoUrl || w.src) || '';
+    const rawP = w.thumbnail || w.poster || (fid ? 'https://drive.google.com/thumbnail?id=' + fid + '&sz=w600' : '');
+    const p = sanitizeUrl(rawP);
+
+    return `
+    <article class="feed-card${w.src ? ' has-video' : ''}" data-index="${i}" style="--h:${Number(w.hue) || (190 + (i * 13) % 160)}" aria-label="${safeTitle}">
+      <div class="feed-media-box">
+        <div class="feed-art-bg"><b>${String(i + 1).padStart(2, '0')}</b></div>
+        ${p ? `<img class="feed-thumb" src="${p}" alt="${safeTitle}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t){this.dataset.t=1;this.src='https://drive.google.com/thumbnail?id=${fid}&sz=w600';}">` : ''}
+        <video class="feed-video" data-src="${sUrl}" ${i === 0 ? `src="${sUrl}"` : ''} playsinline loop ${soundOn ? '' : 'muted'} preload="${i === 0 ? 'auto' : 'none'}"></video>
+        <span class="feed-badge">${safeKind}</span>
+        <span class="feed-dur-badge">${safeDur}</span>
+        <div class="feed-overlay-gradient"></div>
+        <button type="button" class="feed-card-play-btn" aria-label="Play/Pause ${safeTitle}">${PLAY_SVG}</button>
+        <div class="feed-meta-overlay">
+          <h3>${safeTitle}</h3>
+          <p>${safeRole}</p>
+          <div class="feed-progress-bar"><i></i></div>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+
+  feedCards = [...feedTrack.querySelectorAll('.feed-card')];
+  attachFeedCardEvents();
+  setupFeedIntersectionObserver();
+
+  // Activate first card initially
+  if (feedCards[0]) {
+    feedCards[0].classList.add('active');
+    updateCounterBadge(0);
+    setTimeout(() => {
+      playCardVideo(feedCards[0]);
+    }, 150);
+  }
+}
+
+function updateCounterBadge(index) {
+  if (feedCountEl) {
+    const total = feedCards.length || 46;
+    feedCountEl.textContent = `${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
+  }
+}
+
+function attachFeedCardEvents() {
+  feedCards.forEach((card, i) => {
+    const video = card.querySelector('video');
+    const playBtn = card.querySelector('.feed-card-play-btn');
+    const pbar = card.querySelector('.feed-progress-bar i');
+
+    if (video) {
+      video.muted = !soundOn;
+      video.addEventListener('timeupdate', () => {
+        if (video.duration && pbar) {
+          pbar.style.width = (video.currentTime / video.duration * 100) + '%';
+        }
+      });
+      video.addEventListener('ended', () => {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      });
+    }
+
+    // Toggle play/pause or open lightbox on double tap / action
+    card.addEventListener('click', (e) => {
+      const isPlayBtn = e.target.closest('.feed-card-play-btn');
+      if (isPlayBtn) {
+        e.stopPropagation();
+        toggleCardPlayback(card);
+        return;
+      }
+      toggleCardPlayback(card);
+    });
+
+    // Keyboard accessibility: Enter or Space toggles playback
+    card.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        toggleCardPlayback(card);
+      }
+    });
+  });
+}
+
+function toggleCardPlayback(card) {
+  if (!card) return;
+  const v = card.querySelector('video');
+  const index = +card.dataset.index;
+  const isPaused = card.classList.contains('paused') || (v && v.paused);
+
+  if (isPaused) {
+    userPausedMap.set(index, false);
+    playCardVideo(card);
+  } else {
+    userPausedMap.set(index, true);
+    pauseCardVideo(card);
+  }
+}
+
+function playCardVideo(card) {
+  if (!card) return;
+  const v = card.querySelector('video');
+  const index = +card.dataset.index;
+  if (userPausedMap.get(index)) return; // Don't auto-resume if user manually paused
+
+  card.classList.add('playing');
+  card.classList.remove('paused');
+
+  if (v) {
+    if (!v.src && v.dataset.src) {
+      v.src = v.dataset.src;
+    }
+    v.muted = !soundOn;
+    const p = v.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => {
+        // Autoplay policy fallback: mute and retry
+        v.muted = true;
+        v.play().catch(() => {});
+      });
+    }
+  }
+
+  // Preload neighboring videos (previous & next)
+  preloadNeighbors(index);
+}
+
+function pauseCardVideo(card) {
+  if (!card) return;
+  card.classList.remove('playing');
+  card.classList.add('paused');
+  const v = card.querySelector('video');
+  if (v && !v.paused) {
+    v.pause();
+  }
+}
+
+function preloadNeighbors(curIndex) {
+  const total = feedCards.length;
+  if (!total) return;
+  const nextIdx = (curIndex + 1) % total;
+  const prevIdx = (curIndex - 1 + total) % total;
+  [nextIdx, prevIdx].forEach(k => {
+    const c = feedCards[k];
+    if (c) {
+      const v = c.querySelector('video');
+      if (v && !v.src && v.dataset.src) {
+        v.preload = 'metadata';
+        v.src = v.dataset.src;
+      }
+    }
+  });
+}
+
+// IntersectionObserver for TikTok Feed: detects the active video in viewport center
+function setupFeedIntersectionObserver() {
+  if (feedObserver) {
+    feedObserver.disconnect();
+  }
+
+  feedObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const card = entry.target;
+      const index = +card.dataset.index;
+
+      if (entry.isIntersecting) {
+        // Card entered the active viewing threshold
+        if (currentActiveCard && currentActiveCard !== card) {
+          currentActiveCard.classList.remove('active');
+          pauseCardVideo(currentActiveCard);
+        }
+        card.classList.add('active');
+        currentActiveCard = card;
+        updateCounterBadge(index);
+        playCardVideo(card);
+      } else {
+        // Card left the view
+        card.classList.remove('active');
+        pauseCardVideo(card);
+      }
+    });
+  }, {
+    root: feedContainer,
+    threshold: 0.65 // Triggers when at least 65% of the card is visible in the center
+  });
+
+  feedCards.forEach(card => feedObserver.observe(card));
+}
+
+// Lightbox modal fallback player (without "مشاهدة في Drive")
 function openLightbox(urlOrIndex, isVertical = true) {
   if (urlOrIndex === undefined || urlOrIndex === null) return;
 
@@ -792,14 +1256,12 @@ function openLightbox(urlOrIndex, isVertical = true) {
   let videoObj = null;
 
   if (typeof urlOrIndex === 'number') {
-    const list = isVertical 
-      ? ((window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS) 
-      : ((window.FILMS && window.FILMS.length) ? window.FILMS : INITIAL_GYM_VIDEOS);
+    const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
     videoObj = list[urlOrIndex] || list[0] || {};
     url = videoObj.videoUrl || videoObj.src || videoObj.url || '';
     title = videoObj.title || ('Gym Workout #' + String(urlOrIndex + 1).padStart(2, '0'));
-    dur = videoObj.dur || videoObj.duration || (isVertical ? '0:30' : '3:00');
-    kind = videoObj.kind || videoObj.genre || (isVertical ? 'Gym & Fitness' : 'Film');
+    dur = videoObj.dur || videoObj.duration || '0:30';
+    kind = videoObj.kind || videoObj.genre || 'Gym & Fitness';
   } else if (typeof urlOrIndex === 'string') {
     url = urlOrIndex;
   } else if (typeof urlOrIndex === 'object') {
@@ -814,18 +1276,11 @@ function openLightbox(urlOrIndex, isVertical = true) {
     url = `https://drive.google.com/file/d/${videoObj.fileId || videoObj.id}/preview`;
   }
 
-  if (!url) {
-    console.warn('openLightbox: No URL found for video', urlOrIndex);
-    return;
-  }
+  if (!url) return;
 
   const embedUrl = getCleanEmbedUrl(url);
-
-  console.log("Clicked video:", url);
-  console.log("openLightbox loading iframe with embedUrl:", embedUrl);
-
   const box = document.getElementById('lbBox') || document.querySelector('.p-frame');
-  const lbModal = document.getElementById('lightbox') || document.getElementById('player') || document.querySelector('.lightbox');
+  const lbModal = document.getElementById('lightbox') || document.querySelector('.lightbox');
 
   if (box) {
     if (embedUrl.includes('drive.google.com') || embedUrl.includes('youtube.com')) {
@@ -839,11 +1294,7 @@ function openLightbox(urlOrIndex, isVertical = true) {
     lbModal.classList.toggle('vertical', !!isVertical);
     lbModal.classList.add('open');
     if (typeof lbModal.showModal === 'function') {
-      try {
-        if (!lbModal.open) lbModal.showModal();
-      } catch (_) {
-        lbModal.setAttribute('open', '');
-      }
+      try { if (!lbModal.open) lbModal.showModal(); } catch (_) { lbModal.setAttribute('open', ''); }
     } else {
       lbModal.setAttribute('open', '');
     }
@@ -854,32 +1305,16 @@ function openLightbox(urlOrIndex, isVertical = true) {
   if (pTitle) pTitle.textContent = title;
   const pSub = document.getElementById('p-sub');
   if (pSub) pSub.textContent = `${kind} · ${dur}`;
-  const dLink = document.getElementById('p-drive-link');
-  if (dLink) {
-    if (url.includes('drive.google.com') || embedUrl.includes('drive.google.com')) {
-      dLink.href = embedUrl.replace('/preview', '/view');
-      dLink.style.display = 'inline-flex';
-    } else {
-      dLink.style.display = 'none';
-    }
-  }
 
-  document.querySelectorAll('.film .frame video').forEach(v => v.pause());
+  // Pause background feed videos while modal is open
+  feedCards.forEach(c => pauseCardVideo(c));
   document.documentElement.style.overflow = 'hidden';
   playerOpen = true;
-  if (typeof syncShort === 'function') syncShort();
-}
-
-function safeOpenPlayer(i, kind = 'short') {
-  const now = performance.now();
-  if (now - lastOpenPlayerTime < 250) return;
-  lastOpenPlayerTime = now;
-  openLightbox(i, kind === 'short');
 }
 
 function closeLightbox() {
   const box = document.getElementById('lbBox') || document.querySelector('.p-frame');
-  const lbModal = document.getElementById('lightbox') || document.getElementById('player') || document.querySelector('.lightbox');
+  const lbModal = document.getElementById('lightbox') || document.querySelector('.lightbox');
   if (box) box.innerHTML = '';
   if (lbModal) {
     lbModal.classList.remove('open');
@@ -889,407 +1324,38 @@ function closeLightbox() {
   }
   document.documentElement.style.overflow = '';
   playerOpen = false;
-  filmPreview = false;
-  if (typeof syncShort === 'function') syncShort();
+  // Resume active card
+  if (currentActiveCard) {
+    playCardVideo(currentActiveCard);
+  }
 }
 
 window.openLightbox = openLightbox;
-window.openPlayer = function(i, kind = 'short') { openLightbox(i, kind === 'short'); };
-window.safeOpenPlayer = safeOpenPlayer;
+window.openPlayer = function(i) { openLightbox(i, true); };
 window.closeLightbox = closeLightbox;
 window.closePlayer = closeLightbox;
+window.renderDrum = renderVerticalFeed;
 
-// =========================================================================
-// 3D Drum Carousel (Mathematical Cylinder)
-// =========================================================================
-function attachCardListeners() {
-  cards.forEach((card, i) => {
-    const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
-    const video = list[i] || {};
+// Initial render
+renderVerticalFeed();
 
-    // 1. Direct click on play button always opens lightbox
-    const playBtn = card.querySelector('.playbtn');
-    if (playBtn) {
-      playBtn.style.cursor = 'pointer';
-      playBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        console.log("Clicked video play button:", video.videoUrl || video.src);
-        touched();
-        safeOpenPlayer(i, 'short');
-      });
-    }
-
-    // 2. Direct click on card: opens lightbox
-    card.style.cursor = 'pointer';
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('.snd-btn')) return;
-      if (moved) return; // user was actively dragging
-      e.stopPropagation();
-      console.log("Clicked video card:", video.videoUrl || video.src);
-      touched();
-      safeOpenPlayer(i, 'short');
-    });
-
-    // 3. Time update tracking
-    const v = card.querySelector('video'), bar = card.querySelector('.bar i'), cur = card.querySelector('.cur');
-    if (v) {
-      v.muted = !soundOn;
-      v.addEventListener('timeupdate', () => {
-        if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + '%';
-        cur.textContent = fmt(v.currentTime);
-      });
-    } else if (bar) {
-      bar.addEventListener('animationend', () => { if (card.classList.contains('playing')) restartBar(card); });
-    }
-  });
-}
-
-function renderDrum(newItems) {
-  if (newItems && Array.isArray(newItems) && newItems.length) {
-    window.SHORTS = newItems;
-    SHORTS = newItems;
-  }
-  const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
-  if (!list.length) return;
-  N = list.length;
-  step = 360 / N;
-
-  ring.innerHTML = list.map((w, i) => {
-    const safeTitle = escapeHTML(w.title || `Short #${i + 1}`);
-    const safeDur = escapeHTML(w.dur || '0:30');
-    const sUrl = sanitizeUrl(getDirectStreamUrl(w.src || w.videoUrl));
-    const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
-    const videoTag = isNat
-      ? `<video ${i === 0 ? `src="${sUrl}"` : ''} data-src="${sUrl}" playsinline loop muted ${i === 0 ? 'preload="auto" autoplay' : 'preload="none"'} style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>`
-      : '';
-    return `
-    <article class="card${w.src ? ' has-video' : ''}" data-index="${i}" style="--h:${Number(w.hue) || (190 + (i * 13) % 160)}; --dur:${secs(w.dur || '0:30')}s" aria-label="${safeTitle}">
-      <div class="screen">
-        <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
-        ${thumbImg(w)}
-        ${videoTag}
-        <span class="playbtn" role="button" aria-label="Play ${safeTitle}">${PLAY_SVG}</span>
-        ${w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
-        <div class="cap"><h3>${safeTitle}</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>${safeDur}</span></div></div>
-      </div>
-    </article>`;
-  }).join('');
-
-  cards = [...ring.children];
-
-  const ticksEl = document.getElementById('ticks');
-  if (ticksEl) {
-    ticksEl.innerHTML = list.map((w, i) => `<button type="button" aria-label="Show ${escapeHTML(w.title || '')}"></button>`).join('');
-    ticks = [...ticksEl.children];
-    ticks.forEach((t, i) => t.addEventListener('click', () => { touched(); goToCard(i); }));
-  }
-
-  attachCardListeners();
-  layout();
-  info();
-  if (!reduced && cards[0]) startCard(cards[0]);
-}
-
-function layout() {
-  if (!cards || !cards.length || !cards[0]) return;
-  const cardW = cards[0].offsetWidth || 210;
-  // Calculate exact cylindrical radius for N facets of width cardW
-  R = Math.round((cardW / 2) / Math.tan(Math.PI / N)) + 10;
-
-  // Apply fixed 3D cylinder positioning to each card
-  cards.forEach((c, i) => {
-    const cardAngle = i * step;
-    c.style.transform = `rotateY(${cardAngle.toFixed(4)}deg) translateZ(${R}px)`;
-    c.style.display = 'block';
-  });
-
-  paint();
-}
-
-function paint() {
-  if (!cards || !cards.length) return;
-  // Rotate the cylinder around origin (0, 0, -R)
-  ring.style.transform = `translateZ(-${R}px) rotateY(${-angle.toFixed(4)}deg)`;
-
-  cards.forEach((c, i) => {
-    // Angular distance from the camera center
-    const d = ((((i * step - angle) % 360) + 540) % 360) - 180;
-    const absD = Math.abs(d);
-
-    if (absD < step * 0.55) {
-      c.classList.add('active');
-      c.style.filter = 'brightness(1.08)';
-      c.style.opacity = '1';
-      c.style.zIndex = '60';
-      c.style.pointerEvents = 'auto';
-    } else {
-      c.classList.remove('active');
-      const dim = Math.max(0.42, 1 - (absD / 90) * 0.55);
-      c.style.filter = `brightness(${dim.toFixed(2)})`;
-      c.style.opacity = Math.max(0.32, 1 - (absD / 110)).toFixed(2);
-      c.style.zIndex = String(Math.max(1, 50 - Math.round(absD)));
-      c.style.pointerEvents = absD < 50 ? 'auto' : 'none';
-    }
-  });
-}
-
-function tick() {
-  if (reduced) angle = target; else angle += (target - angle) * 0.14;
-  if (!dragging && Math.abs(target - angle) < 0.05) angle = target;
-  paint();
-  raf = (dragging || angle !== target) ? requestAnimationFrame(tick) : 0;
-}
-const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
-
-/* ---------- Sound Control ---------- */
-const SND_ON = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>';
-const SND_OFF = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w" d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></svg>';
-const audible = () => soundOn;
-function playWithSound(v) {
-  if (!v) return;
-  if (!soundOn) v.muted = true;
-  const pr = v.play();
-  if (pr && typeof pr.catch === 'function') {
-    pr.catch(() => {
-      v.muted = true;
-      v.play().catch(() => {});
-    });
-  }
-}
-function refreshSound() {
-  document.querySelectorAll('.snd-btn').forEach((b) => {
-    b.innerHTML = soundOn ? SND_ON : SND_OFF;
-    b.setAttribute('aria-label', soundOn ? 'Mute' : 'Unmute');
-    b.setAttribute('aria-pressed', String(!soundOn));
-  });
-  document.querySelectorAll('.card video, .film .frame video').forEach((v) => { v.muted = !soundOn; });
-}
-function setSound(on) { soundOn = on; refreshSound(); }
-const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
-function restartBar(card) {
-  const bar = card.querySelector('.bar i');
-  if (bar) {
-    bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
-  }
-}
-function stopAll() {
-  cards.forEach((c) => {
-    c.classList.remove('playing', 'paused');
-    const v = c.querySelector('video');
-    if (v) { v.pause(); v.currentTime = 0; }
-    else restartBar(c);
-  });
-}
-function preloadNeighbors() {
-  if (!cards || !cards.length) return;
-  const cur = active();
-  const next = (cur + 1) % N;
-  const prev = (cur - 1 + N) % N;
-  [next, prev].forEach(k => {
-    const c = cards[k];
-    if (c) {
-      const v = c.querySelector('video');
-      if (v && !v.src && v.dataset.src) {
-        v.preload = 'metadata';
-        v.src = v.dataset.src;
-      }
-    }
-  });
-}
-function syncShort() {
-  const c = cards[active()];
-  if (!c) return;
-  const v = c.querySelector('video');
-  const want = stageVisible && !document.hidden && !playerOpen && !filmPreview && !userPaused;
-  if (want) {
-    c.classList.remove('paused');
-    c.classList.add('playing');
-    if (v) {
-      if (!v.src && v.dataset.src) v.src = v.dataset.src;
-      playWithSound(v);
-    }
-    preloadNeighbors();
-  } else {
-    c.classList.add('paused');
-    if (v && !v.paused) v.pause();
-  }
-}
-function startCard(card) {
-  if (!card) return;
-  card.classList.add('playing');
-  card.classList.remove('paused');
-  userPaused = false;
-  const v = card.querySelector('video');
-  if (v) {
-    if (!v.src && v.dataset.src) v.src = v.dataset.src;
-    playWithSound(v);
-  }
-  syncShort();
-}
-function togglePlay(card) {
-  if (!card.classList.contains('playing')) { startCard(card); return; }
-  userPaused = !card.classList.contains('paused');
-  syncShort();
-}
-function info() {
-  const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS;
-  const w = list[active()] || list[0] || {};
-  const kEl = $('#i-kind'), dEl = $('#i-dur'), tEl = $('#i-title'), rEl = $('#i-role'), cEl = $('#i-count');
-  if (kEl) kEl.textContent = w.kind || '';
-  if (dEl) dEl.textContent = w.dur || '';
-  if (tEl) tEl.textContent = w.title || '';
-  if (rEl) rEl.textContent = w.role || '';
-  if (cEl) cEl.textContent = `${String(active() + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`;
-  ticks.forEach((t, i) => t.setAttribute('aria-current', i === active() ? 'true' : 'false'));
-}
-function go(i) {
-  const changed = i !== idx;
-  if (changed) stopAll();
-  idx = i; target = idx * step; info(); kick();
-  if (!reduced && (changed || !cards[active()].classList.contains('playing'))) startCard(cards[active()]);
-}
-function goToCard(k) {
-  let diff = ((k - active()) % N + N) % N;
-  if (diff > N / 2) diff -= N;
-  go(idx + diff);
-}
-const touched = () => { lastTouch = Date.now(); };
-
-const prevBtn = document.getElementById('prev');
-if (prevBtn) prevBtn.addEventListener('click', () => { touched(); go(idx - 1); });
-const nextBtn = document.getElementById('next');
-if (nextBtn) nextBtn.addEventListener('click', () => { touched(); go(idx + 1); });
-
-// =========================================================================
-// Drag & Touch Gestures on Stage
-// =========================================================================
-stage.addEventListener('pointerdown', (e) => {
-  if (e.target.closest('.snd-btn')) return;
-  dragging = true;
-  moved = false;
-  scrolled = false;
-  sx = e.clientX;
-  sy = e.clientY;
-  st = performance.now();
-  sa = angle;
-  downCard = e.target.closest('.card');
-  downTarget = e.target;
-  touched();
-  kick();
-});
-
-stage.addEventListener('pointermove', (e) => {
-  if (!dragging) return;
-  const dx = e.clientX - sx;
-  const dy = e.clientY - sy;
-  if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) {
-    scrolled = true;
-    return;
-  }
-  if (!scrolled && Math.abs(dx) > 10) {
-    if (!moved) {
-      moved = true;
-      try { stage.setPointerCapture(e.pointerId); } catch (_) {}
-    }
-    const angularSpeed = 360 / (2 * Math.PI * (R || 1500));
-    angle = sa - dx * angularSpeed;
-    target = angle;
-  }
-});
-
-function endDrag(e) {
-  if (!dragging) return;
-  dragging = false;
-  touched();
-  if (moved) {
-    go(Math.round(angle / step));
-    setTimeout(() => { moved = false; }, 80);
-  } else if (!scrolled && downCard) {
-    const k = cards.indexOf(downCard);
-    if (k !== -1) {
-      const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
-      const video = list[k] || {};
-      console.log("Tap on card", k, video.videoUrl || video.src);
-      safeOpenPlayer(k, 'short');
-    }
-  }
-  kick();
-}
-
-stage.addEventListener('pointerup', endDrag);
-stage.addEventListener('pointercancel', endDrag);
-
-stage.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight') { touched(); go(idx + 1); e.preventDefault(); }
-  else if (e.key === 'ArrowLeft') { touched(); go(idx - 1); e.preventDefault(); }
-  else if (e.key === 'Enter') { touched(); openLightbox(active(), true); e.preventDefault(); }
-  else if (e.key === ' ') { touched(); togglePlay(cards[active()]); e.preventDefault(); }
-});
-
-let wheelIdle = 0;
-stage.addEventListener('wheel', (e) => {
-  const dx = e.deltaMode === 1 ? e.deltaX * 16 : e.deltaX;
-  if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
-  e.preventDefault();
-  touched();
-  const angularSpeed = 360 / (2 * Math.PI * (R || 1500));
-  angle += Math.max(-40, Math.min(40, dx)) * angularSpeed;
-  target = angle;
-  paint();
-  clearTimeout(wheelIdle);
-  wheelIdle = setTimeout(() => go(Math.round(angle / step)), 140);
-}, { passive: false });
-
-stage.addEventListener('mouseenter', () => { hover = true; });
-stage.addEventListener('mouseleave', () => { hover = false; });
-
-window.addEventListener('resize', layout);
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
-
-let popupWasPlaying = false;
+// Handle tab focus / visibility
 document.addEventListener('visibilitychange', () => {
-  syncShort();
-  if (document.hidden) document.querySelectorAll('.film .frame video').forEach((v) => v.pause());
-  const pv = document.querySelector('#lbBox video, .p-frame video');
-  if (pv) {
-    if (document.hidden) { popupWasPlaying = !pv.paused; pv.pause(); }
-    else if (popupWasPlaying) { pv.play().catch(() => {}); popupWasPlaying = false; }
+  if (document.hidden) {
+    feedCards.forEach(c => pauseCardVideo(c));
+  } else if (!playerOpen && currentActiveCard) {
+    playCardVideo(currentActiveCard);
   }
 });
 
-// Initial mount
-renderDrum();
-
-if ('IntersectionObserver' in window) {
-  new IntersectionObserver(([e]) => {
-    stageVisible = e.isIntersecting;
-    syncShort();
-  }, { threshold: 0.05, rootMargin: '160px 0px 160px 0px' }).observe(stage);
-}
-
-function tryAutoplay() {
-  if (cards && cards[0]) {
-    const v = cards[0].querySelector('video');
-    if (v) {
-      v.muted = true;
-      const p = v.play();
-      if (p && typeof p.catch === 'function') {
-        p.catch(() => { v.muted = true; v.play().catch(() => {}); });
-      }
-    }
-    startCard(cards[0]);
-  }
-}
-setTimeout(tryAutoplay, 60);
-window.addEventListener('load', tryAutoplay);
+// Unlock audio on first user gesture
 ['click', 'touchstart', 'scroll', 'keydown'].forEach(ev => {
   window.addEventListener(ev, () => {
-    const c = cards[active()];
-    if (c) {
-      const v = c.querySelector('video');
-      if (v && v.paused && !userPaused && !playerOpen) {
-        playWithSound(v);
+    if (currentActiveCard && !playerOpen) {
+      const v = currentActiveCard.querySelector('video');
+      if (v && v.paused && !userPausedMap.get(+currentActiveCard.dataset.index)) {
+        v.muted = !soundOn;
+        v.play().catch(() => {});
       }
     }
   }, { once: true, passive: true });
@@ -1354,6 +1420,7 @@ function renderFilms(newItems) {
 renderFilms();
 
 window.renderCarousel = function(videos) {
+  if (typeof renderVerticalFeed === "function") renderVerticalFeed(videos);
   if (!videos || !videos.length) return;
   const mapped = videos.map((v, i) => ({
     title: v.title || `Short #${i+1}`,
@@ -1538,10 +1605,10 @@ function startFirestoreSync() {
 
     const curSign = (window.SHORTS || []).map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
     const newSign = fullList.map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
-    if (curSign !== newSign || !cards.length) {
+    if (curSign !== newSign || !feedCards.length) {
       window.SHORTS = fullList;
       SHORTS = fullList;
-      if (typeof renderDrum === 'function') renderDrum(fullList);
+      if (typeof renderVerticalFeed === 'function') renderVerticalFeed(fullList);
     }
 
     const filmList = fsLongs.length ? fsLongs : fullList.slice(24);
