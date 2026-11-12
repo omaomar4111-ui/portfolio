@@ -436,6 +436,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js?v=20261111_firestore_v3"></script>
+  <script src="videos.js?v=20261111_gym46_v3"></script>
   <script>
 // Firebase Firestore Integration & Initial Data Setup
 let db = null;
@@ -499,8 +500,8 @@ const INITIAL_GYM_VIDEOS = [
 ];
 
 // Initial memory setup: first 24 shorts, 22 films
-window.SHORTS = INITIAL_GYM_VIDEOS.slice(0, 24);
-window.FILMS = INITIAL_GYM_VIDEOS.slice(24);
+window.SHORTS = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS.slice(0, 24);
+window.FILMS = (window.FILMS && window.FILMS.length) ? window.FILMS : INITIAL_GYM_VIDEOS.slice(24);
 
 // Check if any local overrides exist in localStorage
 try {
@@ -1002,7 +1003,7 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 layout(); info();
-let stageVisible = true;
+stageVisible = true;
 if (!reduced && cards[0]) startCard(cards[0]);
 
 if ('IntersectionObserver' in window) {
