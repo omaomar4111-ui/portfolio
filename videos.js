@@ -493,5 +493,5 @@ window.INITIAL_GYM_VIDEOS = [
 // Carousel displays all 46 gym workout videos
 window.SHORTS = window.INITIAL_GYM_VIDEOS;
 
-// Long-form section is emptied (all videos moved to short-form feed)
-window.FILMS = [];
+// Films showcase section
+window.FILMS = window.INITIAL_GYM_VIDEOS.slice(24);
