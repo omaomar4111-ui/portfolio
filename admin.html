@@ -480,6 +480,30 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       setTimeout(() => t.className = 'toast', 2800);
     }
 
+    function getCleanEmbedUrl(url) {
+      if (!url) return '';
+      let str = String(url).trim();
+      if (str.includes('drive.google.com') || str.includes('drive.usercontent.google.com')) {
+        const m1 = str.match(/\/file\/d\/([a-zA-Z0-9_-]{25,})/);
+        if (m1) return 'https://drive.google.com/file/d/' + m1[1] + '/preview';
+        const m2 = str.match(/[?&](?:id|docid)=([a-zA-Z0-9_-]{25,})/);
+        if (m2) return 'https://drive.google.com/file/d/' + m2[1] + '/preview';
+        const m3 = str.match(/[a-zA-Z0-9_-]{25,}/);
+        if (m3) return 'https://drive.google.com/file/d/' + m3[0] + '/preview';
+      }
+      if (str.includes('youtube.com') || str.includes('youtu.be')) {
+        const vMatch = str.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+        if (vMatch) return 'https://www.youtube.com/embed/' + vMatch[1] + '?autoplay=1';
+        const sMatch = str.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+        if (sMatch) return 'https://www.youtube.com/embed/' + sMatch[1] + '?autoplay=1';
+        const bMatch = str.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+        if (bMatch) return 'https://www.youtube.com/embed/' + bMatch[1] + '?autoplay=1';
+        const eMatch = str.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
+        if (eMatch) return 'https://www.youtube.com/embed/' + eMatch[1] + '?autoplay=1';
+      }
+      return str;
+    }
+
     // إدارة تسجيل الدخول
     if (auth) {
       auth.onAuthStateChanged(user => {

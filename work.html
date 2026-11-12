@@ -239,29 +239,29 @@ section { padding-block: clamp(36px, 6vw, 72px); }
 .film .frame .hint { position: absolute; left: 10px; bottom: 10px; z-index: 2; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #fff; background: rgba(0,0,0,.55); padding: 3px 7px; border-radius: 3px; opacity: 0; transition: opacity .2s; }
 .film .frame.hovering .hint { opacity: 1; }
 
-.player { padding: 0; border: 0; background: transparent; color: var(--fg); width: min(1100px, 92vw); max-width: none; max-height: 92vh; overflow: visible; }
-.player::backdrop { background: rgba(4, 5, 8, .84); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-.player[open] { animation: pop .22s ease-out; position: fixed; inset: 0; margin: auto; z-index: 99999; }
+.player, .lightbox { padding: 0; border: 0; background: transparent; color: var(--fg); width: min(1100px, 92vw); max-width: none; max-height: 92vh; overflow: visible; }
+.player::backdrop, .lightbox::backdrop { background: rgba(4, 5, 8, .84); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.player[open], .player.open, .lightbox[open], .lightbox.open { animation: pop .22s ease-out; position: fixed; inset: 0; margin: auto; z-index: 99999; display: block; }
 @keyframes pop { from { opacity: 0; transform: scale(.96); } }
-.player .p-frame { position: relative; aspect-ratio: 16 / 9; max-height: calc(92vh - 90px); margin-inline: auto; border-radius: 8px; overflow: hidden; background: #050506; outline: 1px solid var(--line); box-shadow: 0 40px 80px -30px rgba(0,0,0,.8); }
-.player .p-frame video, .player .p-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; background: #000; }
-.player .p-frame video { object-fit: contain; }
-.player .p-frame .art b { font-size: clamp(120px, 22vw, 260px); top: 14%; }
-.player .p-empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; color: #fff; }
-.player .p-empty span { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: rgba(0,0,0,.55); padding: 8px 12px; border-radius: 4px; }
-.player .p-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 20px; padding-top: 14px; }
-.player .p-meta h3 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.2rem, 2.6vw, 1.6rem); letter-spacing: -.015em; margin: 0; }
-.player .close { position: absolute; top: -52px; right: 0; width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); background: rgba(20,21,26,.8); color: #fff; display: grid; place-items: center; cursor: pointer; transition: border-color .15s, transform .15s; }
-.player .close:hover { border-color: var(--accent); transform: rotate(90deg); }
-.player .close svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; fill: none; }
+.player .p-frame, .lightbox .p-frame, #lbBox, .player #lbBox { position: relative; aspect-ratio: 16 / 9; max-height: calc(92vh - 90px); margin-inline: auto; border-radius: 8px; overflow: hidden; background: #050506; outline: 1px solid var(--line); box-shadow: 0 40px 80px -30px rgba(0,0,0,.8); }
+.player .p-frame video, .player .p-frame iframe, .lightbox .p-frame video, .lightbox .p-frame iframe, #lbBox iframe, #lbBox video { position: absolute; inset: 0; width: 100%; height: 100%; border: none; background: #000; }
+.player .p-frame video, .lightbox .p-frame video, #lbBox video { object-fit: contain; }
+.player .p-frame .art b, .lightbox .p-frame .art b { font-size: clamp(120px, 22vw, 260px); top: 14%; }
+.player .p-empty, .lightbox .p-empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; color: #fff; }
+.player .p-empty span, .lightbox .p-empty span { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: rgba(0,0,0,.55); padding: 8px 12px; border-radius: 4px; }
+.player .p-meta, .lightbox .p-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 20px; padding-top: 14px; }
+.player .p-meta h3, .lightbox .p-meta h3 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.2rem, 2.6vw, 1.6rem); letter-spacing: -.015em; margin: 0; }
+.player .close, .lightbox .close { position: absolute; top: -52px; right: 0; width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); background: rgba(20,21,26,.8); color: #fff; display: grid; place-items: center; cursor: pointer; transition: border-color .15s, transform .15s; }
+.player .close:hover, .lightbox .close:hover { border-color: var(--accent); transform: rotate(90deg); }
+.player .close svg, .lightbox .close svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; fill: none; }
 /* short-form pop-up: tall 9:16 player */
-.player.vertical { width: min(92vw, 440px, calc((88vh - 120px) * 9 / 16)); }
-.player.vertical .p-frame { aspect-ratio: 9 / 16; max-height: none; }
-.player.vertical .p-meta { flex-direction: column; gap: 4px; }
-.player.vertical .p-frame .art b { font-size: 140px; }
+.player.vertical, .lightbox.vertical { width: min(92vw, 440px, calc((88vh - 120px) * 9 / 16)); }
+.player.vertical .p-frame, .lightbox.vertical .p-frame, .player.vertical #lbBox, .lightbox.vertical #lbBox { aspect-ratio: 9 / 16; max-height: none; }
+.player.vertical .p-meta, .lightbox.vertical .p-meta { flex-direction: column; gap: 4px; }
+.player.vertical .p-frame .art b, .lightbox.vertical .p-frame .art b { font-size: 140px; }
 /* the close button always sits OUTSIDE the video so it never covers the player's own controls.
    Short landscape screens: beside the video instead of above it. */
-@media (max-height: 600px) { .player .close { top: 0; right: 0; } .player:not(.vertical) .p-frame { max-width: calc(100% - 110px); } .player.vertical .close { right: -54px; } }
+@media (max-height: 600px) { .player .close, .lightbox .close { top: 0; right: 0; } .player:not(.vertical) .p-frame, .lightbox:not(.vertical) #lbBox { max-width: calc(100% - 110px); } .player.vertical .close, .lightbox.vertical .close { right: -54px; } }
 
 /* ---------- entrance animations ---------- */
 html.anim .rv { opacity: 0; transform: translateY(26px); filter: blur(10px);
@@ -413,9 +413,9 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
     </section>
   </main>
 
-  <dialog class="player" id="player" aria-labelledby="p-title">
+  <dialog class="player lightbox" id="player" aria-labelledby="p-title">
     <button type="button" class="close" id="p-close" aria-label="Close player"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    <div class="p-frame" id="p-frame"></div>
+    <div class="p-frame" id="lbBox" data-frame="p-frame"></div>
     <div class="p-meta">
       <div>
         <h3 id="p-title"></h3>
@@ -499,8 +499,16 @@ const INITIAL_GYM_VIDEOS = [
   {"id":"1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5","title":"Gym Workout #46","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5","src":"https://drive.google.com/file/d/1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5/preview","hue":342}
 ];
 
-// Initial memory setup: first 24 shorts, 22 films
-window.SHORTS = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS.slice(0, 24);
+// Guarantee getElementById('lightbox') and getElementById('lbBox') always resolve
+const origGetId = document.getElementById.bind(document);
+document.getElementById = function(id) {
+  if (id === 'lightbox') return origGetId('player') || origGetId('lightbox');
+  if (id === 'lbBox') return origGetId('lbBox') || origGetId('p-frame');
+  return origGetId(id);
+};
+
+// Initial memory setup: all 46 gym videos in carousel
+window.SHORTS = (window.SHORTS && window.SHORTS.length >= 46) ? window.SHORTS : INITIAL_GYM_VIDEOS;
 window.FILMS = (window.FILMS && window.FILMS.length) ? window.FILMS : INITIAL_GYM_VIDEOS.slice(24);
 
 // Check if any local overrides exist in localStorage
@@ -508,18 +516,15 @@ try {
   const locV = localStorage.getItem('portfolio_videos');
   if (locV) {
     const arr = JSON.parse(locV);
-    if (Array.isArray(arr) && arr.length) {
-      const s = arr.filter(v => v.type === 'short');
-      const l = arr.filter(v => v.type === 'long');
-      if (s.length) window.SHORTS = s;
-      if (l.length) window.FILMS = l;
+    if (Array.isArray(arr) && arr.length >= 46) {
+      window.SHORTS = arr;
     }
   }
   const locS = localStorage.getItem('portfolio_shorts');
   const locL = localStorage.getItem('portfolio_longs');
   if (locS) {
     const sArr = JSON.parse(locS);
-    if (Array.isArray(sArr) && sArr.length) window.SHORTS = sArr;
+    if (Array.isArray(sArr) && sArr.length >= 46) window.SHORTS = sArr;
   }
   if (locL) {
     const lArr = JSON.parse(locL);
@@ -652,19 +657,152 @@ function getCleanEmbedUrl(url) {
   return str;
 }
 
+let playerOpen = false, stageVisible = true, userPaused = false, filmPreview = false;
 let lastOpenPlayerTime = 0;
+let lastFocus = null;
+
+function openLightbox(urlOrIndex, isVertical = true) {
+  if (urlOrIndex === undefined || urlOrIndex === null) return;
+
+  let url = '';
+  let title = 'Gym Workout';
+  let dur = '0:30';
+  let kind = 'Gym & Fitness';
+  let videoObj = null;
+
+  if (typeof urlOrIndex === 'number') {
+    const list = isVertical 
+      ? ((window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS) 
+      : ((window.FILMS && window.FILMS.length) ? window.FILMS : INITIAL_GYM_VIDEOS);
+    videoObj = list[urlOrIndex] || list[0] || {};
+    url = videoObj.videoUrl || videoObj.src || videoObj.url || '';
+    title = videoObj.title || ('Gym Workout #' + String(urlOrIndex + 1).padStart(2, '0'));
+    dur = videoObj.dur || videoObj.duration || '0:30';
+    kind = videoObj.kind || videoObj.genre || (isVertical ? 'Gym & Fitness' : 'Film');
+  } else if (typeof urlOrIndex === 'string') {
+    url = urlOrIndex;
+  } else if (typeof urlOrIndex === 'object') {
+    videoObj = urlOrIndex;
+    url = videoObj.videoUrl || videoObj.src || videoObj.url || '';
+    title = videoObj.title || 'Gym Workout';
+    dur = videoObj.dur || videoObj.duration || '0:30';
+    kind = videoObj.kind || videoObj.genre || 'Gym & Fitness';
+  }
+
+  if (!url && videoObj && videoObj.id) {
+    url = `https://drive.google.com/file/d/${videoObj.id}/preview`;
+  }
+
+  if (!url) {
+    console.warn('openLightbox: No URL found for video', urlOrIndex);
+    return;
+  }
+
+  // تنظيف الرابط إذا كان بصيغة خاطئة
+  let embedUrl = url;
+  if (url.includes('drive.google.com') || url.includes('drive.usercontent.google.com')) {
+    const idMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]{25,})/) ||
+                    url.match(/[?&](?:id|docid)=([a-zA-Z0-9_-]{25,})/) ||
+                    url.match(/[-\w]{25,}/);
+    if (idMatch) {
+      const fileId = idMatch[1] || idMatch[0];
+      embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+    }
+  } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    const ytMatch = url.match(/(?:youtu\.be\/|watch\?v=|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+    if (ytMatch) {
+      embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`;
+    }
+  }
+
+  console.log("Clicked video:", url);
+  console.log("openLightbox loading iframe with embedUrl:", embedUrl);
+
+  const box = document.getElementById('lbBox') || document.getElementById('p-frame');
+  const lbModal = document.getElementById('lightbox') || document.getElementById('player');
+
+  if (box) {
+    if (embedUrl.includes('drive.google.com') || embedUrl.includes('youtube.com')) {
+      box.innerHTML = `<iframe src="${embedUrl}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;background:#000;border-radius:inherit;"></iframe>`;
+    } else {
+      box.innerHTML = `<video src="${embedUrl}" controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;border-radius:inherit;"></video>`;
+    }
+  }
+
+  if (lbModal) {
+    lbModal.classList.toggle('vertical', !!isVertical);
+    lbModal.classList.add('open');
+    if (typeof lbModal.showModal === 'function') {
+      try {
+        if (!lbModal.open) lbModal.showModal();
+      } catch(_) {
+        lbModal.setAttribute('open', '');
+        lbModal.style.display = 'block';
+      }
+    } else {
+      lbModal.setAttribute('open', '');
+      lbModal.style.display = 'block';
+    }
+  }
+
+  const pTitle = document.getElementById('p-title');
+  if (pTitle) pTitle.textContent = title;
+  const pSub = document.getElementById('p-sub');
+  if (pSub) pSub.textContent = `${kind} · ${dur}`;
+  const dLink = document.getElementById('p-drive-link');
+  if (dLink) {
+    if (url.includes('drive.google.com')) {
+      dLink.href = embedUrl.replace('/preview', '/view');
+      dLink.style.display = 'inline-flex';
+    } else {
+      dLink.style.display = 'none';
+    }
+  }
+
+  document.querySelectorAll('.film .frame video').forEach(v => v.pause());
+  document.documentElement.style.overflow = 'hidden';
+  playerOpen = true;
+  if (typeof syncShort === 'function') syncShort();
+}
+
 function safeOpenPlayer(i, kind = 'short') {
   const now = performance.now();
-  if (now - lastOpenPlayerTime < 400) return;
+  if (now - lastOpenPlayerTime < 350) return;
   lastOpenPlayerTime = now;
-  openPlayer(i, kind);
+  openLightbox(i, kind === 'short');
 }
+
+function closeLightbox() {
+  const box = document.getElementById('lbBox') || document.getElementById('p-frame');
+  const lbModal = document.getElementById('lightbox') || document.getElementById('player');
+  if (box) box.innerHTML = '';
+  if (lbModal) {
+    lbModal.classList.remove('open');
+    try { if (lbModal.open) lbModal.close(); } catch(_) {}
+    lbModal.removeAttribute('open');
+    lbModal.style.display = '';
+  }
+  document.documentElement.style.overflow = '';
+  playerOpen = false;
+  filmPreview = false;
+  if (typeof syncShort === 'function') syncShort();
+  if (lastFocus && typeof lastFocus.focus === 'function') {
+    lastFocus.focus({ preventScroll: true });
+  }
+}
+
+window.openLightbox = openLightbox;
+window.openPlayer = function(i, kind = 'short') {
+  openLightbox(i, kind === 'short');
+};
+window.safeOpenPlayer = safeOpenPlayer;
+window.closeLightbox = closeLightbox;
+window.closePlayer = closeLightbox;
 
 function attachCardListeners() {
   cards.forEach((card, i) => {
-    const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS;
+    const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
     const video = list[i] || {};
-    const videoUrl = video.videoUrl || video.src || '';
 
     // Direct click handler on the play button
     const playBtn = card.querySelector('.playbtn');
@@ -862,7 +1000,7 @@ function preloadNeighbors() {
 }
 /* The center video only plays while: the carousel is on screen, this tab is the one being viewed,
    no pop-up / long-form preview is playing, and the visitor hasn't paused it themselves. */
-let stageVisible = true, userPaused = false, filmPreview = false, playerOpen = false;
+stageVisible = true; userPaused = false; filmPreview = false; playerOpen = false;
 function syncShort() {
   const c = cards[active()];
   if (!c) return;
@@ -1133,102 +1271,20 @@ document.addEventListener('click', (e) => {
 }, true);
 refreshSound();
 
-const player = $('#player'), pFrame = $('#p-frame');
-let lastFocus = null;
-function openPlayer(i, kind = 'film') {
-  const short = kind === 'short';
-  const list = short ? ((window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS) : ((window.FILMS && window.FILMS.length) ? window.FILMS : FILMS);
-  const f = list[i] || list[0] || {};
-  const rawUrl = f.videoUrl || f.src || f.url || '';
-  const embedUrl = getCleanEmbedUrl(rawUrl);
+const pCloseBtn = document.getElementById('p-close');
+if (pCloseBtn) pCloseBtn.addEventListener('click', closeLightbox);
 
-  console.log("Clicked video:", rawUrl);
-  console.log("openPlayer:", { index: i, kind, title: f.title, rawUrl, embedUrl });
-
-  player.classList.toggle('vertical', short);
-  lastFocus = document.activeElement;
-  // stop hover previews and carousel video while pop-up is open
-  document.querySelectorAll('.film .frame video').forEach((v) => v.pause());
-  playerOpen = true; syncShort();
-  pFrame.style.setProperty('--h', f.hue || 210);
-
-  const sStreamUrl = getDirectStreamUrl(rawUrl);
-  const isDirectStream = sStreamUrl && !sStreamUrl.includes('youtube.com') && !sStreamUrl.includes('youtu.be');
-  const isYoutube = embedUrl && (embedUrl.includes('youtube.com') || embedUrl.includes('youtu.be'));
-
-  if (isDirectStream) {
-    pFrame.innerHTML = `<video src="${sStreamUrl}" poster="${f.poster || f.thumbnail || ''}" controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;"></video>`;
-    const pv = pFrame.querySelector('video');
-    if (pv) {
-      pv.muted = !soundOn;
-      pv.play().catch(() => { pv.muted = true; pv.play().catch(() => {}); });
-      pv.addEventListener('volumechange', () => { if (pv.muted === soundOn) setSound(!pv.muted); });
-    }
-  } else if (isYoutube) {
-    pFrame.innerHTML = `<iframe src="${embedUrl}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:8px;background:#000;"></iframe>`;
-  } else if (embedUrl) {
-    pFrame.innerHTML = `<video src="${embedUrl}"${posterAttr(f)} controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;"></video>`;
-  } else {
-    pFrame.innerHTML = `<div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div><div class="p-empty"><span>فيديو تجريبي · أضف رابط الفيديو لتشغيله هنا</span></div>`;
-  }
-
-  $('#p-title').textContent = f.title || 'فيديو';
-  $('#p-sub').textContent = `${f.kind || f.genre || 'فيديو'} · ${f.dur || f.duration || '0:30'}`;
-  const dLink = $('#p-drive-link');
-  if (dLink) {
-    if (rawUrl && rawUrl.includes('drive.google.com')) {
-      dLink.href = rawUrl.replace('/preview', '/view');
-      dLink.style.display = 'inline-flex';
-    } else {
-      dLink.style.display = 'none';
-    }
-  }
-  document.documentElement.style.overflow = 'hidden';
-  if (typeof player.showModal === 'function') {
-    try {
-      player.showModal();
-    } catch (_) {
-      player.setAttribute('open', '');
-      player.style.display = 'block';
-    }
-  } else {
-    player.setAttribute('open', '');
-    player.style.display = 'block';
-  }
-  const pv = pFrame.querySelector('video');
-  if (pv) {
-    pv.muted = !soundOn;
-    pv.play().catch(() => {});
-    pv.addEventListener('volumechange', () => { if (pv.muted === soundOn) setSound(!pv.muted); });
-  }
+const playerModal = document.getElementById('player') || document.getElementById('lightbox');
+if (playerModal) {
+  playerModal.addEventListener('click', (e) => {
+    if (e.target.closest('#lbBox, .p-frame, .p-meta, .close')) return;
+    closeLightbox();
+  });
+  playerModal.addEventListener('close', () => {
+    closeLightbox();
+  });
 }
-function closePlayer() {
-  pFrame.innerHTML = '';
-  try {
-    if (player.open) player.close();
-  } catch(_) {}
-  player.removeAttribute('open');
-  player.style.display = '';
-  document.documentElement.style.overflow = '';
-  playerOpen = false; filmPreview = false; syncShort();
-  if (lastFocus) lastFocus.focus({ preventScroll: true });
-}
-player.addEventListener('close', () => {
-  pFrame.innerHTML = '';
-  const pv = pFrame.querySelector('video'); if (pv) pv.pause();
-  pFrame.innerHTML = '';
-  document.documentElement.style.overflow = '';
-  playerOpen = false; filmPreview = false; syncShort();
-  if (lastFocus) lastFocus.focus({ preventScroll: true });
-});
-$('#p-close').addEventListener('click', closePlayer);
-// click or tap anywhere outside the video frame and title closes it
-player.addEventListener('click', (e) => {
-  if (e.target.closest('.p-frame, .p-meta, .close')) return;
-  closePlayer();
-});
-// Esc is handled by <dialog> natively; this covers browsers that don't
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePlayer(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && playerOpen) closeLightbox(); });
 
 /* ---------- copy email ---------- */
 if ($('#copy')) $('#copy').addEventListener('click', async () => {
@@ -1345,14 +1401,59 @@ function startFirestoreSync() {
     if (doc.exists) applySettingsData(doc.data());
   }, err => console.warn('Firestore settings listen notice:', err.message));
 
+  let fsShorts = [];
+  let fsLongs = [];
+
+  function updateCatalogFromFirestore() {
+    const map = new Map();
+    // 1. Seed with all 46 gym videos
+    INITIAL_GYM_VIDEOS.forEach(v => map.set(v.id, { ...v }));
+
+    // 2. Overlay shortVideos from Firestore
+    fsShorts.forEach(v => {
+      const fid = v.fileId || v.id;
+      if (map.has(fid)) {
+        map.set(fid, { ...map.get(fid), ...v });
+      } else {
+        map.set(fid, v);
+      }
+    });
+
+    // 3. Overlay longVideos from Firestore (which include gym workouts #25 to #46)
+    fsLongs.forEach(v => {
+      const fid = v.fileId || v.id;
+      if (map.has(fid)) {
+        map.set(fid, { ...map.get(fid), ...v });
+      } else if (v.title && (v.title.includes('Gym') || v.kind === 'Gym & Fitness' || map.size < 46)) {
+        map.set(fid, v);
+      }
+    });
+
+    const fullList = Array.from(map.values());
+    fullList.sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, { numeric: true, sensitivity: 'base' }));
+
+    const curSign = (window.SHORTS || []).map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
+    const newSign = fullList.map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
+    if (curSign !== newSign || !cards.length) {
+      window.SHORTS = fullList;
+      SHORTS = fullList;
+      if (typeof renderDrum === 'function') renderDrum(fullList);
+    }
+
+    const filmList = fsLongs.length ? fsLongs : fullList.slice(24);
+    window.FILMS = filmList;
+    FILMS = filmList;
+    if (typeof renderFilms === 'function') renderFilms(filmList);
+  }
+
   // 2. Short Videos (Carousel) listener
   db.collection('shortVideos').onSnapshot(snap => {
     if (!snap.empty) {
-      const vids = [];
+      fsShorts = [];
       snap.forEach(d => {
         const v = d.data();
         const fid = v.fileId || d.id || '';
-        vids.push({
+        fsShorts.push({
           id: d.id,
           fileId: fid,
           title: v.title || 'Gym Workout',
@@ -1363,32 +1464,22 @@ function startFirestoreSync() {
           thumbnail: v.thumbnail || (fid ? `https://drive.google.com/thumbnail?id=${fid}&sz=w600` : ''),
           src: v.videoUrl || (fid ? `https://drive.google.com/file/d/${fid}/preview` : ''),
           videoUrl: v.videoUrl || (fid ? `https://drive.google.com/file/d/${fid}/preview` : ''),
-          hue: 180 + (vids.length * 13) % 170,
+          hue: 180 + (fsShorts.length * 13) % 170,
           createdAt: v.createdAt
         });
       });
-      // Natural alphanumeric sort by title (Gym Workout #01 .. #24)
-      vids.sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, { numeric: true, sensitivity: 'base' }));
-
-      // Only re-render if items actually changed to avoid interrupting playing video
-      const curSign = (window.SHORTS || []).map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
-      const newSign = vids.map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
-      if (curSign !== newSign || !cards.length) {
-        window.SHORTS = vids;
-        SHORTS = vids;
-        if (typeof renderDrum === 'function') renderDrum(vids);
-      }
+      updateCatalogFromFirestore();
     }
   }, err => console.warn('Firestore shortVideos listen notice:', err.message));
 
   // 3. Long Videos (Films) listener
   db.collection('longVideos').onSnapshot(snap => {
     if (!snap.empty) {
-      const vids = [];
+      fsLongs = [];
       snap.forEach(d => {
         const v = d.data();
         const fid = v.fileId || d.id || '';
-        vids.push({
+        fsLongs.push({
           id: d.id,
           fileId: fid,
           title: v.title || 'Gym Workout',
@@ -1398,19 +1489,11 @@ function startFirestoreSync() {
           thumbnail: v.thumbnail || (fid ? `https://drive.google.com/thumbnail?id=${fid}&sz=w600` : ''),
           src: v.videoUrl || (fid ? `https://drive.google.com/file/d/${fid}/preview` : ''),
           videoUrl: v.videoUrl || (fid ? `https://drive.google.com/file/d/${fid}/preview` : ''),
-          hue: 200 + (vids.length * 17) % 150,
+          hue: 200 + (fsLongs.length * 17) % 150,
           createdAt: v.createdAt
         });
       });
-      vids.sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, { numeric: true, sensitivity: 'base' }));
-
-      const curSign = (window.FILMS || []).map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
-      const newSign = vids.map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
-      if (curSign !== newSign) {
-        window.FILMS = vids;
-        FILMS = vids;
-        if (typeof renderFilms === 'function') renderFilms(vids);
-      }
+      updateCatalogFromFirestore();
     }
   }, err => console.warn('Firestore longVideos listen notice:', err.message));
 }
