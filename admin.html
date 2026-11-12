@@ -473,6 +473,26 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
     const storage = (isConfigValid && firebase.apps.length) ? firebase.storage() : null;
 
     // Toast
+    // دوال الحماية والتعقيم الأمني ضد ثغرات XSS
+    function escapeHTML(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function sanitizeUrl(url) {
+      if (!url) return '';
+      const s = String(url).trim();
+      if (/^(?:https?:\/\/|\/|\.\/|blob:|data:image\/)/i.test(s)) {
+        return s.replace(/"/g, '%22').replace(/'/g, '%27').replace(/</g, '%3C').replace(/>/g, '%3E');
+      }
+      return '';
+    }
+
     function toast(msg, isErr = false) {
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -728,19 +748,32 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       }
       docs.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
 
-      list.innerHTML = docs.map(v => `
+      list.innerHTML = docs.map(v => {
+        const safeTitle = escapeHTML(v.title || '(بدون عنوان)');
+        const safeDuration = escapeHTML(v.duration || 'غير محدد');
+        const safeGenre = escapeHTML(v.genre || 'Gym & Fitness');
+        const safeThumb = sanitizeUrl(v.thumbnail || '') || 'profile.jpg';
+        const safeId = escapeHTML(v.id || '');
+        return `
         <div class="video-row">
-          <img src="${v.thumbnail || ''}" alt="" onerror="this.src='profile.jpg'">
+          <img src="${safeThumb}" alt="" onerror="this.src='profile.jpg'">
           <div class="info">
-            <h3>${v.title || '(بدون عنوان)'}</h3>
-            <span class="mono">${v.duration || 'غير محدد'} · ${v.genre || 'Gym & Fitness'}</span>
+            <h3>${safeTitle}</h3>
+            <span class="mono">${safeDuration} · ${safeGenre}</span>
           </div>
           <div class="actions">
-            <button class="btn secondary" onclick="editVideo('shortVideos','${v.id}')">تعديل</button>
-            <button class="btn danger" onclick="deleteVideo('shortVideos','${v.id}')">حذف</button>
+            <button class="btn secondary" data-action="edit" data-coll="shortVideos" data-id="${safeId}">تعديل</button>
+            <button class="btn danger" data-action="delete" data-coll="shortVideos" data-id="${safeId}">حذف</button>
           </div>
         </div>
-      `).join('');
+      `;}).join('');
+
+      list.querySelectorAll('button[data-action="edit"]').forEach(btn => {
+        btn.addEventListener('click', () => editVideo(btn.dataset.coll, btn.dataset.id));
+      });
+      list.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+        btn.addEventListener('click', () => deleteVideo(btn.dataset.coll, btn.dataset.id));
+      });
     }
 
     async function loadLongs() {
@@ -781,19 +814,32 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       }
       docs.sort((a,b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
 
-      list.innerHTML = docs.map(v => `
+      list.innerHTML = docs.map(v => {
+        const safeTitle = escapeHTML(v.title || '(بدون عنوان)');
+        const safeDuration = escapeHTML(v.duration || '');
+        const safeGenre = escapeHTML(v.genre || '');
+        const safeThumb = sanitizeUrl(v.thumbnail || '') || 'profile.jpg';
+        const safeId = escapeHTML(v.id || '');
+        return `
         <div class="video-row">
-          <img src="${v.thumbnail || ''}" alt="" onerror="this.src='profile.jpg'">
+          <img src="${safeThumb}" alt="" onerror="this.src='profile.jpg'">
           <div class="info">
-            <h3>${v.title || '(بدون عنوان)'}</h3>
-            <span class="mono">${v.genre ? v.genre + ' · ' : ''}${v.duration || ''}</span>
+            <h3>${safeTitle}</h3>
+            <span class="mono">${safeGenre ? safeGenre + ' · ' : ''}${safeDuration}</span>
           </div>
           <div class="actions">
-            <button class="btn secondary" onclick="editVideo('longVideos','${v.id}')">تعديل</button>
-            <button class="btn danger" onclick="deleteVideo('longVideos','${v.id}')">حذف</button>
+            <button class="btn secondary" data-action="edit" data-coll="longVideos" data-id="${safeId}">تعديل</button>
+            <button class="btn danger" data-action="delete" data-coll="longVideos" data-id="${safeId}">حذف</button>
           </div>
         </div>
-      `).join('');
+      `;}).join('');
+
+      list.querySelectorAll('button[data-action="edit"]').forEach(btn => {
+        btn.addEventListener('click', () => editVideo(btn.dataset.coll, btn.dataset.id));
+      });
+      list.querySelectorAll('button[data-action="delete"]').forEach(btn => {
+        btn.addEventListener('click', () => deleteVideo(btn.dataset.coll, btn.dataset.id));
+      });
     }
 
     async function loadAll() {
@@ -1384,9 +1430,12 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       if (!grid) return;
       grid.innerHTML = '';
       videos.forEach((video, index) => {
-        const thumbUrl = video.thumbnailLink || `https://drive.google.com/thumbnail?id=${video.id}&sz=w400`;
-        const directUrl = `https://drive.google.com/uc?export=download&id=${video.id}`;
-        const previewUrl = `https://drive.google.com/file/d/${video.id}/preview`;
+        const thumbUrl = sanitizeUrl(video.thumbnailLink || `https://drive.google.com/thumbnail?id=${video.id}&sz=w400`) || 'profile.jpg';
+        const directUrl = sanitizeUrl(`https://drive.google.com/uc?export=download&id=${video.id}`);
+        const previewUrl = sanitizeUrl(`https://drive.google.com/file/d/${video.id}/preview`);
+        const safeName = escapeHTML(video.name || '');
+        const safeDur = escapeHTML(video.dur || '0:30');
+        const safeId = escapeHTML(video.id || '');
         
         const card = document.createElement('div');
         card.style.cssText = 'border: 1px solid var(--line, #333); padding: 12px; border-radius: 8px; text-align: center; background: var(--surface2, #18181b); display:flex; flex-direction:column; justify-content:space-between; position:relative;';
@@ -1394,22 +1443,26 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
           <div>
             <div style="position:relative; width:100%; height:120px; margin-bottom:8px; border-radius:6px; overflow:hidden; background:#000;">
               <img src="${thumbUrl}" style="width:100%; height:100%; object-fit:cover;" alt="thumb" onerror="this.src='profile.jpg'">
-              <span style="position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,0.75); color:#fff; font-size:10px; padding:2px 6px; border-radius:4px; font-family:monospace;">${video.dur || '0:30'}</span>
+              <span style="position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,0.75); color:#fff; font-size:10px; padding:2px 6px; border-radius:4px; font-family:monospace;">${safeDur}</span>
               <span style="position:absolute; top:4px; left:4px; background:rgba(48,164,108,0.92); color:#fff; font-size:9px; padding:2px 6px; border-radius:4px; font-weight:bold;">🟢 مباشر</span>
             </div>
-            <p title="${video.name}" style="font-size:13px; font-weight:600; margin-bottom:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--fg, #fff);">${video.name}</p>
+            <p title="${safeName}" style="font-size:13px; font-weight:600; margin-bottom:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--fg, #fff);">${safeName}</p>
           </div>
           <div>
             <label style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px; cursor:pointer;">
-              <input type="checkbox" class="video-checkbox" data-id="${video.id}" data-name="${video.name}" data-url="${previewUrl}" data-preview="${previewUrl}" data-dur="${video.dur || '0:30'}" data-index="${index}" checked style="width: 18px; height: 18px; cursor: pointer;">
+              <input type="checkbox" class="video-checkbox" data-id="${safeId}" data-name="${safeName}" data-url="${previewUrl}" data-preview="${previewUrl}" data-dur="${safeDur}" data-index="${index}" checked style="width: 18px; height: 18px; cursor: pointer;">
               <span style="font-size:12px; color:var(--muted, #aaa);">تحديد للحفظ</span>
             </label>
             <div style="display:flex;gap:6px;">
-              <button type="button" onclick="openDrivePreviewModal('${video.id}', '${video.name.replace(/'/g, "\\'")}')" class="btn secondary" style="font-size:11px; padding:6px 8px; flex:1; font-weight:bold; color:var(--accent,#f2a541); border-color:var(--accent,#f2a541);">معاينة البث 👁️</button>
-              <a href="${directUrl}" target="_blank" class="btn secondary" style="font-size:11px; padding:6px 8px; text-decoration:none;" title="رابط مباشر / تحميل">🔗</a>
+              <button type="button" class="btn secondary btn-preview-drive" data-id="${safeId}" data-name="${safeName}" style="font-size:11px; padding:6px 8px; flex:1; font-weight:bold; color:var(--accent,#f2a541); border-color:var(--accent,#f2a541);">معاينة البث 👁️</button>
+              <a href="${directUrl}" target="_blank" rel="noopener noreferrer" class="btn secondary" style="font-size:11px; padding:6px 8px; text-decoration:none;" title="رابط مباشر / تحميل">🔗</a>
             </div>
           </div>
         `;
+        const previewBtn = card.querySelector('.btn-preview-drive');
+        if (previewBtn) {
+          previewBtn.addEventListener('click', () => openDrivePreviewModal(video.id, video.name));
+        }
         grid.appendChild(card);
       });
 

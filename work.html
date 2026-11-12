@@ -678,8 +678,27 @@ if (!reduced && tcEl) {
 }
 
 // =========================================================================
-// URL Helpers & Thumbnails
+// URL Helpers & Thumbnails & Security Sanitizers
 // =========================================================================
+function escapeHTML(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function sanitizeUrl(url) {
+  if (!url) return '';
+  const s = String(url).trim();
+  if (/^(?:https?:\/\/|\/|\.\/|blob:|data:image\/)/i.test(s)) {
+    return s.replace(/"/g, '%22').replace(/'/g, '%27').replace(/</g, '%3C').replace(/>/g, '%3E');
+  }
+  return '';
+}
+
 function extractDriveId(url) {
   if (!url) return '';
   const str = String(url).trim();
@@ -720,11 +739,13 @@ function getCleanEmbedUrl(url) {
 }
 
 const thumbImg = (x, isLazy = false) => {
-  const fid = x.fileId || x.id || extractDriveId(x.videoUrl || x.src) || '';
-  const p = x.thumbnail || x.poster || (fid ? 'https://drive.google.com/thumbnail?id=' + fid + '&sz=w600' : '');
+  const fid = extractDriveId(x.fileId || x.id || x.videoUrl || x.src) || '';
+  const rawP = x.thumbnail || x.poster || (fid ? 'https://drive.google.com/thumbnail?id=' + fid + '&sz=w600' : '');
+  const p = sanitizeUrl(rawP);
   if (!p) return '';
   const lazyAttr = isLazy ? ' loading="lazy"' : '';
-  return '<img class="thumb" src="' + p + '"' + lazyAttr + ' alt="' + (x.title || '') + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t){this.dataset.t=1;this.src=\'https://drive.google.com/thumbnail?id=' + fid + '&sz=w600\';}">';
+  const safeTitle = escapeHTML(x.title || '');
+  return '<img class="thumb" src="' + p + '"' + lazyAttr + ' alt="' + safeTitle + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t){this.dataset.t=1;this.src=\'https://drive.google.com/thumbnail?id=' + fid + '&sz=w600\';}">';
 };
 
 // =========================================================================
@@ -934,28 +955,32 @@ function renderDrum(newItems) {
   N = list.length;
   step = 360 / N;
 
-  ring.innerHTML = list.map((w, i) => `
-    <article class="card${w.src ? ' has-video' : ''}" data-index="${i}" style="--h:${w.hue || (190 + (i * 13) % 160)}; --dur:${secs(w.dur || '0:30')}s" aria-label="${w.title}">
+  ring.innerHTML = list.map((w, i) => {
+    const safeTitle = escapeHTML(w.title || `Short #${i + 1}`);
+    const safeDur = escapeHTML(w.dur || '0:30');
+    const sUrl = sanitizeUrl(getDirectStreamUrl(w.src || w.videoUrl));
+    const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
+    const videoTag = isNat
+      ? `<video ${i === 0 ? `src="${sUrl}"` : ''} data-src="${sUrl}" playsinline loop muted ${i === 0 ? 'preload="auto" autoplay' : 'preload="none"'} style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>`
+      : '';
+    return `
+    <article class="card${w.src ? ' has-video' : ''}" data-index="${i}" style="--h:${Number(w.hue) || (190 + (i * 13) % 160)}; --dur:${secs(w.dur || '0:30')}s" aria-label="${safeTitle}">
       <div class="screen">
         <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
         ${thumbImg(w)}
-        ${(() => {
-          const sUrl = getDirectStreamUrl(w.src || w.videoUrl);
-          const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
-          if (!isNat) return '';
-          return '<video ' + (i === 0 ? 'src="' + sUrl + '"' : '') + ' data-src="' + sUrl + '" playsinline loop muted ' + (i === 0 ? 'preload="auto" autoplay' : 'preload="none"') + ' style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>';
-        })()}
-        <span class="playbtn" role="button" aria-label="Play ${w.title}">${PLAY_SVG}</span>
+        ${videoTag}
+        <span class="playbtn" role="button" aria-label="Play ${safeTitle}">${PLAY_SVG}</span>
         ${w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
-        <div class="cap"><h3>${w.title}</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>${w.dur || '0:30'}</span></div></div>
+        <div class="cap"><h3>${safeTitle}</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>${safeDur}</span></div></div>
       </div>
-    </article>`).join('');
+    </article>`;
+  }).join('');
 
   cards = [...ring.children];
 
   const ticksEl = document.getElementById('ticks');
   if (ticksEl) {
-    ticksEl.innerHTML = list.map((w, i) => `<button type="button" aria-label="Show ${w.title}"></button>`).join('');
+    ticksEl.innerHTML = list.map((w, i) => `<button type="button" aria-label="Show ${escapeHTML(w.title || '')}"></button>`).join('');
     ticks = [...ticksEl.children];
     ticks.forEach((t, i) => t.addEventListener('click', () => { touched(); goToCard(i); }));
   }
@@ -1281,26 +1306,31 @@ function renderFilms(newItems) {
   const grid = $('#films-grid');
   if (!grid || !list.length) return;
 
-  grid.innerHTML = list.map((f, i) => `
+  grid.innerHTML = list.map((f, i) => {
+    const safeTitle = escapeHTML(f.title || `Film #${i + 1}`);
+    const safeKind = escapeHTML(f.kind || 'Film');
+    const safeDur = escapeHTML(f.dur || '3:00');
+    const sUrl = sanitizeUrl(getDirectStreamUrl(f.src || f.videoUrl));
+    const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
+    const videoTag = isNat
+      ? `<video data-src="${sUrl}" muted playsinline loop preload="none" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>`
+      : '';
+    return `
     <article class="film">
-      <div class="frame${f.src ? ' has-video' : ''}" style="--h:${f.hue || 210}" role="button" tabindex="0" data-i="${i}" aria-label="Play ${f.title}">
+      <div class="frame${f.src ? ' has-video' : ''}" style="--h:${Number(f.hue) || 210}" role="button" tabindex="0" data-i="${i}" aria-label="Play ${safeTitle}">
         <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
         ${thumbImg(f, true)}
-        ${(() => {
-          const sUrl = getDirectStreamUrl(f.src || f.videoUrl);
-          const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
-          if (!isNat) return '';
-          return '<video data-src="' + sUrl + '" muted playsinline loop preload="none" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>';
-        })()}
+        ${videoTag}
         <span class="playbtn">${PLAY_SVG}</span>
         ${canHover ? '<span class="hint">Click to watch</span>' : ''}
         ${f.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
-        <span class="dur">${f.dur || '3:00'}</span>
+        <span class="dur">${safeDur}</span>
         <div class="pbar"><i></i></div>
       </div>
-      <h3>${f.title}</h3>
-      <p>${f.kind || 'Film'}</p>
-    </article>`).join('');
+      <h3>${safeTitle}</h3>
+      <p>${safeKind}</p>
+    </article>`;
+  }).join('');
 
   grid.querySelectorAll('.film .frame').forEach((fr) => {
     const v = fr.querySelector('video'), bar = fr.querySelector('.pbar i');
@@ -1462,7 +1492,8 @@ function applySettingsData(s) {
   }
   if (s.profileImage) {
     const p = $('#portrait');
-    if (p) p.innerHTML = '<img src="' + s.profileImage + '" alt="Portrait">';
+    const safeSrc = sanitizeUrl(s.profileImage);
+    if (p && safeSrc) p.innerHTML = '<img src="' + safeSrc + '" alt="Portrait">';
   }
 }
 
