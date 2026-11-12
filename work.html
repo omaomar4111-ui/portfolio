@@ -156,11 +156,14 @@ section { padding-block: clamp(36px, 6vw, 72px); }
 
 /* carousel */
 .stage {
-  --cw: clamp(168px, 50vw, 250px); --ch: calc(var(--cw) * 16 / 9);
-  position: relative; height: calc(var(--ch) + 72px); perspective: 1500px; overflow: hidden;
+  --cw: clamp(170px, 22vw, 245px); --ch: calc(var(--cw) * 16 / 9);
+  position: relative; height: calc(var(--ch) + 84px);
+  perspective: 1400px; perspective-origin: 50% 50%;
+  overflow: hidden;
   cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y; overscroll-behavior-x: contain;
   border-block: 1px solid var(--line);
   background: radial-gradient(60% 55% at 50% 100%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+  transform-style: preserve-3d;
 }
 .stage::before, .stage::after {
   content: ""; position: absolute; top: 0; bottom: 0; width: clamp(36px, 10vw, 100px); z-index: 120; pointer-events: none;
@@ -168,8 +171,35 @@ section { padding-block: clamp(36px, 6vw, 72px); }
 .stage::before { left: 0; background: linear-gradient(90deg, #0c0d11 0%, transparent 100%); }
 .stage::after { right: 0; background: linear-gradient(270deg, #0c0d11 0%, transparent 100%); }
 .stage:active { cursor: grabbing; }
-.ring { position: absolute; top: 36px; left: 50%; width: var(--cw); height: var(--ch); margin-left: calc(var(--cw) / -2); transform-style: preserve-3d; will-change: transform; }
-.card { position: absolute; inset: 0; will-change: transform, opacity; }
+
+.ring {
+  position: absolute;
+  top: 36px;
+  left: 50%;
+  width: var(--cw);
+  height: var(--ch);
+  margin-left: calc(var(--cw) / -2);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform, opacity, filter;
+  cursor: pointer;
+  transition: filter .25s ease, opacity .25s ease;
+}
+.card:not(.active) {
+  filter: brightness(0.72);
+}
+.card.active {
+  filter: brightness(1);
+  z-index: 50;
+}
 .screen {
   position: absolute; inset: 0; border-radius: 26px; overflow: hidden; background: #050506;
   border: 5px solid #050506; outline: 1px solid var(--line);
@@ -239,29 +269,93 @@ section { padding-block: clamp(36px, 6vw, 72px); }
 .film .frame .hint { position: absolute; left: 10px; bottom: 10px; z-index: 2; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: #fff; background: rgba(0,0,0,.55); padding: 3px 7px; border-radius: 3px; opacity: 0; transition: opacity .2s; }
 .film .frame.hovering .hint { opacity: 1; }
 
-.player, .lightbox { padding: 0; border: 0; background: transparent; color: var(--fg); width: min(1100px, 92vw); max-width: none; max-height: 92vh; overflow: visible; }
-.player::backdrop, .lightbox::backdrop { background: rgba(4, 5, 8, .84); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-.player[open], .player.open, .lightbox[open], .lightbox.open { animation: pop .22s ease-out; position: fixed; inset: 0; margin: auto; z-index: 99999; display: block; }
+/* lightbox dialog */
+#lightbox:not([open]):not(.open),
+#player:not([open]):not(.open),
+.player:not([open]):not(.open),
+.lightbox:not([open]):not(.open) {
+  display: none !important;
+}
+
+#lightbox[open], #lightbox.open,
+#player[open], #player.open,
+.player[open], .player.open,
+.lightbox[open], .lightbox.open {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed !important;
+  inset: 0 !important;
+  margin: auto !important;
+  z-index: 999999 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--fg);
+  width: min(1100px, 92vw);
+  max-width: none;
+  max-height: 92vh;
+  overflow: visible;
+  animation: pop .22s ease-out;
+}
+
+#lightbox::backdrop, #player::backdrop,
+.player::backdrop, .lightbox::backdrop {
+  background: rgba(4, 5, 8, .88) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
 @keyframes pop { from { opacity: 0; transform: scale(.96); } }
-.player .p-frame, .lightbox .p-frame, #lbBox, .player #lbBox { position: relative; aspect-ratio: 16 / 9; max-height: calc(92vh - 90px); margin-inline: auto; border-radius: 8px; overflow: hidden; background: #050506; outline: 1px solid var(--line); box-shadow: 0 40px 80px -30px rgba(0,0,0,.8); }
-.player .p-frame video, .player .p-frame iframe, .lightbox .p-frame video, .lightbox .p-frame iframe, #lbBox iframe, #lbBox video { position: absolute; inset: 0; width: 100%; height: 100%; border: none; background: #000; }
+
+#lbBox, .p-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  max-height: calc(92vh - 90px);
+  margin-inline: auto;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #050506;
+  outline: 1px solid var(--line);
+  box-shadow: 0 40px 80px -30px rgba(0,0,0,.8);
+}
+
+#lightbox.vertical #lbBox,
+#player.vertical #lbBox,
+.player.vertical .p-frame,
+.lightbox.vertical #lbBox,
+.lightbox.vertical .p-frame {
+  width: min(92vw, 440px, calc((88vh - 120px) * 9 / 16)) !important;
+  aspect-ratio: 9 / 16 !important;
+  max-height: none !important;
+}
+
+#lbBox iframe, #lbBox video,
+.p-frame iframe, .p-frame video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #000;
+}
 .player .p-frame video, .lightbox .p-frame video, #lbBox video { object-fit: contain; }
-.player .p-frame .art b, .lightbox .p-frame .art b { font-size: clamp(120px, 22vw, 260px); top: 14%; }
+.player .p-frame .art b, .lightbox .p-frame .art b, #lbBox .art b { font-size: clamp(120px, 22vw, 260px); top: 14%; }
 .player .p-empty, .lightbox .p-empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; color: #fff; }
 .player .p-empty span, .lightbox .p-empty span { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: rgba(0,0,0,.55); padding: 8px 12px; border-radius: 4px; }
-.player .p-meta, .lightbox .p-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 20px; padding-top: 14px; }
+.player .p-meta, .lightbox .p-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 20px; padding-top: 14px; width: 100%; }
 .player .p-meta h3, .lightbox .p-meta h3 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.2rem, 2.6vw, 1.6rem); letter-spacing: -.015em; margin: 0; }
-.player .close, .lightbox .close { position: absolute; top: -52px; right: 0; width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); background: rgba(20,21,26,.8); color: #fff; display: grid; place-items: center; cursor: pointer; transition: border-color .15s, transform .15s; }
+.player .close, .lightbox .close { position: absolute; top: -52px; right: 0; width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); background: rgba(20,21,26,.8); color: #fff; display: grid; place-items: center; cursor: pointer; transition: border-color .15s, transform .15s; z-index: 10; }
 .player .close:hover, .lightbox .close:hover { border-color: var(--accent); transform: rotate(90deg); }
 .player .close svg, .lightbox .close svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; fill: none; }
-/* short-form pop-up: tall 9:16 player */
-.player.vertical, .lightbox.vertical { width: min(92vw, 440px, calc((88vh - 120px) * 9 / 16)); }
-.player.vertical .p-frame, .lightbox.vertical .p-frame, .player.vertical #lbBox, .lightbox.vertical #lbBox { aspect-ratio: 9 / 16; max-height: none; }
 .player.vertical .p-meta, .lightbox.vertical .p-meta { flex-direction: column; gap: 4px; }
 .player.vertical .p-frame .art b, .lightbox.vertical .p-frame .art b { font-size: 140px; }
-/* the close button always sits OUTSIDE the video so it never covers the player's own controls.
-   Short landscape screens: beside the video instead of above it. */
-@media (max-height: 600px) { .player .close, .lightbox .close { top: 0; right: 0; } .player:not(.vertical) .p-frame, .lightbox:not(.vertical) #lbBox { max-width: calc(100% - 110px); } .player.vertical .close, .lightbox.vertical .close { right: -54px; } }
+@media (max-height: 600px) {
+  .player .close, .lightbox .close { top: 0; right: 0; }
+  .player:not(.vertical) .p-frame, .lightbox:not(.vertical) #lbBox { max-width: calc(100% - 110px); }
+  .player.vertical .close, .lightbox.vertical .close { right: -54px; }
+}
 
 /* ---------- entrance animations ---------- */
 html.anim .rv { opacity: 0; transform: translateY(26px); filter: blur(10px);
@@ -413,9 +507,9 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
     </section>
   </main>
 
-  <dialog class="player lightbox" id="player" aria-labelledby="p-title">
+  <dialog class="player lightbox" id="lightbox" aria-labelledby="p-title">
     <button type="button" class="close" id="p-close" aria-label="Close player"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    <div class="p-frame" id="lbBox" data-frame="p-frame"></div>
+    <div class="p-frame" id="lbBox"></div>
     <div class="p-meta">
       <div>
         <h3 id="p-title"></h3>
@@ -499,14 +593,6 @@ const INITIAL_GYM_VIDEOS = [
   {"id":"1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5","title":"Gym Workout #46","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5","src":"https://drive.google.com/file/d/1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5/preview","hue":342}
 ];
 
-// Guarantee getElementById('lightbox') and getElementById('lbBox') always resolve
-const origGetId = document.getElementById.bind(document);
-document.getElementById = function(id) {
-  if (id === 'lightbox') return origGetId('player') || origGetId('lightbox');
-  if (id === 'lbBox') return origGetId('lbBox') || origGetId('p-frame');
-  return origGetId(id);
-};
-
 // Initial memory setup: all 46 gym videos in carousel
 window.SHORTS = (window.SHORTS && window.SHORTS.length >= 46) ? window.SHORTS : INITIAL_GYM_VIDEOS;
 window.FILMS = (window.FILMS && window.FILMS.length) ? window.FILMS : INITIAL_GYM_VIDEOS.slice(24);
@@ -516,9 +602,7 @@ try {
   const locV = localStorage.getItem('portfolio_videos');
   if (locV) {
     const arr = JSON.parse(locV);
-    if (Array.isArray(arr) && arr.length >= 46) {
-      window.SHORTS = arr;
-    }
+    if (Array.isArray(arr) && arr.length >= 46) window.SHORTS = arr;
   }
   const locS = localStorage.getItem('portfolio_shorts');
   const locL = localStorage.getItem('portfolio_longs');
@@ -540,14 +624,14 @@ try {
 let SHORTS = window.SHORTS || [];
 let FILMS = window.FILMS || [];
 
-
 /* Your photo. src: path or data URI of the image. layout: 'beside' (next to the name) or 'behind' (blurred behind the name).
    position: which part of the photo stays in view, as 'x% y%'. */
 const PHOTO = { src: 'profile.jpg', layout: 'behind', position: '50% 20%', alt: 'Portrait of Omar Mostafa' };
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (s) => document.querySelector(s);
-const secs = (d) => { const [m, s] = d.split(':').map(Number); return m * 60 + s; };
+const secs = (d) => { const [m, s] = (d || '0:30').split(':').map(Number); return (m || 0) * 60 + (s || 0); };
+const PLAY_SVG = '<svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg>';
 
 /* ---------- hero photo ---------- */
 $('#hero').dataset.layout = PHOTO.layout;
@@ -556,10 +640,10 @@ $('#portrait').innerHTML = PHOTO.src
   ? `<img src="${PHOTO.src}" alt="${PHOTO.alt}">`
   : `<div class="ph" role="img" aria-label="Photo placeholder"><svg viewBox="0 0 100 120"><circle cx="50" cy="38" r="22"/><path d="M6 120c0-30 20-48 44-48s44 18 44 48z"/></svg><span>Your photo here</span></div>`;
 
-/* ---------- name: both lines the same width ----------
-   Same letter height on both lines; the last name's letter width is adjusted until it matches the first name exactly. */
+/* ---------- name: both lines the same width ---------- */
 function fitName() {
   const a = $('#nl1'), b = $('#nl2');
+  if (!a || !b) return;
   const setW = (el, w) => { el.style.fontVariationSettings = `"wdth" ${w}`; el.style.fontStretch = w + '%'; };
   a.style.fontSize = b.style.fontSize = '';
   setW(a, 118); setW(b, 118);
@@ -571,9 +655,9 @@ function fitName() {
   }
   setW(b, lo);
   const wb = b.getBoundingClientRect().width;
-  if (wb > target + 0.5) {            // still too long even at the narrowest setting: shrink slightly
+  if (wb > target + 0.5) {
     b.style.fontSize = (parseFloat(getComputedStyle(b).fontSize) * target / wb) + 'px';
-  } else if (wb < target - 0.5) {      // a hair short: close the gap with spacing
+  } else if (wb < target - 0.5) {
     b.style.letterSpacing = `calc(-.01em + ${((target - wb) / (b.textContent.length - 1)).toFixed(2)}px)`;
   }
 }
@@ -583,7 +667,7 @@ window.addEventListener('resize', fitName);
 
 /* ---------- hero timecode (24 fps) ---------- */
 const tcEl = $('#tc');
-if (!reduced) {
+if (!reduced && tcEl) {
   const t0 = performance.now();
   const pad = (n) => String(n).padStart(2, '0');
   (function loop(now) {
@@ -593,74 +677,90 @@ if (!reduced) {
   })(performance.now());
 }
 
-/* ---------- carousel ---------- */
-const ring = $('#ring'), stage = $('#stage');
-let N = SHORTS.length, step = N ? 360 / N : 30;
-const PLAY_SVG = '<svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg>';
+// =========================================================================
+// URL Helpers & Thumbnails
+// =========================================================================
+function extractDriveId(url) {
+  if (!url) return '';
+  const str = String(url).trim();
+  const m1 = str.match(/\/file\/d\/([a-zA-Z0-9_-]{25,})/);
+  if (m1) return m1[1];
+  const m2 = str.match(/[?&](?:id|docid)=([a-zA-Z0-9_-]{25,})/);
+  if (m2) return m2[1];
+  const m3 = str.match(/[-\w]{25,}/);
+  if (m3) return m3[0];
+  return '';
+}
 
-/* thumbnails: a poster picture if given; otherwise '#t=0.1' makes phones show the video's first frame */
-const thumbSrc = (u) => (u && !u.includes('#')) ? u + '#t=0.1' : u;
+function getDirectStreamUrl(url) {
+  if (!url) return '';
+  const fid = extractDriveId(url);
+  if (fid) {
+    return 'https://drive.usercontent.google.com/download?id=' + fid + '&export=download';
+  }
+  return url;
+}
+
+function getCleanEmbedUrl(url) {
+  if (!url) return '';
+  const str = String(url).trim();
+  if (str.includes('drive.google.com') || str.includes('drive.usercontent.google.com')) {
+    const fid = extractDriveId(str);
+    if (fid) return `https://drive.google.com/file/d/${fid}/preview`;
+  }
+  if (str.includes('youtube.com') || str.includes('youtu.be')) {
+    const ytMatch = str.match(/(?:youtu\.be\/|watch\?v=|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`;
+  }
+  const fid = extractDriveId(str);
+  if (fid && fid.length >= 25 && !str.startsWith('http')) {
+    return `https://drive.google.com/file/d/${fid}/preview`;
+  }
+  return str;
+}
+
 const thumbImg = (x, isLazy = false) => {
-  const fid = x.fileId || x.id || '';
+  const fid = x.fileId || x.id || extractDriveId(x.videoUrl || x.src) || '';
   const p = x.thumbnail || x.poster || (fid ? 'https://drive.google.com/thumbnail?id=' + fid + '&sz=w600' : '');
   if (!p) return '';
   const lazyAttr = isLazy ? ' loading="lazy"' : '';
   return '<img class="thumb" src="' + p + '"' + lazyAttr + ' alt="' + (x.title || '') + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t){this.dataset.t=1;this.src=\'https://drive.google.com/thumbnail?id=' + fid + '&sz=w600\';}">';
 };
-const posterAttr = (x) => x.poster ? ` poster="${x.poster}"` : '';
 
+// =========================================================================
+// 3D Carousel & Lightbox State Variables (Top Level)
+// =========================================================================
+const ring = document.getElementById('ring') || $('#ring');
+const stage = document.getElementById('stage') || $('#stage');
 let cards = [];
 let ticks = [];
-let R = 300, idx = 0, angle = 0, target = 0, raf = 0, dragging = false, lastTouch = 0, hover = false;
-let SPACING = 200, dragK = 0.35, spread = 1;
-const SIDE_BLUR = [0, 0, 0];   // px of blur: center, first neighbor, second neighbor
-const active = () => ((idx % N) + N) % N;
-
-// Helper to sanitize Google Drive & YouTube links into direct iframe embed URLs
-// Direct MP4 stream helper from Google Drive CDN (Access-Control-Allow-Origin: * with byte range support)
-function getDirectStreamUrl(url) {
-  if (!url) return '';
-  let str = String(url).trim();
-  if (str.includes('drive.google.com') || str.includes('drive.usercontent.google.com')) {
-    const m = str.match(/\/file\/d\/([a-zA-Z0-9_-]{25,})/) ||
-              str.match(/[?&](?:id|docid)=([a-zA-Z0-9_-]{25,})/) ||
-              str.match(/[a-zA-Z0-9_-]{25,}/);
-    if (m) {
-      const fid = m[1] || m[0];
-      return 'https://drive.usercontent.google.com/download?id=' + fid + '&export=download';
-    }
-  }
-  return str;
-}
-
-function getCleanEmbedUrl(url) {
-  if (!url) return '';
-  let str = String(url).trim();
-  if (str.includes('drive.google.com') || str.includes('drive.usercontent.google.com')) {
-    const m1 = str.match(/\/file\/d\/([a-zA-Z0-9_-]{25,})/);
-    if (m1) return 'https://drive.google.com/file/d/' + m1[1] + '/preview';
-    const m2 = str.match(/[?&](?:id|docid)=([a-zA-Z0-9_-]{25,})/);
-    if (m2) return 'https://drive.google.com/file/d/' + m2[1] + '/preview';
-    const m3 = str.match(/[a-zA-Z0-9_-]{25,}/);
-    if (m3) return 'https://drive.google.com/file/d/' + m3[0] + '/preview';
-  }
-  if (str.includes('youtube.com') || str.includes('youtu.be')) {
-    const vMatch = str.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-    if (vMatch) return 'https://www.youtube.com/embed/' + vMatch[1] + '?autoplay=1';
-    const sMatch = str.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
-    if (sMatch) return 'https://www.youtube.com/embed/' + sMatch[1] + '?autoplay=1';
-    const bMatch = str.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
-    if (bMatch) return 'https://www.youtube.com/embed/' + bMatch[1] + '?autoplay=1';
-    const eMatch = str.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
-    if (eMatch) return 'https://www.youtube.com/embed/' + eMatch[1] + '?autoplay=1';
-  }
-  return str;
-}
-
-let playerOpen = false, stageVisible = true, userPaused = false, filmPreview = false;
+let N = (window.SHORTS && window.SHORTS.length) ? window.SHORTS.length : INITIAL_GYM_VIDEOS.length;
+let step = N ? 360 / N : 7.8261;
+let R = 1550;
+let idx = 0;
+let angle = 0;
+let target = 0;
+let raf = 0;
+let dragging = false;
+let sx = 0, sy = 0, st = 0, sa = 0;
+let moved = false;
+let scrolled = false;
+let downCard = null;
+let downTarget = null;
+let lastTouch = 0;
+let hover = false;
+let soundOn = false;
+let playerOpen = false;
+let stageVisible = true;
+let userPaused = false;
+let filmPreview = false;
 let lastOpenPlayerTime = 0;
-let lastFocus = null;
 
+const active = () => ((Math.round(angle / step) % N) + N) % N;
+
+// =========================================================================
+// Modal Lightbox Player (Google Drive iframe & Direct video)
+// =========================================================================
 function openLightbox(urlOrIndex, isVertical = true) {
   if (urlOrIndex === undefined || urlOrIndex === null) return;
 
@@ -677,7 +777,7 @@ function openLightbox(urlOrIndex, isVertical = true) {
     videoObj = list[urlOrIndex] || list[0] || {};
     url = videoObj.videoUrl || videoObj.src || videoObj.url || '';
     title = videoObj.title || ('Gym Workout #' + String(urlOrIndex + 1).padStart(2, '0'));
-    dur = videoObj.dur || videoObj.duration || '0:30';
+    dur = videoObj.dur || videoObj.duration || (isVertical ? '0:30' : '3:00');
     kind = videoObj.kind || videoObj.genre || (isVertical ? 'Gym & Fitness' : 'Film');
   } else if (typeof urlOrIndex === 'string') {
     url = urlOrIndex;
@@ -689,8 +789,8 @@ function openLightbox(urlOrIndex, isVertical = true) {
     kind = videoObj.kind || videoObj.genre || 'Gym & Fitness';
   }
 
-  if (!url && videoObj && videoObj.id) {
-    url = `https://drive.google.com/file/d/${videoObj.id}/preview`;
+  if (!url && videoObj && (videoObj.fileId || videoObj.id)) {
+    url = `https://drive.google.com/file/d/${videoObj.fileId || videoObj.id}/preview`;
   }
 
   if (!url) {
@@ -698,28 +798,13 @@ function openLightbox(urlOrIndex, isVertical = true) {
     return;
   }
 
-  // تنظيف الرابط إذا كان بصيغة خاطئة
-  let embedUrl = url;
-  if (url.includes('drive.google.com') || url.includes('drive.usercontent.google.com')) {
-    const idMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]{25,})/) ||
-                    url.match(/[?&](?:id|docid)=([a-zA-Z0-9_-]{25,})/) ||
-                    url.match(/[-\w]{25,}/);
-    if (idMatch) {
-      const fileId = idMatch[1] || idMatch[0];
-      embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-    }
-  } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
-    const ytMatch = url.match(/(?:youtu\.be\/|watch\?v=|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
-    if (ytMatch) {
-      embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`;
-    }
-  }
+  const embedUrl = getCleanEmbedUrl(url);
 
   console.log("Clicked video:", url);
   console.log("openLightbox loading iframe with embedUrl:", embedUrl);
 
-  const box = document.getElementById('lbBox') || document.getElementById('p-frame');
-  const lbModal = document.getElementById('lightbox') || document.getElementById('player');
+  const box = document.getElementById('lbBox') || document.querySelector('.p-frame');
+  const lbModal = document.getElementById('lightbox') || document.getElementById('player') || document.querySelector('.lightbox');
 
   if (box) {
     if (embedUrl.includes('drive.google.com') || embedUrl.includes('youtube.com')) {
@@ -735,14 +820,13 @@ function openLightbox(urlOrIndex, isVertical = true) {
     if (typeof lbModal.showModal === 'function') {
       try {
         if (!lbModal.open) lbModal.showModal();
-      } catch(_) {
+      } catch (_) {
         lbModal.setAttribute('open', '');
-        lbModal.style.display = 'block';
       }
     } else {
       lbModal.setAttribute('open', '');
-      lbModal.style.display = 'block';
     }
+    lbModal.style.display = 'flex';
   }
 
   const pTitle = document.getElementById('p-title');
@@ -751,7 +835,7 @@ function openLightbox(urlOrIndex, isVertical = true) {
   if (pSub) pSub.textContent = `${kind} · ${dur}`;
   const dLink = document.getElementById('p-drive-link');
   if (dLink) {
-    if (url.includes('drive.google.com')) {
+    if (url.includes('drive.google.com') || embedUrl.includes('drive.google.com')) {
       dLink.href = embedUrl.replace('/preview', '/view');
       dLink.style.display = 'inline-flex';
     } else {
@@ -767,67 +851,66 @@ function openLightbox(urlOrIndex, isVertical = true) {
 
 function safeOpenPlayer(i, kind = 'short') {
   const now = performance.now();
-  if (now - lastOpenPlayerTime < 350) return;
+  if (now - lastOpenPlayerTime < 250) return;
   lastOpenPlayerTime = now;
   openLightbox(i, kind === 'short');
 }
 
 function closeLightbox() {
-  const box = document.getElementById('lbBox') || document.getElementById('p-frame');
-  const lbModal = document.getElementById('lightbox') || document.getElementById('player');
+  const box = document.getElementById('lbBox') || document.querySelector('.p-frame');
+  const lbModal = document.getElementById('lightbox') || document.getElementById('player') || document.querySelector('.lightbox');
   if (box) box.innerHTML = '';
   if (lbModal) {
     lbModal.classList.remove('open');
     try { if (lbModal.open) lbModal.close(); } catch(_) {}
     lbModal.removeAttribute('open');
-    lbModal.style.display = '';
+    lbModal.style.display = 'none';
   }
   document.documentElement.style.overflow = '';
   playerOpen = false;
   filmPreview = false;
   if (typeof syncShort === 'function') syncShort();
-  if (lastFocus && typeof lastFocus.focus === 'function') {
-    lastFocus.focus({ preventScroll: true });
-  }
 }
 
 window.openLightbox = openLightbox;
-window.openPlayer = function(i, kind = 'short') {
-  openLightbox(i, kind === 'short');
-};
+window.openPlayer = function(i, kind = 'short') { openLightbox(i, kind === 'short'); };
 window.safeOpenPlayer = safeOpenPlayer;
 window.closeLightbox = closeLightbox;
 window.closePlayer = closeLightbox;
 
+// =========================================================================
+// 3D Drum Carousel (Mathematical Cylinder)
+// =========================================================================
 function attachCardListeners() {
   cards.forEach((card, i) => {
     const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
     const video = list[i] || {};
 
-    // Direct click handler on the play button
+    // 1. Direct click on play button always opens lightbox
     const playBtn = card.querySelector('.playbtn');
     if (playBtn) {
       playBtn.style.cursor = 'pointer';
       playBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         e.preventDefault();
-        console.log("Clicked video:", video.videoUrl || video.src);
+        console.log("Clicked video play button:", video.videoUrl || video.src);
         touched();
         safeOpenPlayer(i, 'short');
       });
     }
 
-    // Direct click handler on the card itself - tap any card to open and play
+    // 2. Direct click on card: opens lightbox
     card.style.cursor = 'pointer';
     card.addEventListener('click', (e) => {
       if (e.target.closest('.snd-btn')) return;
-      if (moved) return; // user was actively dragging carousel
+      if (moved) return; // user was actively dragging
       e.stopPropagation();
-      console.log("Clicked video:", video.videoUrl || video.src);
+      console.log("Clicked video card:", video.videoUrl || video.src);
       touched();
       safeOpenPlayer(i, 'short');
     });
 
+    // 3. Time update tracking
     const v = card.querySelector('video'), bar = card.querySelector('.bar i'), cur = card.querySelector('.cur');
     if (v) {
       v.muted = !soundOn;
@@ -842,15 +925,17 @@ function attachCardListeners() {
 }
 
 function renderDrum(newItems) {
-  if (newItems && Array.isArray(newItems)) window.SHORTS = newItems;
-  const list = window.SHORTS || [];
+  if (newItems && Array.isArray(newItems) && newItems.length) {
+    window.SHORTS = newItems;
+    SHORTS = newItems;
+  }
+  const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
   if (!list.length) return;
   N = list.length;
   step = 360 / N;
-  idx = 0; angle = 0; target = 0;
 
   ring.innerHTML = list.map((w, i) => `
-    <article class="card${w.src ? ' has-video' : ''}" style="--h:${w.hue || (190 + (i*13)%160)}; --dur:${secs(w.dur || '0:30')}s" aria-label="${w.title}">
+    <article class="card${w.src ? ' has-video' : ''}" data-index="${i}" style="--h:${w.hue || (190 + (i * 13) % 160)}; --dur:${secs(w.dur || '0:30')}s" aria-label="${w.title}">
       <div class="screen">
         <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
         ${thumbImg(w)}
@@ -860,14 +945,15 @@ function renderDrum(newItems) {
           if (!isNat) return '';
           return '<video ' + (i === 0 ? 'src="' + sUrl + '"' : '') + ' data-src="' + sUrl + '" playsinline loop muted ' + (i === 0 ? 'preload="auto" autoplay' : 'preload="none"') + ' style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>';
         })()}
-        <span class="playbtn">${PLAY_SVG}</span>
+        <span class="playbtn" role="button" aria-label="Play ${w.title}">${PLAY_SVG}</span>
         ${w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
         <div class="cap"><h3>${w.title}</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>${w.dur || '0:30'}</span></div></div>
       </div>
     </article>`).join('');
+
   cards = [...ring.children];
 
-  const ticksEl = $('#ticks');
+  const ticksEl = document.getElementById('ticks');
   if (ticksEl) {
     ticksEl.innerHTML = list.map((w, i) => `<button type="button" aria-label="Show ${w.title}"></button>`).join('');
     ticks = [...ticksEl.children];
@@ -880,46 +966,49 @@ function renderDrum(newItems) {
   if (!reduced && cards[0]) startCard(cards[0]);
 }
 
-renderDrum();
-// Autoplay active card on load
-setTimeout(() => { if (cards && cards[0]) startCard(cards[0]); }, 120);
 function layout() {
   if (!cards || !cards.length || !cards[0]) return;
-  const w = cards[0].offsetWidth, half = stage.clientWidth / 2;
-  SPACING = Math.max(w * 0.5, Math.min(w * 0.84, (half - w * 0.3) / 2));
-  dragK = step / SPACING;
-  ring.style.transform = 'none';
+  const cardW = cards[0].offsetWidth || 210;
+  // Calculate exact cylindrical radius for N facets of width cardW
+  R = Math.round((cardW / 2) / Math.tan(Math.PI / N)) + 10;
+
+  // Apply fixed 3D cylinder positioning to each card
+  cards.forEach((c, i) => {
+    const cardAngle = i * step;
+    c.style.transform = `rotateY(${cardAngle.toFixed(4)}deg) translateZ(${R}px)`;
+    c.style.display = 'block';
+  });
+
   paint();
 }
+
 function paint() {
+  if (!cards || !cards.length) return;
+  // Rotate the cylinder around origin (0, 0, -R)
+  ring.style.transform = `translateZ(-${R}px) rotateY(${-angle.toFixed(4)}deg)`;
+
   cards.forEach((c, i) => {
+    // Angular distance from the camera center
     const d = ((((i * step - angle) % 360) + 540) % 360) - 180;
-    const sl = d / step, a = Math.abs(sl), sg = Math.sign(sl);
+    const absD = Math.abs(d);
 
-    // Extreme performance: hide back-facing cards (> 3 steps away) to reduce DOM mutations by 85%
-    if (a > 3.2) {
-      if (c.style.display !== 'none') {
-        c.style.display = 'none';
-        const v = c.querySelector('video');
-        if (v && !v.paused) v.pause();
-      }
-      return;
+    if (absD < step * 0.55) {
+      c.classList.add('active');
+      c.style.filter = 'brightness(1.08)';
+      c.style.opacity = '1';
+      c.style.zIndex = '60';
+      c.style.pointerEvents = 'auto';
+    } else {
+      c.classList.remove('active');
+      const dim = Math.max(0.42, 1 - (absD / 90) * 0.55);
+      c.style.filter = `brightness(${dim.toFixed(2)})`;
+      c.style.opacity = Math.max(0.32, 1 - (absD / 110)).toFixed(2);
+      c.style.zIndex = String(Math.max(1, 50 - Math.round(absD)));
+      c.style.pointerEvents = absD < 50 ? 'auto' : 'none';
     }
-    if (c.style.display === 'none') c.style.display = 'block';
-
-    const sp = SPACING * spread;
-    const x = sg * (Math.min(a, 1) * sp + Math.max(0, a - 1) * sp * 0.86);
-    const scale = 1 - Math.min(a, 2.5) * 0.09;
-    const rot = -sg * Math.min(a, 1) * 9;
-    const op = a <= 2 ? 1 - a * 0.07 : Math.max(0, 0.86 * (1 - (a - 2) / 0.7));
-
-    c.style.transform = `translateX(${x.toFixed(1)}px) translateZ(${(-a * 40).toFixed(1)}px) rotateY(${rot.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
-    c.style.opacity = op.toFixed(3);
-    c.style.zIndex = String(100 - Math.round(a * 10));
-    c.style.visibility = op > 0.01 ? 'visible' : 'hidden';
-    c.style.pointerEvents = a < 2.4 ? '' : 'none';
   });
 }
+
 function tick() {
   if (reduced) angle = target; else angle += (target - angle) * 0.14;
   if (!dragging && Math.abs(target - angle) < 0.05) angle = target;
@@ -928,11 +1017,7 @@ function tick() {
 }
 const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
 
-/* ---------- sound ----------
-   One sound setting for the whole site. It starts OFF; only the speaker icon on a video turns it on.
-   Once on, it stays on for every video (also after swiping); once muted, everything stays muted.
-   A page refresh starts muted again. */
-let soundOn = false;
+/* ---------- Sound Control ---------- */
 const SND_ON = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>';
 const SND_OFF = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w" d="M16.5 9.5l5 5M21.5 9.5l-5 5"/></svg>';
 const audible = () => soundOn;
@@ -959,20 +1044,10 @@ function setSound(on) { soundOn = on; refreshSound(); }
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 function restartBar(card) {
   const bar = card.querySelector('.bar i');
-  bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
-}
-cards.forEach((card) => {
-  const v = card.querySelector('video'), bar = card.querySelector('.bar i'), cur = card.querySelector('.cur');
-  if (v) {
-    v.muted = true;
-    v.addEventListener('timeupdate', () => {
-      if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + '%';
-      cur.textContent = fmt(v.currentTime);
-    });
-  } else {
-    bar.addEventListener('animationend', () => { if (card.classList.contains('playing')) restartBar(card); });
+  if (bar) {
+    bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
   }
-});
+}
 function stopAll() {
   cards.forEach((c) => {
     c.classList.remove('playing', 'paused');
@@ -981,7 +1056,6 @@ function stopAll() {
     else restartBar(c);
   });
 }
-/* Preload next and previous card videos for zero-latency rotation */
 function preloadNeighbors() {
   if (!cards || !cards.length) return;
   const cur = active();
@@ -998,9 +1072,6 @@ function preloadNeighbors() {
     }
   });
 }
-/* The center video only plays while: the carousel is on screen, this tab is the one being viewed,
-   no pop-up / long-form preview is playing, and the visitor hasn't paused it themselves. */
-stageVisible = true; userPaused = false; filmPreview = false; playerOpen = false;
 function syncShort() {
   const c = cards[active()];
   if (!c) return;
@@ -1039,11 +1110,12 @@ function togglePlay(card) {
 function info() {
   const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS;
   const w = list[active()] || list[0] || {};
-  $('#i-kind').textContent = w.kind || '';
-  $('#i-dur').textContent = w.dur || '';
-  $('#i-title').textContent = w.title || '';
-  $('#i-role').textContent = w.role || '';
-  $('#i-count').textContent = `${String(active() + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`;
+  const kEl = $('#i-kind'), dEl = $('#i-dur'), tEl = $('#i-title'), rEl = $('#i-role'), cEl = $('#i-count');
+  if (kEl) kEl.textContent = w.kind || '';
+  if (dEl) dEl.textContent = w.dur || '';
+  if (tEl) tEl.textContent = w.title || '';
+  if (rEl) rEl.textContent = w.role || '';
+  if (cEl) cEl.textContent = `${String(active() + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`;
   ticks.forEach((t, i) => t.setAttribute('aria-current', i === active() ? 'true' : 'false'));
 }
 function go(i) {
@@ -1059,90 +1131,110 @@ function goToCard(k) {
 }
 const touched = () => { lastTouch = Date.now(); };
 
-$('#prev').addEventListener('click', () => { touched(); go(idx - 1); });
-$('#next').addEventListener('click', () => { touched(); go(idx + 1); });
-ticks.forEach((t, i) => t.addEventListener('click', () => { touched(); goToCard(i); }));
+const prevBtn = document.getElementById('prev');
+if (prevBtn) prevBtn.addEventListener('click', () => { touched(); go(idx - 1); });
+const nextBtn = document.getElementById('next');
+if (nextBtn) nextBtn.addEventListener('click', () => { touched(); go(idx + 1); });
 
-let sx = 0, sy = 0, st = 0, sa = 0, moved = false, scrolled = false, downCard = null, downTarget = null;
+// =========================================================================
+// Drag & Touch Gestures on Stage
+// =========================================================================
 stage.addEventListener('pointerdown', (e) => {
   if (e.target.closest('.snd-btn')) return;
-  dragging = true; moved = false; scrolled = false;
-  sx = e.clientX; sy = e.clientY; st = performance.now(); sa = angle; touched();
+  dragging = true;
+  moved = false;
+  scrolled = false;
+  sx = e.clientX;
+  sy = e.clientY;
+  st = performance.now();
+  sa = angle;
   downCard = e.target.closest('.card');
   downTarget = e.target;
+  touched();
   kick();
 });
+
 stage.addEventListener('pointermove', (e) => {
   if (!dragging) return;
-  const dx = e.clientX - sx, dy = e.clientY - sy;
-  if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) scrolled = true; // finger is scrolling vertically
-  if (!scrolled && Math.abs(dx) > 6) {
+  const dx = e.clientX - sx;
+  const dy = e.clientY - sy;
+  if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) {
+    scrolled = true;
+    return;
+  }
+  if (!scrolled && Math.abs(dx) > 10) {
     if (!moved) {
       moved = true;
       try { stage.setPointerCapture(e.pointerId); } catch (_) {}
     }
-    angle = sa - dx * dragK;
+    const angularSpeed = 360 / (2 * Math.PI * (R || 1500));
+    angle = sa - dx * angularSpeed;
     target = angle;
   }
 });
-/* A tap only counts if the finger barely moved and wasn't scrolling. */
+
 function endDrag(e) {
   if (!dragging) return;
-  dragging = false; touched();
+  dragging = false;
+  touched();
   if (moved) {
     go(Math.round(angle / step));
+    setTimeout(() => { moved = false; }, 80);
   } else if (!scrolled && downCard) {
     const k = cards.indexOf(downCard);
     if (k !== -1) {
-      const isPlayBtn = downTarget && (downTarget.closest('.playbtn') || (e && e.target && e.target.closest && e.target.closest('.playbtn')));
-      const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS;
+      const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
       const video = list[k] || {};
-      console.log("Clicked video:", video.videoUrl || video.src);
+      console.log("Tap on card", k, video.videoUrl || video.src);
       safeOpenPlayer(k, 'short');
     }
   }
   kick();
 }
+
 stage.addEventListener('pointerup', endDrag);
 stage.addEventListener('pointercancel', endDrag);
+
 stage.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') { touched(); go(idx + 1); e.preventDefault(); }
   else if (e.key === 'ArrowLeft') { touched(); go(idx - 1); e.preventDefault(); }
-  else if (e.key === 'Enter') { touched(); openPlayer(active(), 'short'); e.preventDefault(); }
+  else if (e.key === 'Enter') { touched(); openLightbox(active(), true); e.preventDefault(); }
   else if (e.key === ' ') { touched(); togglePlay(cards[active()]); e.preventDefault(); }
 });
-/* two-finger swipe on a trackpad (only while the cursor is over the carousel):
-   the cards follow your fingers, then settle on the nearest video when you stop */
+
 let wheelIdle = 0;
 stage.addEventListener('wheel', (e) => {
   const dx = e.deltaMode === 1 ? e.deltaX * 16 : e.deltaX;
-  if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;   // mostly vertical: let the page scroll
-  e.preventDefault();                                      // stop the browser's back/forward swipe
+  if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+  e.preventDefault();
   touched();
-  angle += Math.max(-60, Math.min(60, dx)) * dragK;
+  const angularSpeed = 360 / (2 * Math.PI * (R || 1500));
+  angle += Math.max(-40, Math.min(40, dx)) * angularSpeed;
   target = angle;
   paint();
   clearTimeout(wheelIdle);
   wheelIdle = setTimeout(() => go(Math.round(angle / step)), 140);
 }, { passive: false });
+
 stage.addEventListener('mouseenter', () => { hover = true; });
 stage.addEventListener('mouseleave', () => { hover = false; });
 
 window.addEventListener('resize', layout);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+
 let popupWasPlaying = false;
 document.addEventListener('visibilitychange', () => {
   syncShort();
   if (document.hidden) document.querySelectorAll('.film .frame video').forEach((v) => v.pause());
-  const pv = document.querySelector('#p-frame video');
+  const pv = document.querySelector('#lbBox video, .p-frame video');
   if (pv) {
     if (document.hidden) { popupWasPlaying = !pv.paused; pv.pause(); }
     else if (popupWasPlaying) { pv.play().catch(() => {}); popupWasPlaying = false; }
   }
 });
-layout(); info();
-stageVisible = true;
-if (!reduced && cards[0]) startCard(cards[0]);
+
+// Initial mount
+renderDrum();
 
 if ('IntersectionObserver' in window) {
   new IntersectionObserver(([e]) => {
@@ -1151,7 +1243,6 @@ if ('IntersectionObserver' in window) {
   }, { threshold: 0.05, rootMargin: '160px 0px 160px 0px' }).observe(stage);
 }
 
-// Ensure video autoplays immediately on page load across all browsers
 function tryAutoplay() {
   if (cards && cards[0]) {
     const v = cards[0].querySelector('video');
@@ -1165,7 +1256,6 @@ function tryAutoplay() {
     startCard(cards[0]);
   }
 }
-
 setTimeout(tryAutoplay, 60);
 window.addEventListener('load', tryAutoplay);
 ['click', 'touchstart', 'scroll', 'keydown'].forEach(ev => {
@@ -1180,9 +1270,9 @@ window.addEventListener('load', tryAutoplay);
   }, { once: true, passive: true });
 });
 
-/* ---------- long-form ----------
-   Desktop: hovering a film plays a silent preview; moving away pauses it.
-   Click / tap / Enter: opens the pop-up player with sound. Close with X, Esc, or a click outside. */
+// =========================================================================
+// Long-Form Grid (16:9 Films)
+// =========================================================================
 const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 function renderFilms(newItems) {
@@ -1226,8 +1316,8 @@ function renderFilms(newItems) {
         else if (bar) { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = ''; }
       });
     }
-    fr.addEventListener('click', (e) => { if (e.target.closest('.snd-btn')) return; openPlayer(+fr.dataset.i, 'film'); });
-    fr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPlayer(+fr.dataset.i, 'film'); } });
+    fr.addEventListener('click', (e) => { if (e.target.closest('.snd-btn')) return; openLightbox(+fr.dataset.i, false); });
+    fr.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(+fr.dataset.i, false); } });
   });
 }
 
@@ -1274,7 +1364,7 @@ refreshSound();
 const pCloseBtn = document.getElementById('p-close');
 if (pCloseBtn) pCloseBtn.addEventListener('click', closeLightbox);
 
-const playerModal = document.getElementById('player') || document.getElementById('lightbox');
+const playerModal = document.getElementById('lightbox') || document.getElementById('player');
 if (playerModal) {
   playerModal.addEventListener('click', (e) => {
     if (e.target.closest('#lbBox, .p-frame, .p-meta, .close')) return;
@@ -1297,14 +1387,12 @@ if ($('#copy')) $('#copy').addEventListener('click', async () => {
   setTimeout(() => { btn.textContent = 'Copy email'; }, 1800);
 });
 
-/* ---------- entrance animations ----------
-   Hero: soft blurred fade-in on load. Every section below: reveals as it scrolls into view. */
+/* ---------- entrance animations ---------- */
 (function () {
   if (reduced || !('IntersectionObserver' in window)) return;
   document.documentElement.classList.add('anim', 'anim-init');
   const mark = (el, d, cls = 'rv') => { if (el) { el.classList.add(cls); el.style.setProperty('--d', d + 's'); } return el; };
 
-  // hero (on load)
   const hero = [
     mark($('.top'), 0),
     mark($('#portrait'), 0.1, 'rv-photo'),
@@ -1318,7 +1406,6 @@ if ($('#copy')) $('#copy').addEventListener('click', async () => {
   ];
   setTimeout(() => requestAnimationFrame(() => hero.forEach((el) => el && el.classList.add('in'))), 120);
 
-  // scroll reveals
   const groups = [];
   const add = (el, d, cls) => { if (el) { mark(el, d, cls); groups.push(el); } };
   document.querySelectorAll('section .sec-head').forEach((h) => { add(h.querySelector('h2'), 0); add(h.querySelector('.mono'), 0.15); });
@@ -1329,27 +1416,13 @@ if ($('#copy')) $('#copy').addEventListener('click', async () => {
   document.querySelectorAll('.contact-list .mail').forEach((m, i) => add(m, 0.25 + i * 0.15));
   add($('footer'), 0);
 
-  // start hidden without animating to the hidden state, then enable transitions
   void document.body.offsetHeight;
   document.documentElement.classList.remove('anim-init');
-
-  // short-form cards start stacked and fan out when the carousel comes into view
-  spread = 0; paint();
-  function fanOut() {
-    const t0 = performance.now(), D = 1300;
-    (function step(now) {
-      const t = Math.min(1, (now - t0) / D);
-      spread = 1 - Math.pow(1 - t, 4);
-      paint();
-      if (t < 1) requestAnimationFrame(step);
-    })(t0);
-  }
 
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       if (!e.isIntersecting) return;
       e.target.classList.add('in');
-      if (e.target.id === 'stage') setTimeout(fanOut, 250);
       io.unobserve(e.target);
     });
   }, { threshold: 0.18, rootMargin: '0px 0px -6% 0px' });
