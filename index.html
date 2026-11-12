@@ -6,7 +6,72 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+/* Filter Tabs Styling */
+.filter-tabs-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 22px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+}
+.filter-tabs {
+  display: inline-flex;
+  gap: 8px;
+  padding: 5px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.ftab {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+.ftab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+.ftab.active {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* Card Glow & Seamless Direct Playback Styling */
+.card {
+  transition: filter .35s cubic-bezier(0.16, 1, 0.3, 1), opacity .35s cubic-bezier(0.16, 1, 0.3, 1), transform .35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.card.active .screen {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 50px -10px color-mix(in srgb, var(--accent) 25%, rgba(0,0,0,0.85));
+}
+.card.playing .screen {
+  border-color: var(--accent);
+  box-shadow: 0 25px 60px -10px color-mix(in srgb, var(--accent) 45%, rgba(0,0,0,0.9));
+}
+.card .screen video {
+  border-radius: inherit;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.card.active:hover .screen video {
+  transform: scale(1.02);
+}
+
+</style>
 <title>Omar Mostafa Portfolio</title>
 <!-- ===== Browser tab icon + link preview (WhatsApp, Facebook, LinkedIn, X...) =====
      Upload icon.png, favicon-32.png, apple-touch-icon.png and preview.jpg next to index.html.
@@ -424,7 +489,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
     <a class="brand" href="#top">Portfolio</a>
     <nav aria-label="Sections">
       <a href="#shorts">Short-form</a>
-      <a href="#films">Long-form</a>
+      <!-- <a href="#films">Long-form</a> -->
       <a href="#services">Services</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -453,6 +518,18 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
         <span class="mono">9:16 &nbsp;·&nbsp; drag, swipe or use arrow keys</span>
       </div>
 
+      
+      <!-- Industry / Niche Filter Tabs -->
+      <div class="filter-tabs-container">
+        <div class="filter-tabs" role="tablist" aria-label="تصفية حسب التخصص">
+          <button type="button" class="ftab active" data-genre="all">الكل (All)</button>
+          <button type="button" class="ftab" data-genre="gym">جيم ورياضة (Fitness)</button>
+          <button type="button" class="ftab" data-genre="medical">طب ورعاية (Medical)</button>
+          <button type="button" class="ftab" data-genre="commercial">إعلانات (Commercials)</button>
+          <button type="button" class="ftab" data-genre="podcast">بودكاست (Podcasts)</button>
+        </div>
+      </div>
+
       <div class="stage" id="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Short-form videos. Use left and right arrows to rotate, Enter to play.">
         <div class="ring" id="ring"></div>
       </div>
@@ -472,7 +549,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
       <div class="ticks" id="ticks"></div>
     </section>
 
-    <section id="films" aria-labelledby="films-h">
+    <section id="films" aria-labelledby="films-h" style="display:none !important;">
       <div class="sec-head">
         <h2 id="films-h">Long-form</h2>
         <span class="mono">16:9</span>
@@ -507,17 +584,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
     </section>
   </main>
 
-  <dialog class="player lightbox" id="lightbox" aria-labelledby="p-title">
-    <button type="button" class="close" id="p-close" aria-label="Close player"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    <div class="p-frame" id="lbBox"></div>
-    <div class="p-meta">
-      <div>
-        <h3 id="p-title"></h3>
-        <span class="mono" id="p-sub"></span>
-      </div>
-      <a id="p-drive-link" href="#" target="_blank" rel="noopener" class="btn" style="padding:6px 14px;font-size:12px;margin-left:auto;text-decoration:none;display:none;">مشاهدة في Drive ↗</a>
-    </div>
-  </dialog>
+  <!-- Lightbox modal removed for direct in-place video playback -->
 
   <footer>
     <span class="mono">© 2026 Omar Mostafa</span>
@@ -907,28 +974,36 @@ function attachCardListeners() {
     const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
     const video = list[i] || {};
 
-    // 1. Direct click on play button always opens lightbox
+    // 1. Direct click on play button: direct in-place playback with sound
     const playBtn = card.querySelector('.playbtn');
     if (playBtn) {
       playBtn.style.cursor = 'pointer';
       playBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         e.preventDefault();
-        console.log("Clicked video play button:", video.videoUrl || video.src);
         touched();
-        safeOpenPlayer(i, 'short');
+        if (i !== active()) {
+          go(i);
+        } else {
+          setSound(true);
+          togglePlay(card);
+        }
       });
     }
 
-    // 2. Direct click on card: opens lightbox
+    // 2. Direct click on card: plays directly in place without popup modal!
     card.style.cursor = 'pointer';
     card.addEventListener('click', (e) => {
       if (e.target.closest('.snd-btn')) return;
       if (moved) return; // user was actively dragging
       e.stopPropagation();
-      console.log("Clicked video card:", video.videoUrl || video.src);
       touched();
-      safeOpenPlayer(i, 'short');
+      if (i !== active()) {
+        go(i);
+      } else {
+        setSound(true);
+        togglePlay(card);
+      }
     });
 
     // 3. Time update tracking
@@ -1208,10 +1283,12 @@ function endDrag(e) {
   } else if (!scrolled && downCard) {
     const k = cards.indexOf(downCard);
     if (k !== -1) {
-      const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
-      const video = list[k] || {};
-      console.log("Tap on card", k, video.videoUrl || video.src);
-      safeOpenPlayer(k, 'short');
+      if (k !== active()) {
+        go(k);
+      } else {
+        setSound(true);
+        togglePlay(cards[k]);
+      }
     }
   }
   kick();
@@ -1223,7 +1300,7 @@ stage.addEventListener('pointercancel', endDrag);
 stage.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight') { touched(); go(idx + 1); e.preventDefault(); }
   else if (e.key === 'ArrowLeft') { touched(); go(idx - 1); e.preventDefault(); }
-  else if (e.key === 'Enter') { touched(); openLightbox(active(), true); e.preventDefault(); }
+  else if (e.key === 'Enter') { touched(); togglePlay(cards[active()]); e.preventDefault(); }
   else if (e.key === ' ') { touched(); togglePlay(cards[active()]); e.preventDefault(); }
 });
 
@@ -1405,6 +1482,68 @@ if (playerModal) {
   });
 }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && playerOpen) closeLightbox(); });
+
+
+/* ---------- Copy Phone Number ---------- */
+const copyPhoneBtn = document.getElementById('copy-phone');
+if (copyPhoneBtn) {
+  copyPhoneBtn.addEventListener('click', async () => {
+    const phoneVal = '+201144826641';
+    try {
+      await navigator.clipboard.writeText(phoneVal);
+      copyPhoneBtn.textContent = 'Copied!';
+    } catch (_) {
+      const phEl = document.getElementById('phone');
+      const r = document.createRange(); r.selectNodeContents(phEl);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      copyPhoneBtn.textContent = 'Press Ctrl+C';
+    }
+    setTimeout(() => { copyPhoneBtn.textContent = 'Copy My Phone'; }, 2000);
+  });
+}
+
+/* ---------- Industry / Niche Filter Tabs ---------- */
+(function setupFilterTabs() {
+  const tabs = document.querySelectorAll('.ftab');
+  if (!tabs.length) return;
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const genre = tab.dataset.genre || 'all';
+
+      const fullList = (window.ALL_SHORTS_CATALOG && window.ALL_SHORTS_CATALOG.length)
+        ? window.ALL_SHORTS_CATALOG
+        : (window.SHORTS && window.SHORTS.length ? [...window.SHORTS] : [...INITIAL_GYM_VIDEOS]);
+
+      if (!window.ALL_SHORTS_CATALOG) {
+        window.ALL_SHORTS_CATALOG = fullList;
+      }
+
+      let filtered = fullList;
+      if (genre === 'gym') {
+        filtered = fullList.filter(v => (v.kind || v.genre || '').toLowerCase().includes('gym') || (v.kind || v.genre || '').toLowerCase().includes('fitness') || (v.title || '').toLowerCase().includes('gym'));
+      } else if (genre === 'medical') {
+        filtered = fullList.filter(v => (v.kind || v.genre || '').toLowerCase().includes('med') || (v.kind || v.genre || '').toLowerCase().includes('health') || (v.kind || v.genre || '').toLowerCase().includes('طب'));
+      } else if (genre === 'commercial') {
+        filtered = fullList.filter(v => (v.kind || v.genre || '').toLowerCase().includes('comm') || (v.kind || v.genre || '').toLowerCase().includes('ad') || (v.kind || v.genre || '').toLowerCase().includes('إعلان'));
+      } else if (genre === 'podcast') {
+        filtered = fullList.filter(v => (v.kind || v.genre || '').toLowerCase().includes('pod') || (v.kind || v.genre || '').toLowerCase().includes('بودكاست'));
+      }
+
+      if (!filtered.length) {
+        filtered = fullList; // Fallback so carousel is never empty
+      }
+
+      stopAll();
+      idx = 0;
+      angle = 0;
+      target = 0;
+      renderDrum(filtered);
+    });
+  });
+})();
 
 /* ---------- copy email ---------- */
 if ($('#copy')) $('#copy').addEventListener('click', async () => {
