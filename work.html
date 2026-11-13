@@ -446,6 +446,27 @@ html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transiti
 .snd-btn svg { width: 17px; height: 17px; fill: currentColor; }
 .snd-btn svg .w { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 .thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; border-radius: inherit; }
+.card .screen iframe.card-player {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  z-index: 100 !important;
+  border-radius: inherit;
+  background: #000;
+  pointer-events: auto;
+}
+.card.playing .thumb,
+.card.playing video,
+.card.playing .art,
+.card.playing .playbtn,
+.card.playing .cap {
+  display: none !important;
+}
+.card.playing .screen::after {
+  display: none !important;
+}
 .film .frame .thumb { transition: transform 6s ease-out; }
 .film .frame.hovering .thumb { transform: scale(1.06); }
 .film .frame .snd-btn { top: 10px; right: 10px; width: 30px; height: 30px; }
@@ -812,7 +833,7 @@ function getCleanEmbedUrl(url) {
 
 const thumbImg = (x, isLazy = false) => {
   const fid = extractDriveId(x.fileId || x.id || x.videoUrl || x.src) || '';
-  const rawP = x.thumbnail || x.poster || (fid ? 'https://drive.google.com/thumbnail?id=' + fid + '&sz=w600' : '');
+  const rawP = x.thumbnail || x.poster || (fid ? 'https://lh3.googleusercontent.com/d/' + fid + '=w400' : '');
   const p = sanitizeUrl(rawP);
   if (!p) return '';
   const lazyAttr = isLazy ? ' loading="lazy"' : '';
@@ -1061,7 +1082,7 @@ function renderDrum(newItems) {
     <article class="card${(w.src || fid) ? ' has-video' : ''}" data-index="${i}" data-drive-id="${fid}" data-embed-url="${cleanEmbed}" style="--h:${Number(w.hue) || (190 + (i * 13) % 160)}; --dur:${secs(w.dur || '0:30')}s" aria-label="${safeTitle}">
       <div class="screen">
         <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
-        ${thumbImg(w)}
+        ${thumbImg(w, i > 2)}
         ${videoTag}
         <span class="playbtn" role="button" aria-label="Play ${safeTitle}">${PLAY_SVG}</span>
         ${w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
@@ -1317,17 +1338,7 @@ function endDrag(e) {
   if (moved) {
     go(Math.round(angle / step));
     setTimeout(() => { moved = false; }, 80);
-  } else if (!scrolled && downCard) {
-    const k = cards.indexOf(downCard);
-    if (k !== -1) {
-      if (k !== active()) {
-        go(k);
-      } else {
-        setSound(true);
-        togglePlay(cards[k]);
-      }
-    }
-  }
+
   kick();
 }
 
@@ -1753,8 +1764,8 @@ function startFirestoreSync() {
           kind: v.genre || 'Gym & Fitness',
           dur: v.duration || '0:30',
           role: v.role || 'Edit · sound design · color',
-          poster: v.thumbnail || (fid ? `https://drive.google.com/thumbnail?id=${fid}&sz=w600` : ''),
-          thumbnail: v.thumbnail || (fid ? `https://drive.google.com/thumbnail?id=${fid}&sz=w600` : ''),
+          poster: v.thumbnail || (fid ? `https://lh3.googleusercontent.com/d/${fid}=w400` : ''),
+          thumbnail: v.thumbnail || (fid ? `https://lh3.googleusercontent.com/d/${fid}=w400` : ''),
           src: v.videoUrl || (fid ? `https://drive.google.com/file/d/${fid}/preview` : ''),
           videoUrl: v.videoUrl || (fid ? `https://drive.google.com/file/d/${fid}/preview` : ''),
           hue: 180 + (fsShorts.length * 13) % 170,
@@ -1778,8 +1789,8 @@ function startFirestoreSync() {
           title: v.title || 'Gym Workout',
           kind: v.genre || 'Gym & Fitness',
           dur: v.duration || '3:00',
-          poster: v.thumbnail || (fid ? `https://drive.google.com/thumbnail?id=${fid}&sz=w600` : ''),
-          thumbnail: v.thumbnail || (fid ? `https://drive.google.com/thumbnail?id=${fid}&sz=w600` : ''),
+          poster: v.thumbnail || (fid ? `https://lh3.googleusercontent.com/d/${fid}=w400` : ''),
+          thumbnail: v.thumbnail || (fid ? `https://lh3.googleusercontent.com/d/${fid}=w400` : ''),
           src: v.videoUrl || (fid ? `https://drive.google.com/file/d/${fid}/preview` : ''),
           videoUrl: v.videoUrl || (fid ? `https://drive.google.com/file/d/${fid}/preview` : ''),
           hue: 200 + (fsLongs.length * 17) % 150,
