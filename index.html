@@ -461,11 +461,10 @@ html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transiti
 .thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; border-radius: inherit; }
 .card .screen iframe.card-player {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 138%;
-  height: 138%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: none;
   border: none;
   z-index: 100 !important;
   border-radius: inherit;
@@ -559,24 +558,25 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
       <div class="filter-tabs-container">
         <div class="filter-tabs" role="tablist" aria-label="Filter by Industry">
           <button type="button" class="ftab active" data-cat="all">All (213)</button>
-          <button type="button" class="ftab" data-cat="fitness">Fitness / جيم (46)</button>
-          <button type="button" class="ftab" data-cat="medical">Medical / طبي (33)</button>
+          <button type="button" class="ftab" data-cat="fitness">Fitness (46)</button>
+          <button type="button" class="ftab" data-cat="medical">Medical (33)</button>
+          <button type="button" class="ftab" data-cat="commercials">Commercials (134)</button>
           <button type="button" class="ftab" data-cat="ai">AI (18)</button>
-          <button type="button" class="ftab" data-cat="cafe">Cafe / كافيه (17)</button>
-          <button type="button" class="ftab" data-cat="finishing">Finishing / تشطيب (16)</button>
-          <button type="button" class="ftab" data-cat="lighting">Lighting / نجف (15)</button>
-          <button type="button" class="ftab" data-cat="fashion">Fashion / ملابس (14)</button>
-          <button type="button" class="ftab" data-cat="beauty">Beauty / تجميل (11)</button>
-          <button type="button" class="ftab" data-cat="event">Event / ايفنت (9)</button>
-          <button type="button" class="ftab" data-cat="cars">Cars / عربيات (8)</button>
-          <button type="button" class="ftab" data-cat="realestate">Real Estate / عقارات (7)</button>
-          <button type="button" class="ftab" data-cat="agency">Agency / ايجنسي (5)</button>
-          <button type="button" class="ftab" data-cat="dates">Dates / بلح (4)</button>
-          <button type="button" class="ftab" data-cat="kitchens">Kitchens / مطابخ (3)</button>
-          <button type="button" class="ftab" data-cat="restaurant">Restaurant / مطعم (3)</button>
-          <button type="button" class="ftab" data-cat="motion">Motion / موشن (2)</button>
-          <button type="button" class="ftab" data-cat="saudi">Saudi / سعودي (2)</button>
-        </div>
+          <button type="button" class="ftab" data-cat="cafe">Cafe (17)</button>
+          <button type="button" class="ftab" data-cat="finishing">Finishing (16)</button>
+          <button type="button" class="ftab" data-cat="lighting">Lighting (15)</button>
+          <button type="button" class="ftab" data-cat="fashion">Fashion (14)</button>
+          <button type="button" class="ftab" data-cat="beauty">Beauty (11)</button>
+          <button type="button" class="ftab" data-cat="event">Event (9)</button>
+          <button type="button" class="ftab" data-cat="cars">Cars (8)</button>
+          <button type="button" class="ftab" data-cat="realestate">Real Estate (7)</button>
+          <button type="button" class="ftab" data-cat="agency">Agency (5)</button>
+          <button type="button" class="ftab" data-cat="dates">Dates (4)</button>
+          <button type="button" class="ftab" data-cat="kitchens">Kitchens (3)</button>
+          <button type="button" class="ftab" data-cat="restaurant">Restaurant (3)</button>
+          <button type="button" class="ftab" data-cat="motion">Motion (2)</button>
+          <button type="button" class="ftab" data-cat="saudi">Saudi (2)</button>
+        </div></div>
       </div>
 
       <div class="stage" id="stage" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Short-form videos. Use left and right arrows to rotate, Enter to play.">
@@ -860,7 +860,7 @@ let userPaused = false;
 let filmPreview = false;
 let lastOpenPlayerTime = 0;
 
-const active = () => ((Math.round(angle / step) % N) + N) % N;
+const active = () => ((Math.round(currentPos) % N) + N) % N;
 
 // =========================================================================
 // Modal Lightbox Player (Google Drive iframe & Direct video)
@@ -982,59 +982,19 @@ window.safeOpenPlayer = safeOpenPlayer;
 window.closeLightbox = closeLightbox;
 window.closePlayer = closeLightbox;
 
+//// =========================================================================
+// Ultra-Smooth 3D Virtualized Coverflow Engine (Apple / Studio Grade)
 // =========================================================================
-// 3D Drum Carousel (Mathematical Cylinder)
-// =========================================================================
-function attachCardListeners() {
-  cards.forEach((card, i) => {
-    const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
-    const video = list[i] || {};
-
-    // 1. Direct click on play button: direct in-place playback with sound
-    const playBtn = card.querySelector('.playbtn');
-    if (playBtn) {
-      playBtn.style.cursor = 'pointer';
-      playBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        touched();
-        if (i !== active()) {
-          go(i);
-        } else {
-          setSound(true);
-          togglePlay(card);
-        }
-      });
-    }
-
-    // 2. Direct click on card: plays directly in place without popup modal!
-    card.style.cursor = 'pointer';
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('.snd-btn')) return;
-      if (moved) return; // user was actively dragging
-      e.stopPropagation();
-      touched();
-      if (i !== active()) {
-        go(i);
-      } else {
-        setSound(true);
-        togglePlay(card);
-      }
-    });
-
-    // 3. Time update tracking
-    const v = card.querySelector('video'), bar = card.querySelector('.bar i'), cur = card.querySelector('.cur');
-    if (v) {
-      v.muted = !soundOn;
-      v.addEventListener('timeupdate', () => {
-        if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + '%';
-        cur.textContent = fmt(v.currentTime);
-      });
-    } else if (bar) {
-      bar.addEventListener('animationend', () => { if (card.classList.contains('playing')) restartBar(card); });
-    }
-  });
-}
+let currentIndex = 0;
+let currentPos = 0;       // Smooth floating virtual index
+let targetPos = 0;        // Target integer index
+let isDraggingStage = false;
+let startDragX = 0;
+let lastDragX = 0;
+let lastDragTime = 0;
+let stageVelocity = 0;
+let snapTimer = null;
+let autoplayTimer = null;
 
 function renderDrum(newItems) {
   if (newItems && Array.isArray(newItems)) {
@@ -1043,7 +1003,7 @@ function renderDrum(newItems) {
   }
   const list = Array.isArray(window.SHORTS) ? window.SHORTS : INITIAL_GYM_VIDEOS;
   if (!list.length) {
-    ring.innerHTML = '<div style="position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-family:var(--font-mono);font-size:14px;text-transform:uppercase;letter-spacing:1px;text-align:center;padding:20px;">No videos found in this category yet.<br><span style="font-size:12px;opacity:0.7;margin-top:8px;">Add videos in this niche from admin panel.</span></div>';
+    ring.innerHTML = '<div style="position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-family:var(--font-mono);font-size:14px;text-transform:uppercase;letter-spacing:1px;text-align:center;padding:20px;">No videos found in this category yet.</div>';
     cards = [];
     const ticksEl = document.getElementById('ticks');
     if (ticksEl) ticksEl.innerHTML = '';
@@ -1051,34 +1011,37 @@ function renderDrum(newItems) {
     if (kEl) kEl.textContent = '';
     if (dEl) dEl.textContent = '';
     if (tEl) tEl.textContent = 'No videos';
-    if (rEl) rEl.textContent = 'Upload or sync videos from admin';
+    if (rEl) rEl.textContent = 'Add videos from admin';
     if (cEl) cEl.textContent = '00 / 00';
     return;
   }
-  N = list.length;
-  step = 360 / N;
 
+  N = list.length;
+  currentIndex = 0;
+  currentPos = 0;
+  targetPos = 0;
+
+  // Render all cards as lightweight items; offscreen cards stay lightweight
   ring.innerHTML = list.map((w, i) => {
-    const safeTitle = escapeHTML(w.title || `Short #${i + 1}`);
+    const safeTitle = escapeHTML(w.title || ('Video #' + (i + 1)));
     const safeDur = escapeHTML(w.dur || '0:30');
     const sUrl = sanitizeUrl(getDirectStreamUrl(w.src || w.videoUrl));
     const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
     const videoTag = isNat
-      ? `<video ${i === 0 ? `src="${sUrl}"` : ''} data-src="${sUrl}" playsinline loop muted ${i === 0 ? 'preload="none"' : 'preload="none"'} style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>`
+      ? '<video data-src="' + sUrl + '" playsinline loop muted preload="none" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>'
       : '';
     const fid = extractDriveId(w.fileId || w.id || w.videoUrl || w.src);
-    const cleanEmbed = fid ? `https://drive.google.com/file/d/${fid}/preview?autoplay=1` : '';
-    return `
-    <article class="card${(w.src || fid) ? ' has-video' : ''}" data-index="${i}" data-drive-id="${fid}" data-embed-url="${cleanEmbed}" style="--h:${Number(w.hue) || (190 + (i * 13) % 160)}; --dur:${secs(w.dur || '0:30')}s" aria-label="${safeTitle}">
-      <div class="screen">
-        <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
-        ${thumbImg(w, i > 2)}
-        ${videoTag}
-        <span class="playbtn" role="button" aria-label="Play ${safeTitle}">${PLAY_SVG}</span>
-        ${w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
-        <div class="cap"><h3>${safeTitle}</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>${safeDur}</span></div></div>
-      </div>
-    </article>`;
+    const cleanEmbed = fid ? ('https://drive.google.com/file/d/' + fid + '/preview?autoplay=1') : '';
+    return '<article class="card' + ((w.src || fid) ? ' has-video' : '') + '" data-index="' + i + '" data-drive-id="' + fid + '" data-embed-url="' + cleanEmbed + '" style="--h:' + (Number(w.hue) || (190 + (i * 13) % 160)) + ';" aria-label="' + safeTitle + '">' +
+      '<div class="screen">' +
+        '<div class="art"><b>' + String(i + 1).padStart(2, '0') + '</b></div>' +
+        thumbImg(w, i > 3) +
+        videoTag +
+        '<span class="playbtn" role="button" aria-label="Play ' + safeTitle + '">' + PLAY_SVG + '</span>' +
+        (w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : '') +
+        '<div class="cap"><h3>' + safeTitle + '</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>' + safeDur + '</span></div></div>' +
+      '</div>' +
+    '</article>';
   }).join('');
 
   cards = [...ring.children];
@@ -1091,7 +1054,7 @@ function renderDrum(newItems) {
       ticks = [];
     } else {
       ticksEl.style.display = 'flex';
-      ticksEl.innerHTML = list.map((w, i) => `<button type="button" aria-label="Show ${escapeHTML(w.title || '')}"></button>`).join('');
+      ticksEl.innerHTML = list.map((w, i) => '<button type="button" aria-label="Show ' + escapeHTML(w.title || '') + '"></button>').join('');
       ticks = [...ticksEl.children];
       ticks.forEach((t, i) => t.addEventListener('click', () => { touched(); goToCard(i); }));
     }
@@ -1100,40 +1063,39 @@ function renderDrum(newItems) {
   attachCardListeners();
   layout();
   info();
-  if (!reduced && cards[0]) startCard(cards[0]);
+  kick();
+  schedulePlayCurrent(150);
 }
 
 function layout() {
   if (!cards || !cards.length || !cards[0]) return;
-  const cardW = cards[0].offsetWidth || 210;
-  // Calculate exact cylindrical radius for N facets of width cardW
-  R = Math.round((cardW / 2) / Math.tan(Math.PI / N)) + 10;
-
-  // Apply fixed 3D cylinder positioning to each card
-  cards.forEach((c, i) => {
-    const cardAngle = i * step;
-    c.style.transform = `rotateY(${cardAngle.toFixed(4)}deg) translateZ(${R}px)`;
-    c.style.display = 'block';
-  });
-
+  // Coverflow does not require cylindrical tan math!
   paint();
 }
 
 function paint() {
   if (!cards || !cards.length) return;
-  ring.style.transform = `translateZ(-${R}px) rotateY(${-angle.toFixed(3)}deg)`;
-
   const total = cards.length;
-  // Frustum culling threshold: only display cards within view range (~75 to 80 deg)
-  const maxVisibleDeg = Math.min(85, Math.max(60, step * 4));
+  const stageWidth = stage.offsetWidth || window.innerWidth;
+  const isMobile = stageWidth < 640;
+  
+  // Responsive spread spacing between cards in 3D
+  const cardSpacing = isMobile ? Math.min(160, stageWidth * 0.42) : 220;
 
   for (let i = 0; i < total; i++) {
     const c = cards[i];
-    const d = ((((i * step - angle) % 360) + 540) % 360) - 180;
-    const absD = Math.abs(d);
+    let offset = i - currentPos;
 
-    // Frustum Culling: Turn off display for back-facing / off-screen cards
-    if (absD > maxVisibleDeg) {
+    // Loop offset for infinite carousel illusion when total > 5
+    if (total > 5) {
+      while (offset > total / 2) offset -= total;
+      while (offset < -total / 2) offset += total;
+    }
+
+    const absOffset = Math.abs(offset);
+
+    // Virtualization / Culling: cards further than 3.2 positions away are culled
+    if (absOffset > 3.4) {
       if (c._visible !== false) {
         c.style.display = 'none';
         c._visible = false;
@@ -1146,36 +1108,196 @@ function paint() {
       c._visible = true;
     }
 
-    if (absD < step * 0.55) {
+    // Mathematical 3D Coverflow Transform
+    const sign = offset < 0 ? -1 : (offset > 0 ? 1 : 0);
+    const clampedOffset = Math.max(-3, Math.min(3, offset));
+    
+    // Translation X, Z depth and Y rotation
+    const tx = clampedOffset * cardSpacing;
+    const tz = -Math.min(380, absOffset * (isMobile ? 120 : 150));
+    const ry = -sign * Math.min(52, absOffset * 38);
+    const scale = Math.max(0.72, 1 - absOffset * 0.10);
+
+    c.style.transform = 'translate3d(' + tx.toFixed(2) + 'px, 0, ' + tz.toFixed(2) + 'px) rotateY(' + ry.toFixed(2) + 'deg) scale(' + scale.toFixed(3) + ')';
+    c.style.zIndex = String(Math.round(100 - absOffset * 20));
+
+    if (absOffset < 0.45) {
       if (!c._isActive) {
         c.classList.add('active');
         c._isActive = true;
       }
-      c.style.filter = 'brightness(1.1)';
+      c.style.filter = 'brightness(1.08)';
       c.style.opacity = '1';
-      c.style.zIndex = '60';
       c.style.pointerEvents = 'auto';
     } else {
       if (c._isActive) {
         c.classList.remove('active');
         c._isActive = false;
       }
-      const dim = Math.max(0.45, 1 - (absD / 90) * 0.52);
-      c.style.filter = `brightness(${dim.toFixed(2)})`;
-      c.style.opacity = Math.max(0.28, 1 - (absD / 115)).toFixed(2);
-      c.style.zIndex = String(Math.max(1, 50 - Math.round(absD)));
-      c.style.pointerEvents = absD < 50 ? 'auto' : 'none';
+      const dim = Math.max(0.35, 1 - absOffset * 0.28);
+      c.style.filter = 'brightness(' + dim.toFixed(2) + ')';
+      c.style.opacity = Math.max(0.25, 1 - absOffset * 0.30).toFixed(2);
+      c.style.pointerEvents = absOffset < 1.6 ? 'auto' : 'none';
     }
   }
 }
 
 function tick() {
-  if (reduced) angle = target; else angle += (target - angle) * 0.10;
-  if (!dragging && Math.abs(target - angle) < 0.05) angle = target;
+  if (reduced) {
+    currentPos = targetPos;
+  } else {
+    // Smooth 60fps spring lerp interpolation
+    const diff = targetPos - currentPos;
+    currentPos += diff * 0.16;
+    if (!isDraggingStage && Math.abs(diff) < 0.003) {
+      currentPos = targetPos;
+    }
+  }
+
   paint();
-  raf = (dragging || angle !== target) ? requestAnimationFrame(tick) : 0;
+
+  if (isDraggingStage || Math.abs(targetPos - currentPos) >= 0.003) {
+    raf = requestAnimationFrame(tick);
+  } else {
+    raf = 0;
+  }
 }
+
 const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
+
+function schedulePlayCurrent(delay = 180) {
+  clearTimeout(autoplayTimer);
+  autoplayTimer = setTimeout(() => {
+    if (!cards || !cards.length) return;
+    const actIdx = active();
+    stopAll(actIdx);
+    const card = cards[actIdx];
+    if (card && stageVisible && !document.hidden && !playerOpen && !filmPreview && !userPaused) {
+      card.classList.add('playing');
+      card.classList.remove('paused');
+      mountCardMedia(card);
+    }
+  }, delay);
+}
+
+function stopAll(exceptIndex = -1) {
+  cards.forEach((c, i) => {
+    if (i !== exceptIndex) {
+      c.classList.remove('playing', 'paused');
+      const ifr = c.querySelector('iframe.card-player');
+      if (ifr) ifr.remove();
+      const v = c.querySelector('video');
+      if (v) {
+        v.pause();
+        try { v.currentTime = 0; } catch(_) {}
+      } else {
+        restartBar(c);
+      }
+    }
+  });
+}
+
+function mountCardMedia(card) {
+  if (!card) return;
+  const currentActiveIdx = active();
+  const cardIdx = cards.indexOf(card);
+  if (cardIdx !== -1 && cardIdx !== currentActiveIdx) return;
+  
+  stopAll(currentActiveIdx);
+
+  const fid = card.dataset.driveId;
+  const embedUrl = card.dataset.embedUrl || (fid ? ('https://drive.google.com/file/d/' + fid + '/preview?autoplay=1') : '');
+  
+  if (embedUrl) {
+    const screen = card.querySelector('.screen');
+    let ifr = screen.querySelector('iframe.card-player');
+    if (!ifr) {
+      ifr = document.createElement('iframe');
+      ifr.className = 'card-player';
+      ifr.src = embedUrl;
+      ifr.allow = 'autoplay; fullscreen; encrypted-media';
+      ifr.setAttribute('allowfullscreen', 'true');
+      screen.appendChild(ifr);
+    }
+  } else {
+    const v = card.querySelector('video');
+    if (v) {
+      if (!v.src && v.dataset.src) v.src = v.dataset.src;
+      playWithSound(v);
+    }
+  }
+}
+
+function syncShort() {
+  const actIdx = active();
+  const c = cards[actIdx];
+  if (!c) return;
+  const want = stageVisible && !document.hidden && !playerOpen && !filmPreview && !userPaused;
+  if (want) {
+    schedulePlayCurrent(100);
+  } else {
+    stopAll(-1);
+  }
+}
+
+function startCard(card) {
+  if (!card) return;
+  userPaused = false;
+  card.classList.add('playing');
+  card.classList.remove('paused');
+  mountCardMedia(card);
+}
+
+function togglePlay(card) {
+  if (!card.classList.contains('playing')) {
+    startCard(card);
+    return;
+  }
+  userPaused = !card.classList.contains('paused');
+  if (userPaused) {
+    card.classList.add('paused');
+    card.classList.remove('playing');
+    const ifr = card.querySelector('iframe.card-player');
+    if (ifr) ifr.remove();
+  } else {
+    card.classList.remove('paused');
+    card.classList.add('playing');
+    mountCardMedia(card);
+  }
+}
+
+function info() {
+  const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS;
+  const act = active();
+  const w = list[act] || list[0] || {};
+  const kEl = $('#i-kind'), dEl = $('#i-dur'), tEl = $('#i-title'), rEl = $('#i-role'), cEl = $('#i-count');
+  if (kEl) kEl.textContent = w.kind || '';
+  if (dEl) dEl.textContent = w.dur || '';
+  if (tEl) tEl.textContent = w.title || '';
+  if (rEl) rEl.textContent = w.role || '';
+  if (cEl) cEl.textContent = String(act + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0');
+  ticks.forEach((t, i) => t.setAttribute('aria-current', i === act ? 'true' : 'false'));
+}
+
+function go(i) {
+  targetPos = i;
+  currentIndex = ((Math.round(targetPos) % N) + N) % N;
+  stopAll();
+  info();
+  kick();
+  schedulePlayCurrent(260);
+}
+
+function goToCard(k) {
+  let diff = ((k - active()) % N + N) % N;
+  if (diff > N / 2) diff -= N;
+  go(targetPos + diff);
+}
+
+const prevBtn = document.getElementById('prev');
+if (prevBtn) prevBtn.addEventListener('click', () => { touched(); go(Math.round(targetPos) - 1); });
+const nextBtn = document.getElementById('next');
+if (nextBtn) nextBtn.addEventListener('click', () => { touched(); go(Math.round(targetPos) + 1); });
 
 /* ---------- Sound Control ---------- */
 const SND_ON = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>';
@@ -1201,163 +1323,74 @@ function refreshSound() {
   document.querySelectorAll('.card video, .film .frame video').forEach((v) => { v.muted = !soundOn; });
 }
 function setSound(on) { soundOn = on; refreshSound(); }
-const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const fmt = (s) => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 function restartBar(card) {
   const bar = card.querySelector('.bar i');
   if (bar) {
     bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
   }
 }
-function stopAll(exceptIndex = -1) {
-  cards.forEach((c, i) => {
-    if (i !== exceptIndex) {
-      c.classList.remove('playing', 'paused');
-      // Remove mounted iframe so no background audio or second video can possibly play
-      const ifr = c.querySelector('iframe.card-player');
-      if (ifr) ifr.remove();
-      const v = c.querySelector('video');
-      if (v) {
-        v.pause();
-        try { v.currentTime = 0; } catch(_) {}
+
+function attachCardListeners() {
+  cards.forEach((card, i) => {
+    const playBtn = card.querySelector('.playbtn');
+    if (playBtn) {
+      playBtn.style.cursor = 'pointer';
+      playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        touched();
+        if (i !== active()) {
+          goToCard(i);
+        } else {
+          setSound(true);
+          togglePlay(card);
+        }
+      });
+    }
+
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.snd-btn')) return;
+      if (moved) return;
+      e.stopPropagation();
+      touched();
+      if (i !== active()) {
+        goToCard(i);
       } else {
-        restartBar(c);
+        setSound(true);
+        togglePlay(card);
       }
+    });
+
+    const v = card.querySelector('video'), bar = card.querySelector('.bar i'), cur = card.querySelector('.cur');
+    if (v) {
+      v.muted = !soundOn;
+      v.addEventListener('timeupdate', () => {
+        if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + '%';
+        cur.textContent = fmt(v.currentTime);
+      });
+    } else if (bar) {
+      bar.addEventListener('animationend', () => { if (card.classList.contains('playing')) restartBar(card); });
     }
   });
 }
-function preloadNeighbors() {
-  // Direct Google Drive embed on demand to avoid unnecessary network load
-}
-function mountCardMedia(card) {
-  if (!card) return;
-  const currentActiveIdx = active();
-  const cardIdx = cards.indexOf(card);
-  
-  // Guarantee that ONLY the active card can ever mount or play media!
-  if (cardIdx !== -1 && cardIdx !== currentActiveIdx) {
-    return;
-  }
-  
-  // Stop and clean up ALL other cards immediately
-  stopAll(currentActiveIdx);
-
-  const fid = card.dataset.driveId;
-  const embedUrl = card.dataset.embedUrl || (fid ? ('https://drive.google.com/file/d/' + fid + '/preview?autoplay=1') : '');
-  
-  if (embedUrl) {
-    const screen = card.querySelector('.screen');
-    let ifr = screen.querySelector('iframe.card-player');
-    if (!ifr) {
-      ifr = document.createElement('iframe');
-      ifr.className = 'card-player';
-      ifr.src = embedUrl;
-      ifr.allow = 'autoplay; fullscreen; encrypted-media';
-      ifr.setAttribute('allowfullscreen', 'true');
-      screen.appendChild(ifr);
-    }
-  } else {
-    const v = card.querySelector('video');
-    if (v) {
-      if (!v.src && v.dataset.src) v.src = v.dataset.src;
-      playWithSound(v);
-    }
-  }
-}
-function syncShort() {
-  const actIdx = active();
-  const c = cards[actIdx];
-  if (!c) return;
-  const want = stageVisible && !document.hidden && !playerOpen && !filmPreview && !userPaused;
-  if (want) {
-    // Stop all other cards strictly
-    stopAll(actIdx);
-    c.classList.remove('paused');
-    c.classList.add('playing');
-    mountCardMedia(c);
-  } else {
-    c.classList.add('paused');
-    const v = c.querySelector('video');
-    if (v && !v.paused) v.pause();
-    const ifr = c.querySelector('iframe.card-player');
-    if (ifr) ifr.remove();
-  }
-}
-function startCard(card) {
-  if (!card) return;
-  card.classList.add('playing');
-  card.classList.remove('paused');
-  userPaused = false;
-  mountCardMedia(card);
-  syncShort();
-}
-function togglePlay(card) {
-  if (!card.classList.contains('playing')) {
-    startCard(card);
-    return;
-  }
-  userPaused = !card.classList.contains('paused');
-  if (userPaused) {
-    card.classList.add('paused');
-    card.classList.remove('playing');
-    const ifr = card.querySelector('iframe.card-player');
-    if (ifr) ifr.remove(); // removes audio on pause
-  } else {
-    card.classList.remove('paused');
-    card.classList.add('playing');
-    mountCardMedia(card);
-  }
-}
-function info() {
-  const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS;
-  const w = list[active()] || list[0] || {};
-  const kEl = $('#i-kind'), dEl = $('#i-dur'), tEl = $('#i-title'), rEl = $('#i-role'), cEl = $('#i-count');
-  if (kEl) kEl.textContent = w.kind || '';
-  if (dEl) dEl.textContent = w.dur || '';
-  if (tEl) tEl.textContent = w.title || '';
-  if (rEl) rEl.textContent = w.role || '';
-  if (cEl) cEl.textContent = `${String(active() + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`;
-  ticks.forEach((t, i) => t.setAttribute('aria-current', i === active() ? 'true' : 'false'));
-}
-function go(i) {
-  const changed = i !== idx;
-  idx = i;
-  target = idx * step;
-  stopAll(active());
-  info();
-  kick();
-  if (!reduced) {
-    startCard(cards[active()]);
-  }
-}
-function goToCard(k) {
-  let diff = ((k - active()) % N + N) % N;
-  if (diff > N / 2) diff -= N;
-  go(idx + diff);
-}
-const touched = () => { lastTouch = Date.now(); };
-
-const prevBtn = document.getElementById('prev');
-if (prevBtn) prevBtn.addEventListener('click', () => { touched(); go(idx - 1); });
-const nextBtn = document.getElementById('next');
-if (nextBtn) nextBtn.addEventListener('click', () => { touched(); go(idx + 1); });
 
 // =========================================================================
-// Drag & Touch Gestures on Stage
+// Drag & Touch Gestures on Stage (Silky Smooth)
 // =========================================================================
-let lastMoveX = 0, lastMoveTime = 0, dragVelocity = 0;
-
 stage.addEventListener('pointerdown', (e) => {
   if (e.target.closest('.snd-btn')) return;
-  dragging = true;
+  isDraggingStage = true;
   moved = false;
   scrolled = false;
   sx = e.clientX;
   sy = e.clientY;
   st = performance.now();
-  lastMoveX = sx;
-  lastMoveTime = st;
-  dragVelocity = 0;
-  sa = angle;
+  lastDragX = sx;
+  lastDragTime = st;
+  stageVelocity = 0;
+  startDragPos = currentPos;
   downCard = e.target.closest('.card');
   downTarget = e.target;
   touched();
@@ -1365,71 +1398,79 @@ stage.addEventListener('pointerdown', (e) => {
 });
 
 stage.addEventListener('pointermove', (e) => {
-  if (!dragging) return;
+  if (!isDraggingStage) return;
   const dx = e.clientX - sx;
   const dy = e.clientY - sy;
+
   if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) {
     scrolled = true;
     return;
   }
-  if (!scrolled && Math.abs(dx) > 10) {
+  if (!scrolled && Math.abs(dx) > 8) {
     if (!moved) {
       moved = true;
       try { stage.setPointerCapture(e.pointerId); } catch (_) {}
     }
     const now = performance.now();
-    const dt = now - lastMoveTime;
+    const dt = now - lastDragTime;
     if (dt > 8) {
-      dragVelocity = (e.clientX - lastMoveX) / dt;
-      lastMoveX = e.clientX;
-      lastMoveTime = now;
+      stageVelocity = (e.clientX - lastDragX) / dt;
+      lastDragX = e.clientX;
+      lastDragTime = now;
     }
-    const angularSpeed = (360 / (2 * Math.PI * (R || 1500))) * 0.70;
-    angle = sa - dx * angularSpeed;
-    target = angle;
+
+    // Direct pixel-to-card mapping: 200px drag = 1 full card shift!
+    const dragCardShift = dx / 200;
+    currentPos = startDragPos - dragCardShift;
+    targetPos = currentPos;
+    paint();
+    info();
   }
 });
 
-function endDrag(e) {
-  if (!dragging) return;
-  dragging = false;
+function endStageDrag(e) {
+  if (!isDraggingStage) return;
+  isDraggingStage = false;
   touched();
+
   if (moved) {
-    // Add momentum inertia based on drag velocity
-    let momentumSteps = 0;
-    if (Math.abs(dragVelocity) > 0.45) {
-      momentumSteps = Math.round(-dragVelocity * 2.8);
-      momentumSteps = Math.max(-3, Math.min(3, momentumSteps));
+    // Add flick momentum
+    let flickOffset = 0;
+    if (Math.abs(stageVelocity) > 0.4) {
+      flickOffset = -stageVelocity * 0.9;
+      flickOffset = Math.max(-2.5, Math.min(2.5, flickOffset));
     }
-    const targetIdx = Math.round(angle / step) + momentumSteps;
-    go(targetIdx);
+    const snapTarget = Math.round(targetPos + flickOffset);
+    go(snapTarget);
     setTimeout(() => { moved = false; }, 80);
+  } else {
+    go(Math.round(targetPos));
   }
   kick();
 }
 
-stage.addEventListener('pointerup', endDrag);
-stage.addEventListener('pointercancel', endDrag);
+stage.addEventListener('pointerup', endStageDrag);
+stage.addEventListener('pointercancel', endStageDrag);
 
 stage.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight') { touched(); go(idx + 1); e.preventDefault(); }
-  else if (e.key === 'ArrowLeft') { touched(); go(idx - 1); e.preventDefault(); }
+  if (e.key === 'ArrowRight') { touched(); go(Math.round(targetPos) + 1); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft') { touched(); go(Math.round(targetPos) - 1); e.preventDefault(); }
   else if (e.key === 'Enter') { touched(); togglePlay(cards[active()]); e.preventDefault(); }
   else if (e.key === ' ') { touched(); togglePlay(cards[active()]); e.preventDefault(); }
 });
 
-let wheelIdle = 0;
+let stageWheelTimer = 0;
 stage.addEventListener('wheel', (e) => {
   const dx = e.deltaMode === 1 ? e.deltaX * 16 : e.deltaX;
   if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
   e.preventDefault();
   touched();
-  const angularSpeed = 360 / (2 * Math.PI * (R || 1500));
-  angle += Math.max(-40, Math.min(40, dx)) * angularSpeed;
-  target = angle;
+  targetPos += Math.max(-1.5, Math.min(1.5, dx / 120));
   paint();
-  clearTimeout(wheelIdle);
-  wheelIdle = setTimeout(() => go(Math.round(angle / step)), 140);
+  info();
+  kick();
+  clearTimeout(stageWheelTimer);
+  stageWheelTimer = setTimeout(() => go(Math.round(targetPos)), 120);
 }, { passive: false });
 
 stage.addEventListener('mouseenter', () => { hover = true; });
@@ -1459,28 +1500,8 @@ if ('IntersectionObserver' in window) {
   }, { threshold: 0.05, rootMargin: '160px 0px 160px 0px' }).observe(stage);
 }
 
-function tryAutoplay() {
-  if (cards && cards.length) {
-    const actIdx = active();
-    stopAll(actIdx);
-    startCard(cards[actIdx]);
-  }
-}
-setTimeout(tryAutoplay, 60);
-window.addEventListener('load', tryAutoplay);
-['click', 'touchstart', 'scroll', 'keydown'].forEach(ev => {
-  window.addEventListener(ev, () => {
-    const c = cards[active()];
-    if (c) {
-      const v = c.querySelector('video');
-      if (v && v.paused && !userPaused && !playerOpen) {
-        playWithSound(v);
-      }
-    }
-  }, { once: true, passive: true });
-});
-
-// =========================================================================
+// Update active function to use currentPos
+ =========================================================================
 // Long-Form Grid (16:9 Films)
 // =========================================================================
 const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -1640,6 +1661,7 @@ if (copyPhoneBtn) {
           switch(cat) {
             case 'fitness': return sub.includes('جيم') || sub.includes('fitness') || kind === 'fitness';
             case 'medical': return sub.includes('طبي') || sub.includes('medical') || kind === 'medical';
+            case 'commercials': return !sub.includes('جيم') && !sub.includes('fitness') && !sub.includes('طبي') && !sub.includes('medical');
             case 'ai': return sub.includes('ai') || title.includes('ai');
             case 'cafe': return sub.includes('كافيه') || sub.includes('cafe');
             case 'finishing': return sub.includes('تشطيب') || sub.includes('finishing');
