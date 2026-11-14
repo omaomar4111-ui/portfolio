@@ -881,10 +881,11 @@ function getCleanEmbedUrl(url) {
 
 const thumbImg = (x, isLazy = false) => {
   const fid = extractDriveId(x.fileId || x.id || x.videoUrl || x.src) || '';
-  let p = fid ? ('https://lh3.googleusercontent.com/d/' + fid + '=w600') : (x.thumbnail || x.poster || 'profile.jpg');
+  const p = fid ? ('https://lh3.googleusercontent.com/d/' + fid + '=w600') : (x.thumbnail || x.poster || 'profile.jpg');
   const safeTitle = escapeHTML(x.title || '');
-  const fb = fid ? ('https://drive.google.com/thumbnail?id=' + fid + '&sz=w600') : 'profile.jpg';
-  return '<img class="thumb" src="' + p + '" alt="' + safeTitle + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t){this.dataset.t=1;this.src=\'' + fb + '\';}">';
+  const fb1 = fid ? ('https://drive.google.com/thumbnail?id=' + fid + '&sz=w600') : 'profile.jpg';
+  const fb2 = fid ? ('https://drive.usercontent.google.com/download?id=' + fid + '&export=view') : 'profile.jpg';
+  return '<img class="thumb" src="' + p + '" alt="' + safeTitle + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t1){this.dataset.t1=1;this.src=\'' + fb1 + '\';}else if(!this.dataset.t2){this.dataset.t2=1;this.src=\'' + fb2 + '\';}">';
 };
 
 // =========================================================================
@@ -1485,12 +1486,63 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// Initial mount: start on Best Work / Featured highlight
-const FEATURED_SET = new Set(["1rwusjB5MyPodD1pLsBzeib2_u-p-NsXK","11ovA2D6-z5eJWQruf90DioJTvrzdLv_e","1_42Y_7cq_Dxtg8Nlds8FP8ib3tWLZmCC","1Smo3B-HagJ-JZ2UrhIVHpDLkHbhD5uzT","1vmg4LsdtW8oQixvv4B2SxeB4v1wcCa8D","1hcVVyAhJ6GSTqmUqblKZB8TQ0hr7bxPS","1i3cC1yI98CFfky0kXqrPbI3ZIQtT0XTp","1QqWNf-ZOk7cbKB3kG9KwXlrerk5GGcE9","1tXS6vGOFu97bzvw5Dprk0Lm71zbmfFBY","1rWwQ4pJy5Aq2NnBxcQxTspfeiaKkDuzO","176nDGVK68VUHbdrK_wmPG5zheGxjhmI5","1ehP-Mgl-Fq1YQm4SKUTbxnYzXkdHeVVg","1lAv1Jo9TJmPtVD3O3rmAX3A78T_Ff7Wo","1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p","1NhfGU2oH0eIDFEQT3MuRoyUjyBRJPU86","1z72YZmRB1VFyBkjGBljdHFB_LYl9y_5G","1gZZESO0UsAxp7Wu6SMmpAMWJeYqcmHhg","14i03sptX9XbAdwD2qnZaevMuku7k3R7h","1poSaIlaRAyiN684yd81PWbNbjCSYqV_6","15m4K59bEg3yMONrIp-VD6j0yCYRjTsDO","1AktWXm-Qi6iV3bALEOXPsSInMOg6qZpF","1NTn7Lro0SDNMBwanxGNVXjrkUA3QKGns","1ICDhZlSonoQyFQAKI-FM_2WJSWcsFqqQ","1O0zsS1ztbvf93NQQhkjrVHu3khdbbvm-","1mnb9GBVclbLfnHOdTXJ4dncAWfNx3LMB"]);
-const initialFeaturedList = (window.ALL_PORTFOLIO_VIDEOS && window.ALL_PORTFOLIO_VIDEOS.length)
-  ? window.ALL_PORTFOLIO_VIDEOS.filter(v => FEATURED_SET.has(v.id || v.fileId))
-  : INITIAL_GYM_VIDEOS;
-renderDrum(initialFeaturedList);
+// =========================================================================
+// Category Filtering & Featured Highlight State
+// =========================================================================
+window.FEATURED_SET = new Set([
+  "1rwusjB5MyPodD1pLsBzeib2_u-p-NsXK","11ovA2D6-z5eJWQruf90DioJTvrzdLv_e",
+  "1_42Y_7cq_Dxtg8Nlds8FP8ib3tWLZmCC","1Smo3B-HagJ-JZ2UrhIVHpDLkHbhD5uzT",
+  "1vmg4LsdtW8oQixvv4B2SxeB4v1wcCa8D","1hcVVyAhJ6GSTqmUqblKZB8TQ0hr7bxPS",
+  "1i3cC1yI98CFfky0kXqrPbI3ZIQtT0XTp","1QqWNf-ZOk7cbKB3kG9KwXlrerk5GGcE9",
+  "1tXS6vGOFu97bzvw5Dprk0Lm71zbmfFBY","1rWwQ4pJy5Aq2NnBxcQxTspfeiaKkDuzO",
+  "176nDGVK68VUHbdrK_wmPG5zheGxjhmI5","1ehP-Mgl-Fq1YQm4SKUTbxnYzXkdHeVVg",
+  "1lAv1Jo9TJmPtVD3O3rmAX3A78T_Ff7Wo","1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p",
+  "1NhfGU2oH0eIDFEQT3MuRoyUjyBRJPU86","1z72YZmRB1VFyBkjGBljdHFB_LYl9y_5G",
+  "1gZZESO0UsAxp7Wu6SMmpAMWJeYqcmHhg","14i03sptX9XbAdwD2qnZaevMuku7k3R7h",
+  "1poSaIlaRAyiN684yd81PWbNbjCSYqV_6","15m4K59bEg3yMONrIp-VD6j0yCYRjTsDO",
+  "1AktWXm-Qi6iV3bALEOXPsSInMOg6qZpF","1NTn7Lro0SDNMBwanxGNVXjrkUA3QKGns",
+  "1ICDhZlSonoQyFQAKI-FM_2WJSWcsFqqQ","1O0zsS1ztbvf93NQQhkjrVHu3khdbbvm-",
+  "1mnb9GBVclbLfnHOdTXJ4dncAWfNx3LMB"
+]);
+const FEATURED_SET = window.FEATURED_SET;
+window.currentActiveCategory = 'featured';
+
+window.filterVideosByCategory = function(catalog, cat) {
+  const base = (catalog && catalog.length) ? catalog : (window.ALL_PORTFOLIO_VIDEOS || INITIAL_GYM_VIDEOS);
+  if (!cat || cat === 'all') return base;
+  if (cat === 'featured') {
+    return base.filter(v => window.FEATURED_SET.has(v.id || v.fileId));
+  }
+  return base.filter(v => {
+    const sub = (v.subfolder || '').toLowerCase();
+    const title = (v.title || '').toLowerCase();
+    const kind = (v.kind || v.genre || '').toLowerCase();
+    switch(cat) {
+      case 'fitness': return sub.includes('جيم') || sub.includes('fitness') || kind === 'fitness';
+      case 'medical': return sub.includes('طبي') || sub.includes('medical') || kind === 'medical';
+      case 'commercials': return !sub.includes('جيم') && !sub.includes('fitness') && !sub.includes('طبي') && !sub.includes('medical');
+      case 'ai': return sub.includes('ai') || title.includes('ai');
+      case 'cafe': return sub.includes('كافيه') || sub.includes('cafe');
+      case 'finishing': return sub.includes('تشطيب') || sub.includes('finishing');
+      case 'lighting': return sub.includes('نجف') || sub.includes('lighting');
+      case 'fashion': return sub.includes('ملابس') || sub.includes('fashion');
+      case 'beauty': return sub.includes('تجميل') || sub.includes('beauty');
+      case 'event': return sub.includes('ايفنت') || sub.includes('event');
+      case 'cars': return sub.includes('عربيات') || sub.includes('cars');
+      case 'realestate': return sub.includes('عقارات') || sub.includes('real estate');
+      case 'agency': return sub.includes('ايجنسي') || sub.includes('agency');
+      case 'dates': return sub.includes('بلح') || sub.includes('dates');
+      case 'kitchens': return sub.includes('مطابخ') || sub.includes('kitchen');
+      case 'restaurant': return sub.includes('مطعم') || sub.includes('restaurant');
+      case 'motion': return sub.includes('موشن') || sub.includes('motion');
+      case 'saudi': return sub.includes('سعودي') || sub.includes('saudi');
+      default: return true;
+    }
+  });
+};
+
+const initialFeaturedList = window.filterVideosByCategory(window.ALL_PORTFOLIO_VIDEOS, 'featured');
+renderDrum(initialFeaturedList.length ? initialFeaturedList : INITIAL_GYM_VIDEOS);
 
 if ('IntersectionObserver' in window) {
   new IntersectionObserver(([e]) => {
@@ -1659,52 +1711,15 @@ if (copyPhoneBtn) {
     tab.addEventListener('click', () => {
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      const genre = tab.dataset.genre || 'all';
-
-      const fullList = (window.ALL_SHORTS_CATALOG && window.ALL_SHORTS_CATALOG.length)
-        ? window.ALL_SHORTS_CATALOG
-        : (window.SHORTS && window.SHORTS.length ? [...window.SHORTS] : [...INITIAL_GYM_VIDEOS]);
-
-      if (!window.ALL_SHORTS_CATALOG) {
-        window.ALL_SHORTS_CATALOG = fullList;
-      }
 
       const cat = tab.dataset.cat || tab.dataset.genre || 'all';
-      const baseCatalog = (window.ALL_PORTFOLIO_VIDEOS && window.ALL_PORTFOLIO_VIDEOS.length) ? window.ALL_PORTFOLIO_VIDEOS : fullList;
-      let filtered = baseCatalog;
-      if (cat !== 'all') {
-        filtered = baseCatalog.filter(v => {
-          const sub = (v.subfolder || '').toLowerCase();
-          const title = (v.title || '').toLowerCase();
-          const kind = (v.kind || v.genre || '').toLowerCase();
-          const FEATURED_IDS = new Set(["1rwusjB5MyPodD1pLsBzeib2_u-p-NsXK","11ovA2D6-z5eJWQruf90DioJTvrzdLv_e","1_42Y_7cq_Dxtg8Nlds8FP8ib3tWLZmCC","1Smo3B-HagJ-JZ2UrhIVHpDLkHbhD5uzT","1vmg4LsdtW8oQixvv4B2SxeB4v1wcCa8D","1hcVVyAhJ6GSTqmUqblKZB8TQ0hr7bxPS","1i3cC1yI98CFfky0kXqrPbI3ZIQtT0XTp","1QqWNf-ZOk7cbKB3kG9KwXlrerk5GGcE9","1tXS6vGOFu97bzvw5Dprk0Lm71zbmfFBY","1rWwQ4pJy5Aq2NnBxcQxTspfeiaKkDuzO","176nDGVK68VUHbdrK_wmPG5zheGxjhmI5","1ehP-Mgl-Fq1YQm4SKUTbxnYzXkdHeVVg","1lAv1Jo9TJmPtVD3O3rmAX3A78T_Ff7Wo","1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p","1NhfGU2oH0eIDFEQT3MuRoyUjyBRJPU86","1z72YZmRB1VFyBkjGBljdHFB_LYl9y_5G","1gZZESO0UsAxp7Wu6SMmpAMWJeYqcmHhg","14i03sptX9XbAdwD2qnZaevMuku7k3R7h","1poSaIlaRAyiN684yd81PWbNbjCSYqV_6","15m4K59bEg3yMONrIp-VD6j0yCYRjTsDO","1AktWXm-Qi6iV3bALEOXPsSInMOg6qZpF","1NTn7Lro0SDNMBwanxGNVXjrkUA3QKGns","1ICDhZlSonoQyFQAKI-FM_2WJSWcsFqqQ","1O0zsS1ztbvf93NQQhkjrVHu3khdbbvm-","1mnb9GBVclbLfnHOdTXJ4dncAWfNx3LMB"]);
-          switch(cat) {
-            case 'featured': return FEATURED_IDS.has(v.id || v.fileId);
-            case 'fitness': return sub.includes('جيم') || sub.includes('fitness') || kind === 'fitness';
-            case 'medical': return sub.includes('طبي') || sub.includes('medical') || kind === 'medical';
-            case 'commercials': return !sub.includes('جيم') && !sub.includes('fitness') && !sub.includes('طبي') && !sub.includes('medical');
-            case 'ai': return sub.includes('ai') || title.includes('ai');
-            case 'cafe': return sub.includes('كافيه') || sub.includes('cafe');
-            case 'finishing': return sub.includes('تشطيب') || sub.includes('finishing');
-            case 'lighting': return sub.includes('نجف') || sub.includes('lighting');
-            case 'fashion': return sub.includes('ملابس') || sub.includes('fashion');
-            case 'beauty': return sub.includes('تجميل') || sub.includes('beauty');
-            case 'event': return sub.includes('ايفنت') || sub.includes('event');
-            case 'cars': return sub.includes('عربيات') || sub.includes('cars');
-            case 'realestate': return sub.includes('عقارات') || sub.includes('real estate');
-            case 'agency': return sub.includes('ايجنسي') || sub.includes('agency');
-            case 'dates': return sub.includes('بلح') || sub.includes('dates');
-            case 'kitchens': return sub.includes('مطابخ') || sub.includes('kitchen');
-            case 'restaurant': return sub.includes('مطعم') || sub.includes('restaurant');
-            case 'motion': return sub.includes('موشن') || sub.includes('motion');
-            case 'saudi': return sub.includes('سعودي') || sub.includes('saudi');
-            default: return true;
-          }
-        });
-      }
+      window.currentActiveCategory = cat;
 
-      // If user filters a category with no items yet, show empty state or only matching items
-      // (Do NOT replace with gym videos!)
+      const baseCatalog = (window.ALL_PORTFOLIO_VIDEOS && window.ALL_PORTFOLIO_VIDEOS.length)
+        ? window.ALL_PORTFOLIO_VIDEOS
+        : (window.SHORTS && window.SHORTS.length ? window.SHORTS : INITIAL_GYM_VIDEOS);
+
+      const filtered = window.filterVideosByCategory(baseCatalog, cat);
 
       stopAll();
       idx = 0;
@@ -1847,14 +1862,17 @@ function startFirestoreSync() {
     });
 
     const fullList = Array.from(map.values());
-    fullList.sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, { numeric: true, sensitivity: 'base' }));
+    window.ALL_PORTFOLIO_VIDEOS = fullList;
+
+    const activeCat = window.currentActiveCategory || 'featured';
+    const activeList = window.filterVideosByCategory(fullList, activeCat);
 
     const curSign = (window.SHORTS || []).map(x => (x.fileId || x.id || '') + (x.title || '') + (x.thumbnail || '')).join('|');
-    const newSign = fullList.map(x => (x.fileId || x.id || '') + (x.title || '') + (x.thumbnail || '')).join('|');
+    const newSign = activeList.map(x => (x.fileId || x.id || '') + (x.title || '') + (x.thumbnail || '')).join('|');
     if (curSign !== newSign || !cards.length) {
-      window.SHORTS = fullList;
-      SHORTS = fullList;
-      if (typeof renderDrum === 'function') renderDrum(fullList);
+      window.SHORTS = activeList;
+      SHORTS = activeList;
+      if (typeof renderDrum === 'function') renderDrum(activeList);
     }
 
     const filmList = fsLongs.length ? fsLongs : fullList.slice(24);
