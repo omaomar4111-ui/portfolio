@@ -499,12 +499,22 @@ html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transiti
 .card.playing.loaded iframe.card-player {
   opacity: 1 !important;
 }
-.card.playing.loaded .thumb,
-.card.playing.loaded video,
-.card.playing.loaded .art,
+.card.playing.loaded video {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
 .card.playing.loaded .cap {
   opacity: 0 !important;
   pointer-events: none !important;
+}
+/* Poster thumb remains at z-index: 2 under iframe (z-index: 20) as permanent solid backdrop */
+.card .thumb {
+  z-index: 2 !important;
+  opacity: 1 !important;
+}
+.card .art {
+  z-index: 1 !important;
+  opacity: 1 !important;
 }
 .card.playing .playbtn {
   display: none !important;
@@ -512,16 +522,7 @@ html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transiti
 .card.playing .screen::after {
   display: none !important;
 }
-.thumb {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 5;
-  border-radius: inherit;
-  transition: opacity 0.3s ease;
-}
+
 .film .frame .thumb { transition: transform 6s ease-out; }
 .film .frame.hovering .thumb { transform: scale(1.06); }
 .film .frame .snd-btn { top: 10px; right: 10px; width: 30px; height: 30px; }
@@ -1172,7 +1173,7 @@ function renderDrum(newItems) {
   attachCardListeners();
   layout();
   info();
-  if (!reduced && cards[0]) startCard(cards[0]);
+  // Card 0 starts ready on poster, plays when tapped or rotated
 }
 
 function layout() {
@@ -1587,14 +1588,9 @@ if ('IntersectionObserver' in window) {
 }
 
 function tryAutoplay() {
-  if (cards && cards.length) {
-    const actIdx = active();
-    stopAll(actIdx);
-    startCard(cards[actIdx]);
-  }
+  // Let the user initiate playback to avoid mobile iframe autoplay blocks and black screens
 }
-setTimeout(tryAutoplay, 60);
-window.addEventListener('load', tryAutoplay);
+// Removed premature load autoplay
 ['click', 'touchstart', 'scroll', 'keydown'].forEach(ev => {
   window.addEventListener(ev, () => {
     const c = cards[active()];
