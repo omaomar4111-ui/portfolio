@@ -263,7 +263,12 @@ section { padding-block: clamp(36px, 6vw, 72px); }
 
 .card {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  --aspect: 0.5625;
+  width: calc(var(--ch) * var(--aspect, 0.5625));
+  margin-left: calc((var(--ch) * var(--aspect, 0.5625)) / -2);
   transform-style: preserve-3d;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -908,7 +913,7 @@ const thumbImg = (x, isLazy = false) => {
   const safeTitle = escapeHTML(x.title || '');
   const fb1 = fid ? ('https://drive.google.com/thumbnail?id=' + fid + '&sz=w600') : 'profile.jpg';
   const fb2 = fid ? ('https://drive.usercontent.google.com/download?id=' + fid + '&export=view') : 'profile.jpg';
-  return '<img class="thumb" src="' + p + '" alt="' + safeTitle + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t1){this.dataset.t1=1;this.src=\'' + fb1 + '\';}else if(!this.dataset.t2){this.dataset.t2=1;this.src=\'' + fb2 + '\';}">';
+  return '<img class="thumb" src="' + p + '" alt="' + safeTitle + '" decoding="async" referrerpolicy="no-referrer" onload="if(this.naturalWidth && this.naturalHeight){const c=this.closest(\'.card\');if(c){c.style.setProperty(\'--aspect\', (this.naturalWidth/this.naturalHeight).toFixed(4));c.style.setProperty(\'--v-ratio\', (this.naturalHeight/this.naturalWidth).toFixed(4));}}" onerror="if(!this.dataset.t1){this.dataset.t1=1;this.src=\'' + fb1 + '\';}else if(!this.dataset.t2){this.dataset.t2=1;this.src=\'' + fb2 + '\';}">';
 };
 
 // =========================================================================
