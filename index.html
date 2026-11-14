@@ -666,9 +666,52 @@ try {
 
 // Fallback initial gym videos catalog (46 videos) to guarantee instant zero-delay rendering
 const INITIAL_GYM_VIDEOS = [
-  {"id":"1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p","title":"Gym Workout #01","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p=w400","src":"https://drive.google.com/file/d/1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p/preview"},
-  {"id":"1mC4v4eMh5r0V-tQW312m6ZzE9fK6_L5k","title":"Gym Workout #02","type":"short","kind":"Gym & Fitness","dur":"0:28","role":"Edit · pacing · sound fx","poster":"https://lh3.googleusercontent.com/d/1mC4v4eMh5r0V-tQW312m6ZzE9fK6_L5k=w400","src":"https://drive.google.com/file/d/1mC4v4eMh5r0V-tQW312m6ZzE9fK6_L5k/preview"},
-  {"id":"1oZl9aR1oOQkL7hF2Y9pE0X8bF3W2_V1c","title":"Gym Workout #03","type":"short","kind":"Gym & Fitness","dur":"0:35","role":"Color grade · dynamic transitions","poster":"https://lh3.googleusercontent.com/d/1oZl9aR1oOQkL7hF2Y9pE0X8bF3W2_V1c=w400","src":"https://drive.google.com/file/d/1oZl9aR1oOQkL7hF2Y9pE0X8bF3W2_V1c/preview"}
+  {"id":"1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p","title":"Gym Workout #01","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p","src":"https://drive.google.com/file/d/1xGe_XR2tLBisxnTMMH9EqiSsspIcL48p/preview","hue":197},
+  {"id":"1NhfGU2oH0eIDFEQT3MuRoyUjyBRJPU86","title":"Gym Workout #02","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1NhfGU2oH0eIDFEQT3MuRoyUjyBRJPU86","src":"https://drive.google.com/file/d/1NhfGU2oH0eIDFEQT3MuRoyUjyBRJPU86/preview","hue":204},
+  {"id":"1enjQ7TFz2pXpQ6NvzM8QGeQXLOwOZxoz","title":"Gym Workout #03","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1enjQ7TFz2pXpQ6NvzM8QGeQXLOwOZxoz","src":"https://drive.google.com/file/d/1enjQ7TFz2pXpQ6NvzM8QGeQXLOwOZxoz/preview","hue":211},
+  {"id":"1MbAZiAVfOTaov6dmg2HQ0Wa1rOkk_4tU","title":"Gym Workout #04","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1MbAZiAVfOTaov6dmg2HQ0Wa1rOkk_4tU","src":"https://drive.google.com/file/d/1MbAZiAVfOTaov6dmg2HQ0Wa1rOkk_4tU/preview","hue":218},
+  {"id":"1T103gitCkp-yKMRkbxOGynhFngWCxn28","title":"Gym Workout #05","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1T103gitCkp-yKMRkbxOGynhFngWCxn28","src":"https://drive.google.com/file/d/1T103gitCkp-yKMRkbxOGynhFngWCxn28/preview","hue":225},
+  {"id":"1D6p5EgaAuzIWZqTrg9jthdKVjPNtpqow","title":"Gym Workout #06","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1D6p5EgaAuzIWZqTrg9jthdKVjPNtpqow","src":"https://drive.google.com/file/d/1D6p5EgaAuzIWZqTrg9jthdKVjPNtpqow/preview","hue":232},
+  {"id":"1wnozfWxvgS-AVtDGdmUGZJ3kDtHbPU7C","title":"Gym Workout #07","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1wnozfWxvgS-AVtDGdmUGZJ3kDtHbPU7C","src":"https://drive.google.com/file/d/1wnozfWxvgS-AVtDGdmUGZJ3kDtHbPU7C/preview","hue":239},
+  {"id":"1pFRCDqXVktdVIuA2Srz2eYdsTOOBioTm","title":"Gym Workout #08","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1pFRCDqXVktdVIuA2Srz2eYdsTOOBioTm","src":"https://drive.google.com/file/d/1pFRCDqXVktdVIuA2Srz2eYdsTOOBioTm/preview","hue":246},
+  {"id":"1kP_KTUdxdufO1wl-_p4p7loOaV__t6C-","title":"Gym Workout #09","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1kP_KTUdxdufO1wl-_p4p7loOaV__t6C-","src":"https://drive.google.com/file/d/1kP_KTUdxdufO1wl-_p4p7loOaV__t6C-/preview","hue":253},
+  {"id":"18fxiOcqT59Kxh_XOMCHXJHi90v1Tk-cw","title":"Gym Workout #10","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/18fxiOcqT59Kxh_XOMCHXJHi90v1Tk-cw","src":"https://drive.google.com/file/d/18fxiOcqT59Kxh_XOMCHXJHi90v1Tk-cw/preview","hue":260},
+  {"id":"18BUOsu0v4v7btivuIJdoASWdfiQe_jap","title":"Gym Workout #11","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/18BUOsu0v4v7btivuIJdoASWdfiQe_jap","src":"https://drive.google.com/file/d/18BUOsu0v4v7btivuIJdoASWdfiQe_jap/preview","hue":267},
+  {"id":"1s4cLPLRdoLPcV_-0vJuT4lN4uEUE8Q98","title":"Gym Workout #12","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1s4cLPLRdoLPcV_-0vJuT4lN4uEUE8Q98","src":"https://drive.google.com/file/d/1s4cLPLRdoLPcV_-0vJuT4lN4uEUE8Q98/preview","hue":274},
+  {"id":"1pvGS8JBYAEBjf6_mv_lZkqv6NqC72ccs","title":"Gym Workout #13","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1pvGS8JBYAEBjf6_mv_lZkqv6NqC72ccs","src":"https://drive.google.com/file/d/1pvGS8JBYAEBjf6_mv_lZkqv6NqC72ccs/preview","hue":281},
+  {"id":"1bwdUowGHhnKxO3HyZ9iajiC2buQESVaI","title":"Gym Workout #14","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1bwdUowGHhnKxO3HyZ9iajiC2buQESVaI","src":"https://drive.google.com/file/d/1bwdUowGHhnKxO3HyZ9iajiC2buQESVaI/preview","hue":288},
+  {"id":"1X0i8pcoem8xu4QHzl7GWUo7J-hr3PQ68","title":"Gym Workout #15","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1X0i8pcoem8xu4QHzl7GWUo7J-hr3PQ68","src":"https://drive.google.com/file/d/1X0i8pcoem8xu4QHzl7GWUo7J-hr3PQ68/preview","hue":295},
+  {"id":"1mqHpFOnrmIcxL77mknoSJan300gWQTQI","title":"Gym Workout #16","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1mqHpFOnrmIcxL77mknoSJan300gWQTQI","src":"https://drive.google.com/file/d/1mqHpFOnrmIcxL77mknoSJan300gWQTQI/preview","hue":302},
+  {"id":"1lPmjzW_AKWFWPu66lsFkdNKjEIvery5V","title":"Gym Workout #17","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1lPmjzW_AKWFWPu66lsFkdNKjEIvery5V","src":"https://drive.google.com/file/d/1lPmjzW_AKWFWPu66lsFkdNKjEIvery5V/preview","hue":309},
+  {"id":"1w-3R_QTb0uZvU5V60QxiG-cP8AQ5r_8V","title":"Gym Workout #18","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1w-3R_QTb0uZvU5V60QxiG-cP8AQ5r_8V","src":"https://drive.google.com/file/d/1w-3R_QTb0uZvU5V60QxiG-cP8AQ5r_8V/preview","hue":316},
+  {"id":"1YRdmvXHYb2TqwKUbtZecQAvoYv8ycro8","title":"Gym Workout #19","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1YRdmvXHYb2TqwKUbtZecQAvoYv8ycro8","src":"https://drive.google.com/file/d/1YRdmvXHYb2TqwKUbtZecQAvoYv8ycro8/preview","hue":323},
+  {"id":"1sNxNekdynmxyw-dinLDiqjws73WM_FtA","title":"Gym Workout #20","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1sNxNekdynmxyw-dinLDiqjws73WM_FtA","src":"https://drive.google.com/file/d/1sNxNekdynmxyw-dinLDiqjws73WM_FtA/preview","hue":330},
+  {"id":"1BzO8cgO8uCrF1P_TcV-XvkZXc6fBPjBX","title":"Gym Workout #21","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1BzO8cgO8uCrF1P_TcV-XvkZXc6fBPjBX","src":"https://drive.google.com/file/d/1BzO8cgO8uCrF1P_TcV-XvkZXc6fBPjBX/preview","hue":337},
+  {"id":"1ljGXDrSmscnbZQ2zQ9ze8S_Xn_seUJkn","title":"Gym Workout #22","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1ljGXDrSmscnbZQ2zQ9ze8S_Xn_seUJkn","src":"https://drive.google.com/file/d/1ljGXDrSmscnbZQ2zQ9ze8S_Xn_seUJkn/preview","hue":344},
+  {"id":"1k0dkJNJf10qNsrn4V5s5Dv6M0apqAWZ-","title":"Gym Workout #23","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1k0dkJNJf10qNsrn4V5s5Dv6M0apqAWZ-","src":"https://drive.google.com/file/d/1k0dkJNJf10qNsrn4V5s5Dv6M0apqAWZ-/preview","hue":351},
+  {"id":"1wk4X1xm2WK_dta8mf52Bl_vFm7K-Fltn","title":"Gym Workout #24","type":"short","kind":"Gym & Fitness","dur":"0:30","role":"Edit · sound design · color","poster":"https://lh3.googleusercontent.com/d/1wk4X1xm2WK_dta8mf52Bl_vFm7K-Fltn","src":"https://drive.google.com/file/d/1wk4X1xm2WK_dta8mf52Bl_vFm7K-Fltn/preview","hue":358},
+  {"id":"1EhHl2y93rlpwGCI2pgYzQCbfUISiqLtO","title":"Gym Workout #25","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1EhHl2y93rlpwGCI2pgYzQCbfUISiqLtO","src":"https://drive.google.com/file/d/1EhHl2y93rlpwGCI2pgYzQCbfUISiqLtO/preview","hue":195},
+  {"id":"1DCo_duLGgKu1cSEBp8rEvYZDn6JC0vvf","title":"Gym Workout #26","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1DCo_duLGgKu1cSEBp8rEvYZDn6JC0vvf","src":"https://drive.google.com/file/d/1DCo_duLGgKu1cSEBp8rEvYZDn6JC0vvf/preview","hue":202},
+  {"id":"1mb7HSDzuZfJw7Unx1uhw8S3qjleuROAu","title":"Gym Workout #27","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1mb7HSDzuZfJw7Unx1uhw8S3qjleuROAu","src":"https://drive.google.com/file/d/1mb7HSDzuZfJw7Unx1uhw8S3qjleuROAu/preview","hue":209},
+  {"id":"1LaPUQ-v9uBCLocyBUQQXjw_QuJYenbSc","title":"Gym Workout #28","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1LaPUQ-v9uBCLocyBUQQXjw_QuJYenbSc","src":"https://drive.google.com/file/d/1LaPUQ-v9uBCLocyBUQQXjw_QuJYenbSc/preview","hue":216},
+  {"id":"1W-B7HsUSHq3jSgKUFSgNDMUdJmDSwl_s","title":"Gym Workout #29","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1W-B7HsUSHq3jSgKUFSgNDMUdJmDSwl_s","src":"https://drive.google.com/file/d/1W-B7HsUSHq3jSgKUFSgNDMUdJmDSwl_s/preview","hue":223},
+  {"id":"1o4S_Q1X0XlKq2P13hC6OuLZpcDbhoY9F","title":"Gym Workout #30","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1o4S_Q1X0XlKq2P13hC6OuLZpcDbhoY9F","src":"https://drive.google.com/file/d/1o4S_Q1X0XlKq2P13hC6OuLZpcDbhoY9F/preview","hue":230},
+  {"id":"1Hk-SV19UW0GKx_DcEnegqBQzHhcpspN4","title":"Gym Workout #31","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1Hk-SV19UW0GKx_DcEnegqBQzHhcpspN4","src":"https://drive.google.com/file/d/1Hk-SV19UW0GKx_DcEnegqBQzHhcpspN4/preview","hue":237},
+  {"id":"1EXtxJ0sS75FoezPVZnuUCsj4CjuWrbTD","title":"Gym Workout #32","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1EXtxJ0sS75FoezPVZnuUCsj4CjuWrbTD","src":"https://drive.google.com/file/d/1EXtxJ0sS75FoezPVZnuUCsj4CjuWrbTD/preview","hue":244},
+  {"id":"1NdOZ2Ll5VfyAn8YRMjfsHc07gmaYt5-S","title":"Gym Workout #33","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1NdOZ2Ll5VfyAn8YRMjfsHc07gmaYt5-S","src":"https://drive.google.com/file/d/1NdOZ2Ll5VfyAn8YRMjfsHc07gmaYt5-S/preview","hue":251},
+  {"id":"1eeGk6_5UadpLLcduG_83G9ufW1JqKXhf","title":"Gym Workout #34","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1eeGk6_5UadpLLcduG_83G9ufW1JqKXhf","src":"https://drive.google.com/file/d/1eeGk6_5UadpLLcduG_83G9ufW1JqKXhf/preview","hue":258},
+  {"id":"1pihiUMqQbVBYTBKPfQIuR1_Lm7R9ig3w","title":"Gym Workout #35","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1pihiUMqQbVBYTBKPfQIuR1_Lm7R9ig3w","src":"https://drive.google.com/file/d/1pihiUMqQbVBYTBKPfQIuR1_Lm7R9ig3w/preview","hue":265},
+  {"id":"14hbbuXkJuIMqj29FQTxKTgLn5wLOI9PH","title":"Gym Workout #36","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/14hbbuXkJuIMqj29FQTxKTgLn5wLOI9PH","src":"https://drive.google.com/file/d/14hbbuXkJuIMqj29FQTxKTgLn5wLOI9PH/preview","hue":272},
+  {"id":"1MHoUHNt_E5A5sCzvthVRScyCEGM6uByT","title":"Gym Workout #37","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1MHoUHNt_E5A5sCzvthVRScyCEGM6uByT","src":"https://drive.google.com/file/d/1MHoUHNt_E5A5sCzvthVRScyCEGM6uByT/preview","hue":279},
+  {"id":"1VX26DddIDHYvcKxAjHHzE4A5Mf0HMTOx","title":"Gym Workout #38","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1VX26DddIDHYvcKxAjHHzE4A5Mf0HMTOx","src":"https://drive.google.com/file/d/1VX26DddIDHYvcKxAjHHzE4A5Mf0HMTOx/preview","hue":286},
+  {"id":"1WMwZ_XkQs7bCxyi6s6R-fsS0rlYtVzqs","title":"Gym Workout #39","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1WMwZ_XkQs7bCxyi6s6R-fsS0rlYtVzqs","src":"https://drive.google.com/file/d/1WMwZ_XkQs7bCxyi6s6R-fsS0rlYtVzqs/preview","hue":293},
+  {"id":"1fhKUnHZk-kdmaN7ws852c5sO3wFyd3-v","title":"Gym Workout #40","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1fhKUnHZk-kdmaN7ws852c5sO3wFyd3-v","src":"https://drive.google.com/file/d/1fhKUnHZk-kdmaN7ws852c5sO3wFyd3-v/preview","hue":300},
+  {"id":"1cNj2ljnmPSykPT5le8ZJJzW63ShXvA8H","title":"Gym Workout #41","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1cNj2ljnmPSykPT5le8ZJJzW63ShXvA8H","src":"https://drive.google.com/file/d/1cNj2ljnmPSykPT5le8ZJJzW63ShXvA8H/preview","hue":307},
+  {"id":"1baPw-N01Qd0rthwZxHFulv7A1tQ0S5A3","title":"Gym Workout #42","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1baPw-N01Qd0rthwZxHFulv7A1tQ0S5A3","src":"https://drive.google.com/file/d/1baPw-N01Qd0rthwZxHFulv7A1tQ0S5A3/preview","hue":314},
+  {"id":"1HrE_HnuEPnb0u6GRMdZ82Iz75WjZXgqh","title":"Gym Workout #43","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1HrE_HnuEPnb0u6GRMdZ82Iz75WjZXgqh","src":"https://drive.google.com/file/d/1HrE_HnuEPnb0u6GRMdZ82Iz75WjZXgqh/preview","hue":321},
+  {"id":"1jV-IDwzCo1bq0y1yYgOPf87ouilNsiCg","title":"Gym Workout #44","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1jV-IDwzCo1bq0y1yYgOPf87ouilNsiCg","src":"https://drive.google.com/file/d/1jV-IDwzCo1bq0y1yYgOPf87ouilNsiCg/preview","hue":328},
+  {"id":"1zmqS2qZz7Don10tY37bFokBQvICJVuwQ","title":"Gym Workout #45","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1zmqS2qZz7Don10tY37bFokBQvICJVuwQ","src":"https://drive.google.com/file/d/1zmqS2qZz7Don10tY37bFokBQvICJVuwQ/preview","hue":335},
+  {"id":"1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5","title":"Gym Workout #46","type":"long","kind":"Gym & Fitness","dur":"3:00","poster":"https://lh3.googleusercontent.com/d/1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5","src":"https://drive.google.com/file/d/1hkonZPxn2vygUdn7j2yvPolxFDOAsOl5/preview","hue":342}
 ];
 
 // Initial memory setup: all 46 gym videos in carousel
@@ -860,7 +903,7 @@ let userPaused = false;
 let filmPreview = false;
 let lastOpenPlayerTime = 0;
 
-const active = () => ((Math.round(currentPos) % N) + N) % N;
+const active = () => ((Math.round(angle / step) % N) + N) % N;
 
 // =========================================================================
 // Modal Lightbox Player (Google Drive iframe & Direct video)
@@ -982,19 +1025,59 @@ window.safeOpenPlayer = safeOpenPlayer;
 window.closeLightbox = closeLightbox;
 window.closePlayer = closeLightbox;
 
-//// =========================================================================
-// Ultra-Smooth 3D Virtualized Coverflow Engine (Apple / Studio Grade)
 // =========================================================================
-let currentIndex = 0;
-let currentPos = 0;       // Smooth floating virtual index
-let targetPos = 0;        // Target integer index
-let isDraggingStage = false;
-let startDragX = 0;
-let lastDragX = 0;
-let lastDragTime = 0;
-let stageVelocity = 0;
-let snapTimer = null;
-let autoplayTimer = null;
+// 3D Drum Carousel (Mathematical Cylinder)
+// =========================================================================
+function attachCardListeners() {
+  cards.forEach((card, i) => {
+    const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
+    const video = list[i] || {};
+
+    // 1. Direct click on play button: direct in-place playback with sound
+    const playBtn = card.querySelector('.playbtn');
+    if (playBtn) {
+      playBtn.style.cursor = 'pointer';
+      playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        touched();
+        if (i !== active()) {
+          go(i);
+        } else {
+          setSound(true);
+          togglePlay(card);
+        }
+      });
+    }
+
+    // 2. Direct click on card: plays directly in place without popup modal!
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.snd-btn')) return;
+      if (moved) return; // user was actively dragging
+      e.stopPropagation();
+      touched();
+      if (i !== active()) {
+        go(i);
+      } else {
+        setSound(true);
+        togglePlay(card);
+      }
+    });
+
+    // 3. Time update tracking
+    const v = card.querySelector('video'), bar = card.querySelector('.bar i'), cur = card.querySelector('.cur');
+    if (v) {
+      v.muted = !soundOn;
+      v.addEventListener('timeupdate', () => {
+        if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + '%';
+        cur.textContent = fmt(v.currentTime);
+      });
+    } else if (bar) {
+      bar.addEventListener('animationend', () => { if (card.classList.contains('playing')) restartBar(card); });
+    }
+  });
+}
 
 function renderDrum(newItems) {
   if (newItems && Array.isArray(newItems)) {
@@ -1003,7 +1086,7 @@ function renderDrum(newItems) {
   }
   const list = Array.isArray(window.SHORTS) ? window.SHORTS : INITIAL_GYM_VIDEOS;
   if (!list.length) {
-    ring.innerHTML = '<div style="position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-family:var(--font-mono);font-size:14px;text-transform:uppercase;letter-spacing:1px;text-align:center;padding:20px;">No videos found in this category yet.</div>';
+    ring.innerHTML = '<div style="position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-family:var(--font-mono);font-size:14px;text-transform:uppercase;letter-spacing:1px;text-align:center;padding:20px;">No videos found in this category yet.<br><span style="font-size:12px;opacity:0.7;margin-top:8px;">Add videos in this niche from admin panel.</span></div>';
     cards = [];
     const ticksEl = document.getElementById('ticks');
     if (ticksEl) ticksEl.innerHTML = '';
@@ -1011,293 +1094,108 @@ function renderDrum(newItems) {
     if (kEl) kEl.textContent = '';
     if (dEl) dEl.textContent = '';
     if (tEl) tEl.textContent = 'No videos';
-    if (rEl) rEl.textContent = 'Add videos from admin';
+    if (rEl) rEl.textContent = 'Upload or sync videos from admin';
     if (cEl) cEl.textContent = '00 / 00';
     return;
   }
-
   N = list.length;
-  currentIndex = 0;
-  currentPos = 0;
-  targetPos = 0;
+  step = 360 / N;
 
-  // Render all cards as lightweight items; offscreen cards stay lightweight
   ring.innerHTML = list.map((w, i) => {
-    const safeTitle = escapeHTML(w.title || ('Video #' + (i + 1)));
+    const safeTitle = escapeHTML(w.title || `Short #${i + 1}`);
     const safeDur = escapeHTML(w.dur || '0:30');
     const sUrl = sanitizeUrl(getDirectStreamUrl(w.src || w.videoUrl));
     const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
     const videoTag = isNat
-      ? '<video data-src="' + sUrl + '" playsinline loop muted preload="none" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>'
+      ? `<video ${i === 0 ? `src="${sUrl}"` : ''} data-src="${sUrl}" playsinline loop muted ${i === 0 ? 'preload="none"' : 'preload="none"'} style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>`
       : '';
     const fid = extractDriveId(w.fileId || w.id || w.videoUrl || w.src);
-    const cleanEmbed = fid ? ('https://drive.google.com/file/d/' + fid + '/preview?autoplay=1') : '';
-    return '<article class="card' + ((w.src || fid) ? ' has-video' : '') + '" data-index="' + i + '" data-drive-id="' + fid + '" data-embed-url="' + cleanEmbed + '" style="--h:' + (Number(w.hue) || (190 + (i * 13) % 160)) + ';" aria-label="' + safeTitle + '">' +
-      '<div class="screen">' +
-        '<div class="art"><b>' + String(i + 1).padStart(2, '0') + '</b></div>' +
-        thumbImg(w, i > 3) +
-        videoTag +
-        '<span class="playbtn" role="button" aria-label="Play ' + safeTitle + '">' + PLAY_SVG + '</span>' +
-        (w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : '') +
-        '<div class="cap"><h3>' + safeTitle + '</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>' + safeDur + '</span></div></div>' +
-      '</div>' +
-    '</article>';
+    const cleanEmbed = fid ? `https://drive.google.com/file/d/${fid}/preview?autoplay=1` : '';
+    return `
+    <article class="card${(w.src || fid) ? ' has-video' : ''}" data-index="${i}" data-drive-id="${fid}" data-embed-url="${cleanEmbed}" style="--h:${Number(w.hue) || (190 + (i * 13) % 160)}; --dur:${secs(w.dur || '0:30')}s" aria-label="${safeTitle}">
+      <div class="screen">
+        <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
+        ${thumbImg(w, i > 2)}
+        ${videoTag}
+        <span class="playbtn" role="button" aria-label="Play ${safeTitle}">${PLAY_SVG}</span>
+        ${w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
+        <div class="cap"><h3>${safeTitle}</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>${safeDur}</span></div></div>
+      </div>
+    </article>`;
   }).join('');
 
   cards = [...ring.children];
 
   const ticksEl = document.getElementById('ticks');
   if (ticksEl) {
-    if (N > 50) {
-      ticksEl.innerHTML = '';
-      ticksEl.style.display = 'none';
-      ticks = [];
-    } else {
-      ticksEl.style.display = 'flex';
-      ticksEl.innerHTML = list.map((w, i) => '<button type="button" aria-label="Show ' + escapeHTML(w.title || '') + '"></button>').join('');
-      ticks = [...ticksEl.children];
-      ticks.forEach((t, i) => t.addEventListener('click', () => { touched(); goToCard(i); }));
-    }
+    ticksEl.innerHTML = list.map((w, i) => `<button type="button" aria-label="Show ${escapeHTML(w.title || '')}"></button>`).join('');
+    ticks = [...ticksEl.children];
+    ticks.forEach((t, i) => t.addEventListener('click', () => { touched(); goToCard(i); }));
   }
 
   attachCardListeners();
   layout();
   info();
-  kick();
-  schedulePlayCurrent(150);
+  if (!reduced && cards[0]) startCard(cards[0]);
 }
 
 function layout() {
   if (!cards || !cards.length || !cards[0]) return;
-  // Coverflow does not require cylindrical tan math!
+  const cardW = cards[0].offsetWidth || 210;
+  // Calculate exact cylindrical radius for N facets of width cardW
+  R = Math.round((cardW / 2) / Math.tan(Math.PI / N)) + 10;
+
+  // Apply fixed 3D cylinder positioning to each card
+  cards.forEach((c, i) => {
+    const cardAngle = i * step;
+    c.style.transform = `rotateY(${cardAngle.toFixed(4)}deg) translateZ(${R}px)`;
+    c.style.display = 'block';
+  });
+
   paint();
 }
 
 function paint() {
   if (!cards || !cards.length) return;
-  const total = cards.length;
-  const stageWidth = stage.offsetWidth || window.innerWidth;
-  const isMobile = stageWidth < 640;
-  
-  // Responsive spread spacing between cards in 3D
-  const cardSpacing = isMobile ? Math.min(160, stageWidth * 0.42) : 220;
+  // Rotate the cylinder around origin (0, 0, -R)
+  ring.style.transform = `translateZ(-${R}px) rotateY(${-angle.toFixed(4)}deg)`;
 
-  for (let i = 0; i < total; i++) {
-    const c = cards[i];
-    let offset = i - currentPos;
-
-    // Loop offset for infinite carousel illusion when total > 5
-    if (total > 5) {
-      while (offset > total / 2) offset -= total;
-      while (offset < -total / 2) offset += total;
-    }
-
-    const absOffset = Math.abs(offset);
-
-    // Virtualization / Culling: cards further than 3.2 positions away are culled
-    if (absOffset > 3.4) {
-      if (c._visible !== false) {
-        c.style.display = 'none';
-        c._visible = false;
-      }
-      continue;
-    }
-
-    if (c._visible === false) {
-      c.style.display = 'block';
-      c._visible = true;
-    }
-
-    // Mathematical 3D Coverflow Transform
-    const sign = offset < 0 ? -1 : (offset > 0 ? 1 : 0);
-    const clampedOffset = Math.max(-3, Math.min(3, offset));
-    
-    // Translation X, Z depth and Y rotation
-    const tx = clampedOffset * cardSpacing;
-    const tz = -Math.min(380, absOffset * (isMobile ? 120 : 150));
-    const ry = -sign * Math.min(52, absOffset * 38);
-    const scale = Math.max(0.72, 1 - absOffset * 0.10);
-
-    c.style.transform = 'translate3d(' + tx.toFixed(2) + 'px, 0, ' + tz.toFixed(2) + 'px) rotateY(' + ry.toFixed(2) + 'deg) scale(' + scale.toFixed(3) + ')';
-    c.style.zIndex = String(Math.round(100 - absOffset * 20));
-
-    if (absOffset < 0.45) {
-      if (!c._isActive) {
-        c.classList.add('active');
-        c._isActive = true;
-      }
-      c.style.filter = 'brightness(1.08)';
-      c.style.opacity = '1';
-      c.style.pointerEvents = 'auto';
-    } else {
-      if (c._isActive) {
-        c.classList.remove('active');
-        c._isActive = false;
-      }
-      const dim = Math.max(0.35, 1 - absOffset * 0.28);
-      c.style.filter = 'brightness(' + dim.toFixed(2) + ')';
-      c.style.opacity = Math.max(0.25, 1 - absOffset * 0.30).toFixed(2);
-      c.style.pointerEvents = absOffset < 1.6 ? 'auto' : 'none';
-    }
-  }
-}
-
-function tick() {
-  if (reduced) {
-    currentPos = targetPos;
-  } else {
-    // Smooth 60fps spring lerp interpolation
-    const diff = targetPos - currentPos;
-    currentPos += diff * 0.16;
-    if (!isDraggingStage && Math.abs(diff) < 0.003) {
-      currentPos = targetPos;
-    }
-  }
-
-  paint();
-
-  if (isDraggingStage || Math.abs(targetPos - currentPos) >= 0.003) {
-    raf = requestAnimationFrame(tick);
-  } else {
-    raf = 0;
-  }
-}
-
-const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
-
-function schedulePlayCurrent(delay = 180) {
-  clearTimeout(autoplayTimer);
-  autoplayTimer = setTimeout(() => {
-    if (!cards || !cards.length) return;
-    const actIdx = active();
-    stopAll(actIdx);
-    const card = cards[actIdx];
-    if (card && stageVisible && !document.hidden && !playerOpen && !filmPreview && !userPaused) {
-      card.classList.add('playing');
-      card.classList.remove('paused');
-      mountCardMedia(card);
-    }
-  }, delay);
-}
-
-function stopAll(exceptIndex = -1) {
   cards.forEach((c, i) => {
-    if (i !== exceptIndex) {
-      c.classList.remove('playing', 'paused');
-      const ifr = c.querySelector('iframe.card-player');
-      if (ifr) ifr.remove();
-      const v = c.querySelector('video');
-      if (v) {
-        v.pause();
-        try { v.currentTime = 0; } catch(_) {}
-      } else {
-        restartBar(c);
+    // Angular distance from the camera center
+    const d = ((((i * step - angle) % 360) + 540) % 360) - 180;
+    const absD = Math.abs(d);
+
+    if (absD < step * 0.55) {
+      c.classList.add('active');
+      c.style.filter = 'brightness(1.1)';
+      c.style.opacity = '1';
+      c.style.zIndex = '60';
+      c.style.pointerEvents = 'auto';
+      c.querySelector('.screen').style.transform = 'scale(1.04)';
+      c.querySelector('.screen').style.boxShadow = '0 30px 65px -15px rgba(0,0,0,0.85), 0 0 35px rgba(242,165,65,0.18)';
+    } else {
+      c.classList.remove('active');
+      const dim = Math.max(0.45, 1 - (absD / 90) * 0.52);
+      c.style.filter = `brightness(${dim.toFixed(2)})`;
+      c.style.opacity = Math.max(0.28, 1 - (absD / 115)).toFixed(2);
+      c.style.zIndex = String(Math.max(1, 50 - Math.round(absD)));
+      c.style.pointerEvents = absD < 50 ? 'auto' : 'none';
+      const screenEl = c.querySelector('.screen');
+      if (screenEl) {
+        screenEl.style.transform = 'scale(0.96)';
+        screenEl.style.boxShadow = '0 20px 45px -20px rgba(0,0,0,0.7)';
       }
     }
   });
 }
 
-function mountCardMedia(card) {
-  if (!card) return;
-  const currentActiveIdx = active();
-  const cardIdx = cards.indexOf(card);
-  if (cardIdx !== -1 && cardIdx !== currentActiveIdx) return;
-  
-  stopAll(currentActiveIdx);
-
-  const fid = card.dataset.driveId;
-  const embedUrl = card.dataset.embedUrl || (fid ? ('https://drive.google.com/file/d/' + fid + '/preview?autoplay=1') : '');
-  
-  if (embedUrl) {
-    const screen = card.querySelector('.screen');
-    let ifr = screen.querySelector('iframe.card-player');
-    if (!ifr) {
-      ifr = document.createElement('iframe');
-      ifr.className = 'card-player';
-      ifr.src = embedUrl;
-      ifr.allow = 'autoplay; fullscreen; encrypted-media';
-      ifr.setAttribute('allowfullscreen', 'true');
-      screen.appendChild(ifr);
-    }
-  } else {
-    const v = card.querySelector('video');
-    if (v) {
-      if (!v.src && v.dataset.src) v.src = v.dataset.src;
-      playWithSound(v);
-    }
-  }
+function tick() {
+  if (reduced) angle = target; else angle += (target - angle) * 0.10;
+  if (!dragging && Math.abs(target - angle) < 0.05) angle = target;
+  paint();
+  raf = (dragging || angle !== target) ? requestAnimationFrame(tick) : 0;
 }
-
-function syncShort() {
-  const actIdx = active();
-  const c = cards[actIdx];
-  if (!c) return;
-  const want = stageVisible && !document.hidden && !playerOpen && !filmPreview && !userPaused;
-  if (want) {
-    schedulePlayCurrent(100);
-  } else {
-    stopAll(-1);
-  }
-}
-
-function startCard(card) {
-  if (!card) return;
-  userPaused = false;
-  card.classList.add('playing');
-  card.classList.remove('paused');
-  mountCardMedia(card);
-}
-
-function togglePlay(card) {
-  if (!card.classList.contains('playing')) {
-    startCard(card);
-    return;
-  }
-  userPaused = !card.classList.contains('paused');
-  if (userPaused) {
-    card.classList.add('paused');
-    card.classList.remove('playing');
-    const ifr = card.querySelector('iframe.card-player');
-    if (ifr) ifr.remove();
-  } else {
-    card.classList.remove('paused');
-    card.classList.add('playing');
-    mountCardMedia(card);
-  }
-}
-
-function info() {
-  const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS;
-  const act = active();
-  const w = list[act] || list[0] || {};
-  const kEl = $('#i-kind'), dEl = $('#i-dur'), tEl = $('#i-title'), rEl = $('#i-role'), cEl = $('#i-count');
-  if (kEl) kEl.textContent = w.kind || '';
-  if (dEl) dEl.textContent = w.dur || '';
-  if (tEl) tEl.textContent = w.title || '';
-  if (rEl) rEl.textContent = w.role || '';
-  if (cEl) cEl.textContent = String(act + 1).padStart(2, '0') + ' / ' + String(N).padStart(2, '0');
-  ticks.forEach((t, i) => t.setAttribute('aria-current', i === act ? 'true' : 'false'));
-}
-
-function go(i) {
-  targetPos = i;
-  currentIndex = ((Math.round(targetPos) % N) + N) % N;
-  stopAll();
-  info();
-  kick();
-  schedulePlayCurrent(260);
-}
-
-function goToCard(k) {
-  let diff = ((k - active()) % N + N) % N;
-  if (diff > N / 2) diff -= N;
-  go(targetPos + diff);
-}
-
-const prevBtn = document.getElementById('prev');
-if (prevBtn) prevBtn.addEventListener('click', () => { touched(); go(Math.round(targetPos) - 1); });
-const nextBtn = document.getElementById('next');
-if (nextBtn) nextBtn.addEventListener('click', () => { touched(); go(Math.round(targetPos) + 1); });
+const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
 
 /* ---------- Sound Control ---------- */
 const SND_ON = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="w" d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>';
@@ -1323,74 +1221,163 @@ function refreshSound() {
   document.querySelectorAll('.card video, .film .frame video').forEach((v) => { v.muted = !soundOn; });
 }
 function setSound(on) { soundOn = on; refreshSound(); }
-const fmt = (s) => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 function restartBar(card) {
   const bar = card.querySelector('.bar i');
   if (bar) {
     bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
   }
 }
-
-function attachCardListeners() {
-  cards.forEach((card, i) => {
-    const playBtn = card.querySelector('.playbtn');
-    if (playBtn) {
-      playBtn.style.cursor = 'pointer';
-      playBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        touched();
-        if (i !== active()) {
-          goToCard(i);
-        } else {
-          setSound(true);
-          togglePlay(card);
-        }
-      });
-    }
-
-    card.style.cursor = 'pointer';
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('.snd-btn')) return;
-      if (moved) return;
-      e.stopPropagation();
-      touched();
-      if (i !== active()) {
-        goToCard(i);
+function stopAll(exceptIndex = -1) {
+  cards.forEach((c, i) => {
+    if (i !== exceptIndex) {
+      c.classList.remove('playing', 'paused');
+      // Remove mounted iframe so no background audio or second video can possibly play
+      const ifr = c.querySelector('iframe.card-player');
+      if (ifr) ifr.remove();
+      const v = c.querySelector('video');
+      if (v) {
+        v.pause();
+        try { v.currentTime = 0; } catch(_) {}
       } else {
-        setSound(true);
-        togglePlay(card);
+        restartBar(c);
       }
-    });
-
-    const v = card.querySelector('video'), bar = card.querySelector('.bar i'), cur = card.querySelector('.cur');
-    if (v) {
-      v.muted = !soundOn;
-      v.addEventListener('timeupdate', () => {
-        if (v.duration) bar.style.width = (v.currentTime / v.duration * 100) + '%';
-        cur.textContent = fmt(v.currentTime);
-      });
-    } else if (bar) {
-      bar.addEventListener('animationend', () => { if (card.classList.contains('playing')) restartBar(card); });
     }
   });
 }
+function preloadNeighbors() {
+  // Direct Google Drive embed on demand to avoid unnecessary network load
+}
+function mountCardMedia(card) {
+  if (!card) return;
+  const currentActiveIdx = active();
+  const cardIdx = cards.indexOf(card);
+  
+  // Guarantee that ONLY the active card can ever mount or play media!
+  if (cardIdx !== -1 && cardIdx !== currentActiveIdx) {
+    return;
+  }
+  
+  // Stop and clean up ALL other cards immediately
+  stopAll(currentActiveIdx);
+
+  const fid = card.dataset.driveId;
+  const embedUrl = card.dataset.embedUrl || (fid ? ('https://drive.google.com/file/d/' + fid + '/preview?autoplay=1') : '');
+  
+  if (embedUrl) {
+    const screen = card.querySelector('.screen');
+    let ifr = screen.querySelector('iframe.card-player');
+    if (!ifr) {
+      ifr = document.createElement('iframe');
+      ifr.className = 'card-player';
+      ifr.src = embedUrl;
+      ifr.allow = 'autoplay; fullscreen; encrypted-media';
+      ifr.setAttribute('allowfullscreen', 'true');
+      screen.appendChild(ifr);
+    }
+  } else {
+    const v = card.querySelector('video');
+    if (v) {
+      if (!v.src && v.dataset.src) v.src = v.dataset.src;
+      playWithSound(v);
+    }
+  }
+}
+function syncShort() {
+  const actIdx = active();
+  const c = cards[actIdx];
+  if (!c) return;
+  const want = stageVisible && !document.hidden && !playerOpen && !filmPreview && !userPaused;
+  if (want) {
+    // Stop all other cards strictly
+    stopAll(actIdx);
+    c.classList.remove('paused');
+    c.classList.add('playing');
+    mountCardMedia(c);
+  } else {
+    c.classList.add('paused');
+    const v = c.querySelector('video');
+    if (v && !v.paused) v.pause();
+    const ifr = c.querySelector('iframe.card-player');
+    if (ifr) ifr.remove();
+  }
+}
+function startCard(card) {
+  if (!card) return;
+  card.classList.add('playing');
+  card.classList.remove('paused');
+  userPaused = false;
+  mountCardMedia(card);
+  syncShort();
+}
+function togglePlay(card) {
+  if (!card.classList.contains('playing')) {
+    startCard(card);
+    return;
+  }
+  userPaused = !card.classList.contains('paused');
+  if (userPaused) {
+    card.classList.add('paused');
+    card.classList.remove('playing');
+    const ifr = card.querySelector('iframe.card-player');
+    if (ifr) ifr.remove(); // removes audio on pause
+  } else {
+    card.classList.remove('paused');
+    card.classList.add('playing');
+    mountCardMedia(card);
+  }
+}
+function info() {
+  const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : SHORTS;
+  const w = list[active()] || list[0] || {};
+  const kEl = $('#i-kind'), dEl = $('#i-dur'), tEl = $('#i-title'), rEl = $('#i-role'), cEl = $('#i-count');
+  if (kEl) kEl.textContent = w.kind || '';
+  if (dEl) dEl.textContent = w.dur || '';
+  if (tEl) tEl.textContent = w.title || '';
+  if (rEl) rEl.textContent = w.role || '';
+  if (cEl) cEl.textContent = `${String(active() + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`;
+  ticks.forEach((t, i) => t.setAttribute('aria-current', i === active() ? 'true' : 'false'));
+}
+function go(i) {
+  const changed = i !== idx;
+  idx = i;
+  target = idx * step;
+  stopAll(active());
+  info();
+  kick();
+  if (!reduced) {
+    startCard(cards[active()]);
+  }
+}
+function goToCard(k) {
+  let diff = ((k - active()) % N + N) % N;
+  if (diff > N / 2) diff -= N;
+  go(idx + diff);
+}
+const touched = () => { lastTouch = Date.now(); };
+
+const prevBtn = document.getElementById('prev');
+if (prevBtn) prevBtn.addEventListener('click', () => { touched(); go(idx - 1); });
+const nextBtn = document.getElementById('next');
+if (nextBtn) nextBtn.addEventListener('click', () => { touched(); go(idx + 1); });
 
 // =========================================================================
-// Drag & Touch Gestures on Stage (Silky Smooth)
+// Drag & Touch Gestures on Stage
 // =========================================================================
+let lastMoveX = 0, lastMoveTime = 0, dragVelocity = 0;
+
 stage.addEventListener('pointerdown', (e) => {
   if (e.target.closest('.snd-btn')) return;
-  isDraggingStage = true;
+  dragging = true;
   moved = false;
   scrolled = false;
   sx = e.clientX;
   sy = e.clientY;
   st = performance.now();
-  lastDragX = sx;
-  lastDragTime = st;
-  stageVelocity = 0;
-  startDragPos = currentPos;
+  lastMoveX = sx;
+  lastMoveTime = st;
+  dragVelocity = 0;
+  sa = angle;
   downCard = e.target.closest('.card');
   downTarget = e.target;
   touched();
@@ -1398,79 +1385,71 @@ stage.addEventListener('pointerdown', (e) => {
 });
 
 stage.addEventListener('pointermove', (e) => {
-  if (!isDraggingStage) return;
+  if (!dragging) return;
   const dx = e.clientX - sx;
   const dy = e.clientY - sy;
-
   if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) {
     scrolled = true;
     return;
   }
-  if (!scrolled && Math.abs(dx) > 8) {
+  if (!scrolled && Math.abs(dx) > 10) {
     if (!moved) {
       moved = true;
       try { stage.setPointerCapture(e.pointerId); } catch (_) {}
     }
     const now = performance.now();
-    const dt = now - lastDragTime;
+    const dt = now - lastMoveTime;
     if (dt > 8) {
-      stageVelocity = (e.clientX - lastDragX) / dt;
-      lastDragX = e.clientX;
-      lastDragTime = now;
+      dragVelocity = (e.clientX - lastMoveX) / dt;
+      lastMoveX = e.clientX;
+      lastMoveTime = now;
     }
-
-    // Direct pixel-to-card mapping: 200px drag = 1 full card shift!
-    const dragCardShift = dx / 200;
-    currentPos = startDragPos - dragCardShift;
-    targetPos = currentPos;
-    paint();
-    info();
+    const angularSpeed = step / 180;
+    angle = sa - dx * angularSpeed;
+    target = angle;
   }
 });
 
-function endStageDrag(e) {
-  if (!isDraggingStage) return;
-  isDraggingStage = false;
+function endDrag(e) {
+  if (!dragging) return;
+  dragging = false;
   touched();
-
   if (moved) {
-    // Add flick momentum
-    let flickOffset = 0;
-    if (Math.abs(stageVelocity) > 0.4) {
-      flickOffset = -stageVelocity * 0.9;
-      flickOffset = Math.max(-2.5, Math.min(2.5, flickOffset));
+    // Add momentum inertia based on drag velocity
+    let momentumSteps = 0;
+    if (Math.abs(dragVelocity) > 0.45) {
+      momentumSteps = Math.round(-dragVelocity * 2.8);
+      momentumSteps = Math.max(-3, Math.min(3, momentumSteps));
     }
-    const snapTarget = Math.round(targetPos + flickOffset);
-    go(snapTarget);
+    const targetIdx = Math.round(angle / step) + momentumSteps;
+    go(targetIdx);
     setTimeout(() => { moved = false; }, 80);
-  } else {
-    go(Math.round(targetPos));
   }
   kick();
 }
 
-stage.addEventListener('pointerup', endStageDrag);
-stage.addEventListener('pointercancel', endStageDrag);
+stage.addEventListener('pointerup', endDrag);
+stage.addEventListener('pointercancel', endDrag);
 
 stage.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight') { touched(); go(Math.round(targetPos) + 1); e.preventDefault(); }
-  else if (e.key === 'ArrowLeft') { touched(); go(Math.round(targetPos) - 1); e.preventDefault(); }
+  if (e.key === 'ArrowRight') { touched(); go(idx + 1); e.preventDefault(); }
+  else if (e.key === 'ArrowLeft') { touched(); go(idx - 1); e.preventDefault(); }
   else if (e.key === 'Enter') { touched(); togglePlay(cards[active()]); e.preventDefault(); }
   else if (e.key === ' ') { touched(); togglePlay(cards[active()]); e.preventDefault(); }
 });
 
-let stageWheelTimer = 0;
+let wheelIdle = 0;
 stage.addEventListener('wheel', (e) => {
   const dx = e.deltaMode === 1 ? e.deltaX * 16 : e.deltaX;
   if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
   e.preventDefault();
   touched();
-  targetPos += Math.max(-1.5, Math.min(1.5, dx / 120));
+  const angularSpeed = step / 180;
+  angle += Math.max(-40, Math.min(40, dx)) * angularSpeed;
+  target = angle;
   paint();
-  info();
-  kick();
-  clearTimeout(stageWheelTimer);
-  stageWheelTimer = setTimeout(() => go(Math.round(targetPos)), 120);
+  clearTimeout(wheelIdle);
+  wheelIdle = setTimeout(() => go(Math.round(angle / step)), 140);
 }, { passive: false });
 
 stage.addEventListener('mouseenter', () => { hover = true; });
@@ -1500,8 +1479,28 @@ if ('IntersectionObserver' in window) {
   }, { threshold: 0.05, rootMargin: '160px 0px 160px 0px' }).observe(stage);
 }
 
-// Update active function to use currentPos
- =========================================================================
+function tryAutoplay() {
+  if (cards && cards.length) {
+    const actIdx = active();
+    stopAll(actIdx);
+    startCard(cards[actIdx]);
+  }
+}
+setTimeout(tryAutoplay, 60);
+window.addEventListener('load', tryAutoplay);
+['click', 'touchstart', 'scroll', 'keydown'].forEach(ev => {
+  window.addEventListener(ev, () => {
+    const c = cards[active()];
+    if (c) {
+      const v = c.querySelector('video');
+      if (v && v.paused && !userPaused && !playerOpen) {
+        playWithSound(v);
+      }
+    }
+  }, { once: true, passive: true });
+});
+
+// =========================================================================
 // Long-Form Grid (16:9 Films)
 // =========================================================================
 const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
