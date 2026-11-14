@@ -1069,7 +1069,7 @@ function attachCardListeners() {
     const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
     const video = list[i] || {};
 
-    // 1. Direct click on play button: direct in-place playback with sound
+    // 1. Direct click on play button: opens clean, full 9:16 player without distortion or black bars
     const playBtn = card.querySelector('.playbtn');
     if (playBtn) {
       playBtn.style.cursor = 'pointer';
@@ -1080,13 +1080,12 @@ function attachCardListeners() {
         if (i !== active()) {
           go(i);
         } else {
-          setSound(true);
-          togglePlay(card);
+          openLightbox(i, true);
         }
       });
     }
 
-    // 2. Direct click on card: plays directly in place without popup modal!
+    // 2. Direct click on card: rotates to active or opens full 9:16 player
     card.style.cursor = 'pointer';
     card.addEventListener('click', (e) => {
       if (e.target.closest('.snd-btn')) return;
@@ -1096,8 +1095,7 @@ function attachCardListeners() {
       if (i !== active()) {
         go(i);
       } else {
-        setSound(true);
-        togglePlay(card);
+        openLightbox(i, true);
       }
     });
 
@@ -1336,23 +1334,7 @@ function mountCardMedia(card) {
   }
 }
 function syncShort() {
-  const actIdx = active();
-  const c = cards[actIdx];
-  if (!c) return;
-  const want = stageVisible && !document.hidden && !playerOpen && !filmPreview && !userPaused;
-  if (want) {
-    // Stop all other cards strictly
-    stopAll(actIdx);
-    c.classList.remove('paused');
-    c.classList.add('playing');
-    mountCardMedia(c);
-  } else {
-    c.classList.add('paused');
-    const v = c.querySelector('video');
-    if (v && !v.paused) v.pause();
-    const ifr = c.querySelector('iframe.card-player');
-    if (ifr) ifr.remove();
-  }
+  // Silent sync: no automatic background video loading to prevent premature black screens
 }
 function startCard(card) {
   if (!card) return;
@@ -1397,9 +1379,6 @@ function go(i) {
   stopAll(active());
   info();
   kick();
-  if (!reduced) {
-    startCard(cards[active()]);
-  }
 }
 function goToCard(k) {
   let diff = ((k - active()) % N + N) % N;
