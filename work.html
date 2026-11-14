@@ -10,21 +10,34 @@
 /* Filter Tabs Styling */
 .filter-tabs-container {
   display: flex;
-  justify-content: center;
-  margin-bottom: 22px;
+  justify-content: flex-start;
+  margin-bottom: 24px;
   overflow-x: auto;
-  padding-bottom: 6px;
+  padding: 4px 6px 12px;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(242, 165, 65, 0.4) transparent;
+  scroll-behavior: smooth;
+  mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
+}
+.filter-tabs-container::-webkit-scrollbar {
+  height: 4px;
+}
+.filter-tabs-container::-webkit-scrollbar-thumb {
+  background: rgba(242, 165, 65, 0.35);
+  border-radius: 999px;
 }
 .filter-tabs {
   display: inline-flex;
   gap: 8px;
-  padding: 5px;
-  background: rgba(255, 255, 255, 0.04);
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.035);
   border: 1px solid var(--line);
   border-radius: 999px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  margin-inline: auto;
 }
 .ftab {
   background: transparent;
@@ -542,13 +555,27 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
       </div>
 
       
-      <!-- Industry / Niche Filter Tabs -->
+      <!-- Industry / Niche Filter Tabs (All 17 Drive Categories) -->
       <div class="filter-tabs-container">
-        <div class="filter-tabs" role="tablist" aria-label="Filter by Niche">
-          <button type="button" class="ftab active" data-genre="all">All (213)</button>
-          <button type="button" class="ftab" data-genre="fitness">Fitness (46)</button>
-          <button type="button" class="ftab" data-genre="medical">Medical (33)</button>
-          <button type="button" class="ftab" data-genre="commercials">Commercials (134)</button>
+        <div class="filter-tabs" role="tablist" aria-label="Filter by Industry">
+          <button type="button" class="ftab active" data-cat="all">All (213)</button>
+          <button type="button" class="ftab" data-cat="fitness">Fitness / جيم (46)</button>
+          <button type="button" class="ftab" data-cat="medical">Medical / طبي (33)</button>
+          <button type="button" class="ftab" data-cat="ai">AI (18)</button>
+          <button type="button" class="ftab" data-cat="cafe">Cafe / كافيه (17)</button>
+          <button type="button" class="ftab" data-cat="finishing">Finishing / تشطيب (16)</button>
+          <button type="button" class="ftab" data-cat="lighting">Lighting / نجف (15)</button>
+          <button type="button" class="ftab" data-cat="fashion">Fashion / ملابس (14)</button>
+          <button type="button" class="ftab" data-cat="beauty">Beauty / تجميل (11)</button>
+          <button type="button" class="ftab" data-cat="event">Event / ايفنت (9)</button>
+          <button type="button" class="ftab" data-cat="cars">Cars / عربيات (8)</button>
+          <button type="button" class="ftab" data-cat="realestate">Real Estate / عقارات (7)</button>
+          <button type="button" class="ftab" data-cat="agency">Agency / ايجنسي (5)</button>
+          <button type="button" class="ftab" data-cat="dates">Dates / بلح (4)</button>
+          <button type="button" class="ftab" data-cat="kitchens">Kitchens / مطابخ (3)</button>
+          <button type="button" class="ftab" data-cat="restaurant">Restaurant / مطعم (3)</button>
+          <button type="button" class="ftab" data-cat="motion">Motion / موشن (2)</button>
+          <button type="button" class="ftab" data-cat="saudi">Saudi / سعودي (2)</button>
         </div>
       </div>
 
@@ -1622,14 +1649,35 @@ if (copyPhoneBtn) {
         window.ALL_SHORTS_CATALOG = fullList;
       }
 
+      const cat = tab.dataset.cat || tab.dataset.genre || 'all';
       const baseCatalog = (window.ALL_PORTFOLIO_VIDEOS && window.ALL_PORTFOLIO_VIDEOS.length) ? window.ALL_PORTFOLIO_VIDEOS : fullList;
       let filtered = baseCatalog;
-      if (genre === 'fitness') {
-        filtered = baseCatalog.filter(v => (v.kind || v.genre || '').toLowerCase() === 'fitness' || (v.subfolder || '').includes('جيم'));
-      } else if (genre === 'medical') {
-        filtered = baseCatalog.filter(v => (v.kind || v.genre || '').toLowerCase() === 'medical' || (v.subfolder || '').includes('طبي'));
-      } else if (genre === 'commercials') {
-        filtered = baseCatalog.filter(v => (v.kind || v.genre || '').toLowerCase() === 'commercials' || (!v.subfolder?.includes('جيم') && !v.subfolder?.includes('طبي')));
+      if (cat !== 'all') {
+        filtered = baseCatalog.filter(v => {
+          const sub = (v.subfolder || '').toLowerCase();
+          const title = (v.title || '').toLowerCase();
+          const kind = (v.kind || v.genre || '').toLowerCase();
+          switch(cat) {
+            case 'fitness': return sub.includes('جيم') || sub.includes('fitness') || kind === 'fitness';
+            case 'medical': return sub.includes('طبي') || sub.includes('medical') || kind === 'medical';
+            case 'ai': return sub.includes('ai') || title.includes('ai');
+            case 'cafe': return sub.includes('كافيه') || sub.includes('cafe');
+            case 'finishing': return sub.includes('تشطيب') || sub.includes('finishing');
+            case 'lighting': return sub.includes('نجف') || sub.includes('lighting');
+            case 'fashion': return sub.includes('ملابس') || sub.includes('fashion');
+            case 'beauty': return sub.includes('تجميل') || sub.includes('beauty');
+            case 'event': return sub.includes('ايفنت') || sub.includes('event');
+            case 'cars': return sub.includes('عربيات') || sub.includes('cars');
+            case 'realestate': return sub.includes('عقارات') || sub.includes('real estate');
+            case 'agency': return sub.includes('ايجنسي') || sub.includes('agency');
+            case 'dates': return sub.includes('بلح') || sub.includes('dates');
+            case 'kitchens': return sub.includes('مطابخ') || sub.includes('kitchen');
+            case 'restaurant': return sub.includes('مطعم') || sub.includes('restaurant');
+            case 'motion': return sub.includes('موشن') || sub.includes('motion');
+            case 'saudi': return sub.includes('سعودي') || sub.includes('saudi');
+            default: return true;
+          }
+        });
       }
 
       // If user filters a category with no items yet, show empty state or only matching items
