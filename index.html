@@ -418,6 +418,16 @@ section { padding-block: clamp(36px, 6vw, 72px); }
   border: none;
   background: #000;
 }
+
+#lbBox iframe, .p-frame iframe {
+  top: 50%;
+  left: 50%;
+  width: 138%;
+  height: 138%;
+  transform: translate(-50%, -50%) !important;
+  border: none;
+  background: transparent;
+}
 .player .p-frame video, .lightbox .p-frame video, #lbBox video { object-fit: contain; }
 .player .p-frame .art b, .lightbox .p-frame .art b, #lbBox .art b { font-size: clamp(120px, 22vw, 260px); top: 14%; }
 .player .p-empty, .lightbox .p-empty { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; color: #fff; }
@@ -463,8 +473,8 @@ html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transiti
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 114%;
-  height: 114%;
+  width: 138%;
+  height: 138%;
   transform: translate(-50%, -50%) !important;
   border: none;
   z-index: 20 !important;
@@ -969,7 +979,7 @@ function openLightbox(urlOrIndex, isVertical = true) {
 
   if (box) {
     if (embedUrl.includes('drive.google.com') || embedUrl.includes('youtube.com')) {
-      box.innerHTML = `<iframe src="${embedUrl}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:none;background:#000;border-radius:inherit;"></iframe>`;
+      box.innerHTML = `<iframe src="${embedUrl}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="position:absolute;top:50%;left:50%;width:138%;height:138%;transform:translate(-50%,-50%);border:none;background:#000;border-radius:inherit;"></iframe>`;
     } else {
       box.innerHTML = `<video src="${embedUrl}" controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;border-radius:inherit;"></video>`;
     }
