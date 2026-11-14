@@ -1,8 +1,7 @@
-/* ================= OMAR MOSTAFA - COMPLETE VIDEO PORTFOLIO =================
-   All 213 Videos extracted from Google Drive root folder:
-   https://drive.google.com/drive/folders/1thfowW4uBhcIxfVRxtQqKM-l-9KxTlY4
-   Including: Fitness (46), Medical (33), Commercials / Ads (134)
-   ========================================================================== */
+/**
+ * Omar Mostafa Portfolio - Full Video Catalog
+ * Synchronized with Google Drive (212 Videos across 17 categories)
+ */
 
 window.ALL_PORTFOLIO_VIDEOS = [
   {
@@ -643,22 +642,9 @@ window.ALL_PORTFOLIO_VIDEOS = [
     "hue": 198
   },
   {
-    "id": "1vmg4LsdtW8oQixvv4B2SxeB4v1wcCa8D",
-    "fileId": "1vmg4LsdtW8oQixvv4B2SxeB4v1wcCa8D",
-    "title": "Real Estate #01",
-    "type": "short",
-    "kind": "Commercials",
-    "subfolder": "Real Estate / عقارات",
-    "dur": "0:30",
-    "role": "Edit · sound design · color",
-    "poster": "https://lh3.googleusercontent.com/d/1vmg4LsdtW8oQixvv4B2SxeB4v1wcCa8D=w600",
-    "src": "https://drive.google.com/file/d/1vmg4LsdtW8oQixvv4B2SxeB4v1wcCa8D/preview",
-    "hue": 209
-  },
-  {
     "id": "1o866WwZGGuE8fJ0vm9yR5X_ZnDH0cxDr",
     "fileId": "1o866WwZGGuE8fJ0vm9yR5X_ZnDH0cxDr",
-    "title": "Real Estate #02",
+    "title": "Real Estate #01",
     "type": "short",
     "kind": "Commercials",
     "subfolder": "Real Estate / عقارات",
@@ -671,7 +657,7 @@ window.ALL_PORTFOLIO_VIDEOS = [
   {
     "id": "1z71pYExbio6rmFYMXMzipoYKZgz0JGQr",
     "fileId": "1z71pYExbio6rmFYMXMzipoYKZgz0JGQr",
-    "title": "Real Estate #03",
+    "title": "Real Estate #02",
     "type": "short",
     "kind": "Commercials",
     "subfolder": "Real Estate / عقارات",
@@ -684,7 +670,7 @@ window.ALL_PORTFOLIO_VIDEOS = [
   {
     "id": "1hTRyRrRcGx8mfDpbd9hl8cbH1OEnHGrm",
     "fileId": "1hTRyRrRcGx8mfDpbd9hl8cbH1OEnHGrm",
-    "title": "Real Estate #04",
+    "title": "Real Estate #03",
     "type": "short",
     "kind": "Commercials",
     "subfolder": "Real Estate / عقارات",
@@ -697,7 +683,7 @@ window.ALL_PORTFOLIO_VIDEOS = [
   {
     "id": "1oQxZRakGBOHIpEwdg8z4kM7jXgd1nlcM",
     "fileId": "1oQxZRakGBOHIpEwdg8z4kM7jXgd1nlcM",
-    "title": "Real Estate #05",
+    "title": "Real Estate #04",
     "type": "short",
     "kind": "Commercials",
     "subfolder": "Real Estate / عقارات",
@@ -710,7 +696,7 @@ window.ALL_PORTFOLIO_VIDEOS = [
   {
     "id": "1pyBczLH7LmwYFQpXO-7tBGDagKPhOtjl",
     "fileId": "1pyBczLH7LmwYFQpXO-7tBGDagKPhOtjl",
-    "title": "Real Estate #06",
+    "title": "Real Estate #05",
     "type": "short",
     "kind": "Commercials",
     "subfolder": "Real Estate / عقارات",
@@ -723,7 +709,7 @@ window.ALL_PORTFOLIO_VIDEOS = [
   {
     "id": "1ddHcrTBl96ubGCGh-txokPI7CRBqOjtn",
     "fileId": "1ddHcrTBl96ubGCGh-txokPI7CRBqOjtn",
-    "title": "Real Estate #07",
+    "title": "Real Estate #06",
     "type": "short",
     "kind": "Commercials",
     "subfolder": "Real Estate / عقارات",
@@ -2775,6 +2761,3 @@ window.ALL_PORTFOLIO_VIDEOS = [
     "hue": 302
   }
 ];
-
-window.SHORTS = window.ALL_PORTFOLIO_VIDEOS;
-window.FILMS = window.ALL_PORTFOLIO_VIDEOS.slice(0, 16);
