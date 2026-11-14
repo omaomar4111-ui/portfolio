@@ -448,9 +448,11 @@ html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transiti
 .thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; border-radius: inherit; }
 .card .screen iframe.card-player {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 50%;
+  left: 50%;
+  width: 138%;
+  height: 138%;
+  transform: translate(-50%, -50%);
   border: none;
   z-index: 100 !important;
   border-radius: inherit;
@@ -543,11 +545,10 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
       <!-- Industry / Niche Filter Tabs -->
       <div class="filter-tabs-container">
         <div class="filter-tabs" role="tablist" aria-label="Filter by Niche">
-          <button type="button" class="ftab active" data-genre="all">All</button>
-          <button type="button" class="ftab" data-genre="fitness">Fitness</button>
-          <button type="button" class="ftab" data-genre="medical">Medical</button>
-          <button type="button" class="ftab" data-genre="commercials">Commercials</button>
-          <button type="button" class="ftab" data-genre="podcast">Podcast</button>
+          <button type="button" class="ftab active" data-genre="all">All (213)</button>
+          <button type="button" class="ftab" data-genre="fitness">Fitness (46)</button>
+          <button type="button" class="ftab" data-genre="medical">Medical (33)</button>
+          <button type="button" class="ftab" data-genre="commercials">Commercials (134)</button>
         </div>
       </div>
 
@@ -687,7 +688,7 @@ const INITIAL_GYM_VIDEOS = [
 ];
 
 // Initial memory setup: all 46 gym videos in carousel
-window.SHORTS = (window.SHORTS && window.SHORTS.length >= 46) ? window.SHORTS : INITIAL_GYM_VIDEOS;
+window.SHORTS = (window.ALL_PORTFOLIO_VIDEOS && window.ALL_PORTFOLIO_VIDEOS.length) ? window.ALL_PORTFOLIO_VIDEOS : ((window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS);
 window.FILMS = (window.FILMS && window.FILMS.length) ? window.FILMS : INITIAL_GYM_VIDEOS.slice(24);
 
 // Check if any local overrides exist in localStorage
@@ -853,7 +854,7 @@ const ring = document.getElementById('ring') || $('#ring');
 const stage = document.getElementById('stage') || $('#stage');
 let cards = [];
 let ticks = [];
-let N = (window.SHORTS && window.SHORTS.length) ? window.SHORTS.length : INITIAL_GYM_VIDEOS.length;
+let N = (window.SHORTS && window.SHORTS.length) ? window.SHORTS.length : 46;
 let step = N ? 360 / N : 7.8261;
 let R = 1550;
 let idx = 0;
@@ -1621,15 +1622,14 @@ if (copyPhoneBtn) {
         window.ALL_SHORTS_CATALOG = fullList;
       }
 
-      let filtered = fullList;
+      const baseCatalog = (window.ALL_PORTFOLIO_VIDEOS && window.ALL_PORTFOLIO_VIDEOS.length) ? window.ALL_PORTFOLIO_VIDEOS : fullList;
+      let filtered = baseCatalog;
       if (genre === 'fitness') {
-        filtered = fullList.filter(v => (v.kind || v.genre || '').toLowerCase().includes('fit') || (v.kind || v.genre || '').toLowerCase().includes('gym') || (v.title || '').toLowerCase().includes('gym'));
+        filtered = baseCatalog.filter(v => (v.kind || v.genre || '').toLowerCase() === 'fitness' || (v.subfolder || '').includes('جيم'));
       } else if (genre === 'medical') {
-        filtered = fullList.filter(v => (v.kind || v.genre || '').toLowerCase().includes('med') || (v.kind || v.genre || '').toLowerCase().includes('health') || (v.kind || v.genre || '').toLowerCase().includes('طب'));
+        filtered = baseCatalog.filter(v => (v.kind || v.genre || '').toLowerCase() === 'medical' || (v.subfolder || '').includes('طبي'));
       } else if (genre === 'commercials') {
-        filtered = fullList.filter(v => (v.kind || v.genre || '').toLowerCase().includes('comm') || (v.kind || v.genre || '').toLowerCase().includes('ad') || (v.kind || v.genre || '').toLowerCase().includes('إعلان'));
-      } else if (genre === 'podcast') {
-        filtered = fullList.filter(v => (v.kind || v.genre || '').toLowerCase().includes('pod') || (v.kind || v.genre || '').toLowerCase().includes('بودكاست'));
+        filtered = baseCatalog.filter(v => (v.kind || v.genre || '').toLowerCase() === 'commercials' || (!v.subfolder?.includes('جيم') && !v.subfolder?.includes('طبي')));
       }
 
       // If user filters a category with no items yet, show empty state or only matching items
@@ -1763,7 +1763,8 @@ function startFirestoreSync() {
   function updateCatalogFromFirestore() {
     const map = new Map();
     // 1. Seed with initial gym videos
-    INITIAL_GYM_VIDEOS.forEach(v => map.set(v.id, { ...v }));
+    const seedList = (window.ALL_PORTFOLIO_VIDEOS && window.ALL_PORTFOLIO_VIDEOS.length) ? window.ALL_PORTFOLIO_VIDEOS : INITIAL_GYM_VIDEOS;
+    seedList.forEach(v => map.set(v.id, { ...v }));
 
     // 2. Overlay or add shortVideos from Firestore
     fsShorts.forEach(v => {
