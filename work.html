@@ -498,24 +498,32 @@ html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transiti
 .card.playing iframe.card-player {
   opacity: 1 !important;
 }
-.card.playing.loaded video {
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-.card.playing.loaded .cap {
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-/* Poster thumb remains at z-index: 2 under iframe (z-index: 20) as permanent solid backdrop */
+/* Poster thumb remains at z-index: 2 as permanent solid backdrop */
 .card .thumb {
   z-index: 2 !important;
   opacity: 1 !important;
+}
+.card .screen video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 3 !important;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.card .screen video.is-playing {
+  opacity: 1 !important;
+  pointer-events: auto;
 }
 .card .art {
   z-index: 1 !important;
   opacity: 1 !important;
 }
-.card.playing .playbtn {
+.card.playing.loaded .playbtn,
+.card.has-playing-video .playbtn {
   display: none !important;
 }
 .card.playing .screen::after {
@@ -874,13 +882,23 @@ function extractDriveId(url) {
   return '';
 }
 
+function isDirectVideoUrl(url) {
+  if (!url || typeof url !== 'string') return false;
+  const u = url.trim().toLowerCase();
+  if (u.includes('drive.google.com') || u.includes('drive.usercontent.google.com') || u.includes('youtube.com') || u.includes('youtu.be')) {
+    return false;
+  }
+  if (u.includes('firebasestorage.googleapis.com')) {
+    return true;
+  }
+  const exts = ['.mp4', '.webm', '.mov', '.m4v'];
+  return exts.some(ext => u.endsWith(ext) || u.includes(ext + '?') || u.includes(ext + '&'));
+}
+
 function getDirectStreamUrl(url) {
   if (!url) return '';
-  const fid = extractDriveId(url);
-  if (fid) {
-    return 'https://drive.usercontent.google.com/download?id=' + fid + '&export=download';
-  }
-  return url;
+  if (isDirectVideoUrl(url)) return url;
+  return '';
 }
 
 function getCleanEmbedUrl(url) {
@@ -1071,7 +1089,7 @@ function attachCardListeners() {
     const list = (window.SHORTS && window.SHORTS.length) ? window.SHORTS : INITIAL_GYM_VIDEOS;
     const video = list[i] || {};
 
-    // 1. Direct click on play button: opens clean, full 9:16 player without distortion or black bars
+    // 1. Direct click on play button: plays in place if direct MP4 or opens clean full 9:16 player
     const playBtn = card.querySelector('.playbtn');
     if (playBtn) {
       playBtn.style.cursor = 'pointer';
@@ -1082,12 +1100,18 @@ function attachCardListeners() {
         if (i !== active()) {
           go(i);
         } else {
-          openLightbox(i, true);
+          const directVid = card.dataset.directVideo;
+          if (directVid) {
+            setSound(true);
+            togglePlay(card);
+          } else {
+            openLightbox(i, true);
+          }
         }
       });
     }
 
-    // 2. Direct click on card: rotates to active or opens full 9:16 player
+    // 2. Direct click on card: rotates to active or plays
     card.style.cursor = 'pointer';
     card.addEventListener('click', (e) => {
       if (e.target.closest('.snd-btn')) return;
@@ -1097,7 +1121,13 @@ function attachCardListeners() {
       if (i !== active()) {
         go(i);
       } else {
-        openLightbox(i, true);
+        const directVid = card.dataset.directVideo;
+        if (directVid) {
+          setSound(true);
+          togglePlay(card);
+        } else {
+          openLightbox(i, true);
+        }
       }
     });
 
@@ -1140,20 +1170,21 @@ function renderDrum(newItems) {
   ring.innerHTML = list.map((w, i) => {
     const safeTitle = escapeHTML(w.title || `Short #${i + 1}`);
     const safeDur = escapeHTML(w.dur || '0:30');
-    const isDirectVideo = sUrl && !sUrl.includes('drive.google.com') && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
-    const videoTag = isDirectVideo
-      ? `<video data-src="${sUrl}" playsinline loop muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>`
+    const rawVideoUrl = w.videoUrl || w.src || '';
+    const sUrl = isDirectVideoUrl(rawVideoUrl) ? sanitizeUrl(rawVideoUrl) : '';
+    const videoTag = sUrl
+      ? `<video data-src="${sUrl}" playsinline loop muted preload="none" onerror="this.remove()" onplay="this.classList.add('is-playing')" onpause="this.classList.remove('is-playing')" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3;border-radius:inherit;"></video>`
       : '';
     const fid = extractDriveId(w.fileId || w.id || w.videoUrl || w.src);
     const cleanEmbed = fid ? `https://drive.google.com/file/d/${fid}/preview?autoplay=1` : '';
     return `
-    <article class="card${(w.src || fid) ? ' has-video' : ''}" data-index="${i}" data-drive-id="${fid}" data-embed-url="${cleanEmbed}" style="--h:${Number(w.hue) || (190 + (i * 13) % 160)}; --dur:${secs(w.dur || '0:30')}s" aria-label="${safeTitle}">
+    <article class="card${(sUrl || w.src || fid) ? ' has-video' : ''}" data-index="${i}" data-drive-id="${fid}" data-embed-url="${cleanEmbed}" data-direct-video="${sUrl}" style="--h:${Number(w.hue) || (190 + (i * 13) % 160)}; --dur:${secs(w.dur || '0:30')}s" aria-label="${safeTitle}">
       <div class="screen">
         <div class="art"><b>${String(i + 1).padStart(2, '0')}</b></div>
         ${thumbImg(w, i > 2)}
         ${videoTag}
         <span class="playbtn" role="button" aria-label="Play ${safeTitle}">${PLAY_SVG}</span>
-        ${w.src ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
+        ${(sUrl || w.src) ? '<button type="button" class="snd-btn" aria-label="Mute"></button>' : ''}
         <div class="cap"><h3>${safeTitle}</h3><div class="bar"><i></i></div><div class="t"><span class="cur">0:00</span><span>${safeDur}</span></div></div>
       </div>
     </article>`;
@@ -1561,10 +1592,10 @@ function renderFilms(newItems) {
     const safeTitle = escapeHTML(f.title || `Film #${i + 1}`);
     const safeKind = escapeHTML(f.kind || 'Film');
     const safeDur = escapeHTML(f.dur || '3:00');
-    const sUrl = sanitizeUrl(getDirectStreamUrl(f.src || f.videoUrl));
-    const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
-    const videoTag = isNat
-      ? `<video data-src="${sUrl}" muted playsinline loop preload="none" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>`
+    const rawFilmUrl = f.videoUrl || f.src || '';
+    const sUrl = isDirectVideoUrl(rawFilmUrl) ? sanitizeUrl(rawFilmUrl) : '';
+    const videoTag = sUrl
+      ? `<video data-src="${sUrl}" muted playsinline loop preload="none" onerror="this.remove()" onplay="this.classList.add('is-playing')" onpause="this.classList.remove('is-playing')" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3;border-radius:inherit;"></video>`
       : '';
     return `
     <article class="film">
