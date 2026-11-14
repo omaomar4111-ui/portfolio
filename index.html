@@ -1716,19 +1716,6 @@ if (copyPhoneBtn) {
 })();
 
 /* ---------- copy phone & email ---------- */
-if ($('#copy-phone')) $('#copy-phone').addEventListener('click', async () => {
-  const el = $('#phone'), btn = $('#copy-phone');
-  try {
-    await navigator.clipboard.writeText(el.textContent.trim());
-    btn.textContent = 'Copied!';
-  } catch (e) {
-    const r = document.createRange(); r.selectNodeContents(el);
-    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
-    btn.textContent = 'Press Ctrl+C';
-  }
-  setTimeout(() => { btn.textContent = 'Copy My Phone'; }, 2000);
-});
-
 /* ---------- copy email ---------- */
 if ($('#copy')) $('#copy').addEventListener('click', async () => {
   const el = $('#email'), btn = $('#copy');
