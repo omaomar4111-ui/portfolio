@@ -81,7 +81,7 @@
   transition: transform 0.4s ease;
 }
 .card.active:hover .screen video {
-  transform: scale(1.02);
+  transform: none;
 }
 
 </style>
@@ -464,12 +464,17 @@ html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transiti
   inset: 0;
   width: 100%;
   height: 100%;
-  transform: none;
+  transform: none !important;
   border: none;
-  z-index: 100 !important;
+  z-index: 20 !important;
   border-radius: inherit;
-  background: #000;
+  background: transparent;
   pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.card.playing.loaded iframe.card-player {
+  opacity: 1 !important;
 }
 .card.playing.loaded .thumb,
 .card.playing.loaded video,
@@ -483,23 +488,6 @@ html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transiti
 }
 .card.playing .screen::after {
   display: none !important;
-}
-.card .screen iframe.card-player {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  transform: none;
-  border: none;
-  z-index: 10 !important;
-  border-radius: inherit;
-  background: transparent;
-  pointer-events: auto;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.card.playing.loaded iframe.card-player {
-  opacity: 1 !important;
 }
 .thumb {
   position: absolute;
@@ -1194,7 +1182,7 @@ function paint() {
       c.style.opacity = '1';
       c.style.zIndex = '60';
       c.style.pointerEvents = 'auto';
-      c.querySelector('.screen').style.transform = 'scale(1.04)';
+      c.querySelector('.screen').style.transform = 'none';
       c.querySelector('.screen').style.boxShadow = '0 30px 65px -15px rgba(0,0,0,0.85), 0 0 35px rgba(242,165,65,0.18)';
     } else {
       c.classList.remove('active');
@@ -1205,7 +1193,7 @@ function paint() {
       c.style.pointerEvents = absD < 50 ? 'auto' : 'none';
       const screenEl = c.querySelector('.screen');
       if (screenEl) {
-        screenEl.style.transform = 'scale(0.96)';
+        screenEl.style.transform = 'none';
         screenEl.style.boxShadow = '0 20px 45px -20px rgba(0,0,0,0.7)';
       }
     }
