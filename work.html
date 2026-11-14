@@ -833,12 +833,17 @@ function getCleanEmbedUrl(url) {
 
 const thumbImg = (x, isLazy = false) => {
   const fid = extractDriveId(x.fileId || x.id || x.videoUrl || x.src) || '';
-  const rawP = x.thumbnail || x.poster || (fid ? 'https://lh3.googleusercontent.com/d/' + fid + '=w400' : '');
-  const p = sanitizeUrl(rawP);
-  if (!p) return '';
+  let rawP = x.thumbnail || x.poster || '';
+  if (!rawP && fid) {
+    rawP = 'https://lh3.googleusercontent.com/d/' + fid + '=w400';
+  } else if (!rawP) {
+    rawP = 'profile.jpg';
+  }
+  const p = sanitizeUrl(rawP) || 'profile.jpg';
   const lazyAttr = isLazy ? ' loading="lazy"' : '';
   const safeTitle = escapeHTML(x.title || '');
-  return '<img class="thumb" src="' + p + '"' + lazyAttr + ' alt="' + safeTitle + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t){this.dataset.t=1;this.src=\'https://drive.google.com/thumbnail?id=' + fid + '&sz=w600\';}">';
+  const fallback = fid ? `https://lh3.googleusercontent.com/d/${fid}=w400` : 'profile.jpg';
+  return '<img class="thumb" src="' + p + '"' + lazyAttr + ' alt="' + safeTitle + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t){this.dataset.t=1;this.src=\'' + fallback + '\';}">';
 };
 
 // =========================================================================
@@ -1134,17 +1139,24 @@ function paint() {
 
     if (absD < step * 0.55) {
       c.classList.add('active');
-      c.style.filter = 'brightness(1.08)';
+      c.style.filter = 'brightness(1.1)';
       c.style.opacity = '1';
       c.style.zIndex = '60';
       c.style.pointerEvents = 'auto';
+      c.querySelector('.screen').style.transform = 'scale(1.04)';
+      c.querySelector('.screen').style.boxShadow = '0 30px 65px -15px rgba(0,0,0,0.85), 0 0 35px rgba(242,165,65,0.18)';
     } else {
       c.classList.remove('active');
-      const dim = Math.max(0.42, 1 - (absD / 90) * 0.55);
+      const dim = Math.max(0.45, 1 - (absD / 90) * 0.52);
       c.style.filter = `brightness(${dim.toFixed(2)})`;
-      c.style.opacity = Math.max(0.32, 1 - (absD / 110)).toFixed(2);
+      c.style.opacity = Math.max(0.28, 1 - (absD / 115)).toFixed(2);
       c.style.zIndex = String(Math.max(1, 50 - Math.round(absD)));
       c.style.pointerEvents = absD < 50 ? 'auto' : 'none';
+      const screenEl = c.querySelector('.screen');
+      if (screenEl) {
+        screenEl.style.transform = 'scale(0.96)';
+        screenEl.style.boxShadow = '0 20px 45px -20px rgba(0,0,0,0.7)';
+      }
     }
   });
 }
@@ -1297,6 +1309,8 @@ if (nextBtn) nextBtn.addEventListener('click', () => { touched(); go(idx + 1); }
 // =========================================================================
 // Drag & Touch Gestures on Stage
 // =========================================================================
+let lastMoveX = 0, lastMoveTime = 0, dragVelocity = 0;
+
 stage.addEventListener('pointerdown', (e) => {
   if (e.target.closest('.snd-btn')) return;
   dragging = true;
@@ -1305,6 +1319,9 @@ stage.addEventListener('pointerdown', (e) => {
   sx = e.clientX;
   sy = e.clientY;
   st = performance.now();
+  lastMoveX = sx;
+  lastMoveTime = st;
+  dragVelocity = 0;
   sa = angle;
   downCard = e.target.closest('.card');
   downTarget = e.target;
@@ -1325,7 +1342,14 @@ stage.addEventListener('pointermove', (e) => {
       moved = true;
       try { stage.setPointerCapture(e.pointerId); } catch (_) {}
     }
-    const angularSpeed = (360 / (2 * Math.PI * (R || 1500))) * 0.65;
+    const now = performance.now();
+    const dt = now - lastMoveTime;
+    if (dt > 8) {
+      dragVelocity = (e.clientX - lastMoveX) / dt;
+      lastMoveX = e.clientX;
+      lastMoveTime = now;
+    }
+    const angularSpeed = (360 / (2 * Math.PI * (R || 1500))) * 0.70;
     angle = sa - dx * angularSpeed;
     target = angle;
   }
@@ -1336,9 +1360,16 @@ function endDrag(e) {
   dragging = false;
   touched();
   if (moved) {
-    go(Math.round(angle / step));
+    // Add momentum inertia based on drag velocity
+    let momentumSteps = 0;
+    if (Math.abs(dragVelocity) > 0.45) {
+      momentumSteps = Math.round(-dragVelocity * 2.8);
+      momentumSteps = Math.max(-3, Math.min(3, momentumSteps));
+    }
+    const targetIdx = Math.round(angle / step) + momentumSteps;
+    go(targetIdx);
     setTimeout(() => { moved = false; }, 80);
-
+  }
   kick();
 }
 
@@ -1710,34 +1741,36 @@ function startFirestoreSync() {
 
   function updateCatalogFromFirestore() {
     const map = new Map();
-    // 1. Seed with all 46 gym videos
+    // 1. Seed with initial gym videos
     INITIAL_GYM_VIDEOS.forEach(v => map.set(v.id, { ...v }));
 
-    // 2. Overlay shortVideos from Firestore
+    // 2. Overlay or add shortVideos from Firestore
     fsShorts.forEach(v => {
       const fid = v.fileId || v.id;
-      if (map.has(fid)) {
-        map.set(fid, { ...map.get(fid), ...v });
+      const existing = map.get(fid) || map.get(v.id);
+      if (existing) {
+        map.set(existing.id || fid, { ...existing, ...v });
       } else {
-        map.set(fid, v);
+        map.set(v.id || fid, v);
       }
     });
 
-    // 3. Overlay longVideos from Firestore (which include gym workouts #25 to #46)
+    // 3. Overlay longVideos from Firestore
     fsLongs.forEach(v => {
       const fid = v.fileId || v.id;
-      if (map.has(fid)) {
-        map.set(fid, { ...map.get(fid), ...v });
-      } else if (v.title && (v.title.includes('Gym') || v.kind === 'Gym & Fitness' || map.size < 46)) {
-        map.set(fid, v);
+      const existing = map.get(fid) || map.get(v.id);
+      if (existing) {
+        map.set(existing.id || fid, { ...existing, ...v });
+      } else if (v.title && (v.title.includes('Gym') || v.kind === 'Gym & Fitness')) {
+        map.set(v.id || fid, v);
       }
     });
 
     const fullList = Array.from(map.values());
     fullList.sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, { numeric: true, sensitivity: 'base' }));
 
-    const curSign = (window.SHORTS || []).map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
-    const newSign = fullList.map(x => (x.fileId || x.id || '') + (x.title || '')).join('|');
+    const curSign = (window.SHORTS || []).map(x => (x.fileId || x.id || '') + (x.title || '') + (x.thumbnail || '')).join('|');
+    const newSign = fullList.map(x => (x.fileId || x.id || '') + (x.title || '') + (x.thumbnail || '')).join('|');
     if (curSign !== newSign || !cards.length) {
       window.SHORTS = fullList;
       SHORTS = fullList;

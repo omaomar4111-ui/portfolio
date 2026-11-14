@@ -585,12 +585,32 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       };
     });
 
-    // دالة رفع الملفات إلى Storage مع مؤشر التقدم
+    // دالة مساعدة لحذف ملف من Firebase Storage بأمان
+    async function safeDeleteStorageUrl(fileUrl) {
+      if (!storage || !fileUrl || typeof fileUrl !== 'string') return;
+      if (!fileUrl.includes('firebasestorage.googleapis.com')) return;
+      try {
+        const ref = storage.refFromURL(fileUrl);
+        await ref.delete();
+        console.log('Firebase Storage file deleted:', fileUrl);
+      } catch (err) {
+        console.warn('Could not delete storage file (it might have already been removed):', err.message);
+      }
+    }
+
+    // دالة رفع الملفات إلى Storage مع مؤشر التقدم وطباعة الأخطاء بوضوح
     function uploadFile(file, folder, progressEl) {
       return new Promise((resolve, reject) => {
-        if (!storage) return reject(new Error("Firebase Storage غير مهيأ"));
+        if (!storage) {
+          const err = new Error("Firebase Storage غير مهيأ أو لم يتم تفعيله في firebase-config.js");
+          console.error('[Storage Upload Error]', err);
+          return reject(err);
+        }
         const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const ref = storage.ref(folder + '/' + Date.now() + '_' + cleanName);
+        const storagePath = folder + '/' + Date.now() + '_' + cleanName;
+        const ref = storage.ref(storagePath);
+        console.log(`[Storage Upload] Starting upload for ${file.name} to path: ${storagePath}`);
+        
         const task = ref.put(file);
         const bar = progressEl ? progressEl.querySelector('i') : null;
         if (progressEl) progressEl.classList.add('active');
@@ -598,17 +618,31 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
         task.on('state_changed',
           snap => {
             if (bar && snap.totalBytes > 0) {
-              bar.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + '%';
+              const pct = (snap.bytesTransferred / snap.totalBytes * 100).toFixed(1);
+              bar.style.width = pct + '%';
             }
           },
           err => {
             if (progressEl) progressEl.classList.remove('active');
-            reject(err);
+            console.error('[Firebase Storage Upload Error]:', err);
+            let friendlyMsg = err.message;
+            if (err.code === 'storage/unauthorized' || err.message.includes('permission')) {
+              friendlyMsg = 'فشل الرفع بسبب قيود الأمان (Storage Rules). تأكد من تحديث قواعد Firebase Storage لتسمح بالكتابة!';
+            }
+            toast('خطأ في رفع الملف إلى السحابة: ' + friendlyMsg, true);
+            reject(new Error(friendlyMsg));
           },
           async () => {
-            const url = await task.snapshot.ref.getDownloadURL();
-            if (progressEl) progressEl.classList.remove('active');
-            resolve(url);
+            try {
+              const url = await task.snapshot.ref.getDownloadURL();
+              console.log('[Storage Upload Success] Download URL:', url);
+              if (progressEl) progressEl.classList.remove('active');
+              resolve(url);
+            } catch(urlErr) {
+              console.error('[Storage getDownloadURL Error]:', urlErr);
+              if (progressEl) progressEl.classList.remove('active');
+              reject(urlErr);
+            }
           }
         );
       });
@@ -710,37 +744,8 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       };
     }, 500);
 
-    async function loadShorts() {
-      let docs = [];
-      if (db) {
-        try {
-          const snap = await db.collection('shortVideos').get();
-          if (!snap.empty) {
-            docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-          }
-        } catch (e) {
-          console.warn('Firestore loadShorts error:', e);
-        }
-      }
-      if (!docs.length) {
-        try {
-          docs = JSON.parse(localStorage.getItem('portfolio_shorts') || '[]');
-        } catch(e) {}
-      }
-      // إذا كانت القائمة فارغة، نحمل تلقائياً من videos.js (24 فيديو جيم)
-      if (!docs.length && window.SHORTS && window.SHORTS.length) {
-        docs = window.SHORTS.map((v, i) => ({
-          id: 'short_' + (i + 1),
-          title: v.title,
-          videoUrl: v.src,
-          thumbnail: v.poster,
-          duration: v.dur,
-          genre: v.kind,
-          source: 'Google Drive'
-        }));
-        try { localStorage.setItem('portfolio_shorts', JSON.stringify(docs)); } catch(e) {}
-      }
-
+    let shortsUnsubscribe = null;
+    function renderShortsList(docs) {
       const list = document.getElementById('shortsList');
       if (!docs.length) {
         list.innerHTML = '<div class="empty">لا توجد فيديوهات قصيرة مضافة بعد</div>';
@@ -752,7 +757,9 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
         const safeTitle = escapeHTML(v.title || '(بدون عنوان)');
         const safeDuration = escapeHTML(v.duration || 'غير محدد');
         const safeGenre = escapeHTML(v.genre || 'Gym & Fitness');
-        const safeThumb = sanitizeUrl(v.thumbnail || '') || 'profile.jpg';
+        let thumbUrl = v.thumbnail || v.poster || '';
+        if (v.fileId && !thumbUrl) thumbUrl = 'https://lh3.googleusercontent.com/d/' + v.fileId + '=w400';
+        const safeThumb = sanitizeUrl(thumbUrl) || 'profile.jpg';
         const safeId = escapeHTML(v.id || '');
         return `
         <div class="video-row">
@@ -776,27 +783,26 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       });
     }
 
-    async function loadLongs() {
-      let docs = [];
+    async function loadShorts() {
       if (db) {
-        try {
-          const snap = await db.collection('longVideos').get();
-          if (!snap.empty) {
-            docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-          }
-        } catch (e) {
-          console.warn('Firestore loadLongs error:', e);
+        if (!shortsUnsubscribe) {
+          shortsUnsubscribe = db.collection('shortVideos').onSnapshot(snap => {
+            const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            localStorage.setItem('portfolio_shorts', JSON.stringify(docs));
+            renderShortsList(docs);
+          }, err => {
+            console.warn('Firestore shortVideos snapshot notice:', err);
+          });
         }
+        return;
       }
-      if (!docs.length) {
-        try {
-          docs = JSON.parse(localStorage.getItem('portfolio_longs') || '[]');
-        } catch(e) {}
-      }
-      // إذا كانت القائمة فارغة، نحمل تلقائياً من videos.js (22 فيديو جيم)
-      if (!docs.length && window.FILMS && window.FILMS.length) {
-        docs = window.FILMS.map((v, i) => ({
-          id: 'long_' + (i + 1),
+      let docs = [];
+      try {
+        docs = JSON.parse(localStorage.getItem('portfolio_shorts') || '[]');
+      } catch(e) {}
+      if (!docs.length && window.SHORTS && window.SHORTS.length) {
+        docs = window.SHORTS.map((v, i) => ({
+          id: 'short_' + (i + 1),
           title: v.title,
           videoUrl: v.src,
           thumbnail: v.poster,
@@ -804,9 +810,12 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
           genre: v.kind,
           source: 'Google Drive'
         }));
-        try { localStorage.setItem('portfolio_longs', JSON.stringify(docs)); } catch(e) {}
       }
+      renderShortsList(docs);
+    }
 
+    let longsUnsubscribe = null;
+    function renderLongsList(docs) {
       const list = document.getElementById('longsList');
       if (!docs.length) {
         list.innerHTML = '<div class="empty">لا توجد فيديوهات طويلة مضافة بعد</div>';
@@ -818,7 +827,9 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
         const safeTitle = escapeHTML(v.title || '(بدون عنوان)');
         const safeDuration = escapeHTML(v.duration || '');
         const safeGenre = escapeHTML(v.genre || '');
-        const safeThumb = sanitizeUrl(v.thumbnail || '') || 'profile.jpg';
+        let thumbUrl = v.thumbnail || v.poster || '';
+        if (v.fileId && !thumbUrl) thumbUrl = 'https://lh3.googleusercontent.com/d/' + v.fileId + '=w400';
+        const safeThumb = sanitizeUrl(thumbUrl) || 'profile.jpg';
         const safeId = escapeHTML(v.id || '');
         return `
         <div class="video-row">
@@ -840,6 +851,37 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       list.querySelectorAll('button[data-action="delete"]').forEach(btn => {
         btn.addEventListener('click', () => deleteVideo(btn.dataset.coll, btn.dataset.id));
       });
+    }
+
+    async function loadLongs() {
+      if (db) {
+        if (!longsUnsubscribe) {
+          longsUnsubscribe = db.collection('longVideos').onSnapshot(snap => {
+            const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            localStorage.setItem('portfolio_longs', JSON.stringify(docs));
+            renderLongsList(docs);
+          }, err => {
+            console.warn('Firestore longVideos snapshot notice:', err);
+          });
+        }
+        return;
+      }
+      let docs = [];
+      try {
+        docs = JSON.parse(localStorage.getItem('portfolio_longs') || '[]');
+      } catch(e) {}
+      if (!docs.length && window.FILMS && window.FILMS.length) {
+        docs = window.FILMS.map((v, i) => ({
+          id: 'long_' + (i + 1),
+          title: v.title,
+          videoUrl: v.src,
+          thumbnail: v.poster,
+          duration: v.dur,
+          genre: v.kind,
+          source: 'Google Drive'
+        }));
+      }
+      renderLongsList(docs);
     }
 
     async function loadAll() {
@@ -1030,24 +1072,54 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
     };
 
     window.deleteVideo = async (type, id) => {
-      if (!confirm('هل أنت متأكد من رغبتك في حذف هذا الفيديو من الموقع؟')) return;
-      // حذف من localStorage
+      if (!confirm('هل أنت متأكد من رغبتك في حذف هذا الفيديو من الموقع وحذف ملفاته من السحابة؟')) return;
+      
       const locKey = (type === 'shortVideos') ? 'portfolio_shorts' : 'portfolio_longs';
+      let itemToDelete = null;
+
+      // 1. محاولة جلب بيانات الفيديو لحذف ملفات Storage الخاصة به
+      if (db) {
+        try {
+          const docSnap = await db.collection(type).doc(id).get();
+          if (docSnap.exists) {
+            itemToDelete = docSnap.data();
+          }
+        } catch (err) {
+          console.warn('Could not fetch doc before delete:', err);
+        }
+      }
+      if (!itemToDelete) {
+        try {
+          const arr = JSON.parse(localStorage.getItem(locKey) || '[]');
+          itemToDelete = arr.find(x => x.id === id);
+        } catch(e) {}
+      }
+
+      // 2. حذف ملفات الفيديو والصورة المصغرة من Firebase Storage إن وجدت
+      if (itemToDelete) {
+        if (itemToDelete.videoUrl) await safeDeleteStorageUrl(itemToDelete.videoUrl);
+        if (itemToDelete.thumbnail) await safeDeleteStorageUrl(itemToDelete.thumbnail);
+      }
+
+      // 3. حذف المستند من Firestore
+      if (db) {
+        try {
+          await db.collection(type).doc(id).delete();
+          console.log(`Firestore doc ${id} deleted successfully from ${type}`);
+        } catch (e) {
+          console.error('Firestore delete error:', e);
+          toast('خطأ أثناء الحذف من Firestore: ' + e.message, true);
+        }
+      }
+
+      // 4. حذف من localStorage
       try {
         const arr = JSON.parse(localStorage.getItem(locKey) || '[]');
         const filtered = arr.filter(x => x.id !== id);
         localStorage.setItem(locKey, JSON.stringify(filtered));
       } catch(e) {}
 
-      // حذف من Firestore إن أمكن
-      if (db) {
-        try {
-          await db.collection(type).doc(id).delete();
-        } catch (e) {
-          console.warn('Firestore delete error:', e);
-        }
-      }
-      toast('تم حذف الفيديو بنجاح ✓');
+      toast('تم حذف الفيديو وملفاته السحابية بنجاح ✓');
       if (type === 'shortVideos') loadShorts(); else loadLongs();
     };
 
