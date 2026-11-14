@@ -471,15 +471,45 @@ html.anim-init .rv, html.anim-init .rv-photo, html.anim-init .rv-line { transiti
   background: #000;
   pointer-events: auto;
 }
-.card.playing .thumb,
-.card.playing video,
-.card.playing .art,
-.card.playing .playbtn,
-.card.playing .cap {
+.card.playing.loaded .thumb,
+.card.playing.loaded video,
+.card.playing.loaded .art,
+.card.playing.loaded .cap {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.card.playing .playbtn {
   display: none !important;
 }
 .card.playing .screen::after {
   display: none !important;
+}
+.card .screen iframe.card-player {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: none;
+  border: none;
+  z-index: 10 !important;
+  border-radius: inherit;
+  background: transparent;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.card.playing.loaded iframe.card-player {
+  opacity: 1 !important;
+}
+.thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 5;
+  border-radius: inherit;
+  transition: opacity 0.3s ease;
 }
 .film .frame .thumb { transition: transform 6s ease-out; }
 .film .frame.hovering .thumb { transform: scale(1.06); }
@@ -861,17 +891,10 @@ function getCleanEmbedUrl(url) {
 
 const thumbImg = (x, isLazy = false) => {
   const fid = extractDriveId(x.fileId || x.id || x.videoUrl || x.src) || '';
-  let rawP = x.thumbnail || x.poster || '';
-  if (!rawP && fid) {
-    rawP = 'https://lh3.googleusercontent.com/d/' + fid + '=w400';
-  } else if (!rawP) {
-    rawP = 'profile.jpg';
-  }
-  const p = sanitizeUrl(rawP) || 'profile.jpg';
-  const lazyAttr = isLazy ? ' loading="lazy"' : '';
+  let p = fid ? ('https://lh3.googleusercontent.com/d/' + fid + '=w600') : (x.thumbnail || x.poster || 'profile.jpg');
   const safeTitle = escapeHTML(x.title || '');
-  const fallback = fid ? `https://lh3.googleusercontent.com/d/${fid}=w400` : 'profile.jpg';
-  return '<img class="thumb" src="' + p + '"' + lazyAttr + ' alt="' + safeTitle + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t){this.dataset.t=1;this.src=\'' + fallback + '\';}">';
+  const fb = fid ? ('https://drive.google.com/thumbnail?id=' + fid + '&sz=w600') : 'profile.jpg';
+  return '<img class="thumb" src="' + p + '" alt="' + safeTitle + '" decoding="async" referrerpolicy="no-referrer" onerror="if(!this.dataset.t){this.dataset.t=1;this.src=\'' + fb + '\';}">';
 };
 
 // =========================================================================
@@ -1231,7 +1254,7 @@ function restartBar(card) {
 function stopAll(exceptIndex = -1) {
   cards.forEach((c, i) => {
     if (i !== exceptIndex) {
-      c.classList.remove('playing', 'paused');
+      c.classList.remove('playing', 'paused', 'loaded');
       // Remove mounted iframe so no background audio or second video can possibly play
       const ifr = c.querySelector('iframe.card-player');
       if (ifr) ifr.remove();
@@ -1273,6 +1296,9 @@ function mountCardMedia(card) {
       ifr.src = embedUrl;
       ifr.allow = 'autoplay; fullscreen; encrypted-media';
       ifr.setAttribute('allowfullscreen', 'true');
+      ifr.onload = () => {
+        card.classList.add('loaded');
+      };
       screen.appendChild(ifr);
     }
   } else {
