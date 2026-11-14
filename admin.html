@@ -153,7 +153,7 @@
       <p>سجّل الدخول بحساب الأدمن لإدارة محتوى البورتفوليو</p>
       <div class="field">
         <label>البريد الإلكتروني</label>
-        <input type="email" id="loginEmail" placeholder="omaomar4111@gmail.com" autocomplete="email">
+        <input type="email" id="loginEmail" placeholder="admin@example.com" autocomplete="email">
       </div>
       <div class="field">
         <label>كلمة المرور</label>
@@ -161,7 +161,6 @@
       </div>
       
       <button class="btn" id="loginBtn" style="width:100%">تسجيل الدخول</button>
-      <button type="button" class="btn secondary" id="directAdminBtn" style="width:100%;margin-top:10px;font-size:13px;">المتابعة للوحة التحكم مباشرة ↗</button>
       <p id="loginErr" style="color:var(--danger);margin-top:12px;font-size:13px;text-align:center"></p>
     </div>
   </div>
@@ -538,15 +537,6 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       });
     } else {
       document.getElementById('loginView').style.display = 'block';
-    }
-
-    const directBtn = document.getElementById('directAdminBtn');
-    if (directBtn) {
-      directBtn.onclick = () => {
-        document.getElementById('loginView').style.display = 'none';
-        document.getElementById('dashView').style.display = 'block';
-        loadAll();
-      };
     }
 
     document.getElementById('loginBtn').onclick = async () => {
