@@ -1079,7 +1079,7 @@ function renderDrum(newItems) {
     const sUrl = sanitizeUrl(getDirectStreamUrl(w.src || w.videoUrl));
     const isNat = sUrl && !sUrl.includes('youtube.com') && !sUrl.includes('youtu.be');
     const videoTag = isNat
-      ? `<video ${i === 0 ? `src="${sUrl}"` : ''} data-src="${sUrl}" playsinline loop muted ${i === 0 ? 'preload="auto" autoplay' : 'preload="none"'} style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>`
+      ? `<video ${i === 0 ? `src="${sUrl}"` : ''} data-src="${sUrl}" playsinline loop muted ${i === 0 ? 'preload="none"' : 'preload="none"'} style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;border-radius:inherit;"></video>`
       : '';
     const fid = extractDriveId(w.fileId || w.id || w.videoUrl || w.src);
     const cleanEmbed = fid ? `https://drive.google.com/file/d/${fid}/preview?autoplay=1` : '';
@@ -1200,15 +1200,21 @@ function restartBar(card) {
     bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
   }
 }
-function stopAll() {
-  cards.forEach((c) => {
-    c.classList.remove('playing', 'paused');
-    // Remove mounted iframe so no sound plays in background
-    const ifr = c.querySelector('iframe.card-player');
-    if (ifr) ifr.remove();
-    const v = c.querySelector('video');
-    if (v) { v.pause(); v.currentTime = 0; }
-    else restartBar(c);
+function stopAll(exceptIndex = -1) {
+  cards.forEach((c, i) => {
+    if (i !== exceptIndex) {
+      c.classList.remove('playing', 'paused');
+      // Remove mounted iframe so no background audio or second video can possibly play
+      const ifr = c.querySelector('iframe.card-player');
+      if (ifr) ifr.remove();
+      const v = c.querySelector('video');
+      if (v) {
+        v.pause();
+        try { v.currentTime = 0; } catch(_) {}
+      } else {
+        restartBar(c);
+      }
+    }
   });
 }
 function preloadNeighbors() {
@@ -1216,6 +1222,17 @@ function preloadNeighbors() {
 }
 function mountCardMedia(card) {
   if (!card) return;
+  const currentActiveIdx = active();
+  const cardIdx = cards.indexOf(card);
+  
+  // Guarantee that ONLY the active card can ever mount or play media!
+  if (cardIdx !== -1 && cardIdx !== currentActiveIdx) {
+    return;
+  }
+  
+  // Stop and clean up ALL other cards immediately
+  stopAll(currentActiveIdx);
+
   const fid = card.dataset.driveId;
   const embedUrl = card.dataset.embedUrl || (fid ? ('https://drive.google.com/file/d/' + fid + '/preview?autoplay=1') : '');
   
@@ -1239,10 +1256,13 @@ function mountCardMedia(card) {
   }
 }
 function syncShort() {
-  const c = cards[active()];
+  const actIdx = active();
+  const c = cards[actIdx];
   if (!c) return;
   const want = stageVisible && !document.hidden && !playerOpen && !filmPreview && !userPaused;
   if (want) {
+    // Stop all other cards strictly
+    stopAll(actIdx);
     c.classList.remove('paused');
     c.classList.add('playing');
     mountCardMedia(c);
@@ -1250,6 +1270,8 @@ function syncShort() {
     c.classList.add('paused');
     const v = c.querySelector('video');
     if (v && !v.paused) v.pause();
+    const ifr = c.querySelector('iframe.card-player');
+    if (ifr) ifr.remove();
   }
 }
 function startCard(card) {
@@ -1290,9 +1312,14 @@ function info() {
 }
 function go(i) {
   const changed = i !== idx;
-  if (changed) stopAll();
-  idx = i; target = idx * step; info(); kick();
-  if (!reduced && (changed || !cards[active()].classList.contains('playing'))) startCard(cards[active()]);
+  idx = i;
+  target = idx * step;
+  stopAll(active());
+  info();
+  kick();
+  if (!reduced) {
+    startCard(cards[active()]);
+  }
 }
 function goToCard(k) {
   let diff = ((k - active()) % N + N) % N;
@@ -1425,16 +1452,10 @@ if ('IntersectionObserver' in window) {
 }
 
 function tryAutoplay() {
-  if (cards && cards[0]) {
-    const v = cards[0].querySelector('video');
-    if (v) {
-      v.muted = true;
-      const p = v.play();
-      if (p && typeof p.catch === 'function') {
-        p.catch(() => { v.muted = true; v.play().catch(() => {}); });
-      }
-    }
-    startCard(cards[0]);
+  if (cards && cards.length) {
+    const actIdx = active();
+    stopAll(actIdx);
+    startCard(cards[actIdx]);
   }
 }
 setTimeout(tryAutoplay, 60);
