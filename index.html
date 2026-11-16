@@ -885,11 +885,8 @@ function extractDriveId(url) {
 function isDirectVideoUrl(url) {
   if (!url || typeof url !== 'string') return false;
   const u = url.trim().toLowerCase();
-  if (u.includes('youtube.com') || u.includes('youtu.be') || u.includes('drive.google.com/file/d/')) {
+  if (u.includes('drive.google.com') || u.includes('drive.usercontent.google.com') || u.includes('youtube.com') || u.includes('youtu.be')) {
     return false;
-  }
-  if (u.includes('drive.usercontent.google.com/download') || u.includes('drive.google.com/uc?')) {
-    return true;
   }
   if (u.includes('firebasestorage.googleapis.com')) {
     return true;
