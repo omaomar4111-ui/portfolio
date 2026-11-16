@@ -607,10 +607,10 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
       <div class="filter-tabs-container">
         <div class="filter-tabs" role="tablist" aria-label="Filter by Industry">
           <button type="button" class="ftab active" data-cat="featured">★ Best Work (25)</button>
-          <button type="button" class="ftab" data-cat="all">All (212)</button>
+          <button type="button" class="ftab" data-cat="all">All (217)</button>
           <button type="button" class="ftab" data-cat="fitness">Fitness (46)</button>
           <button type="button" class="ftab" data-cat="medical">Medical (33)</button>
-          <button type="button" class="ftab" data-cat="commercials">Commercials (134)</button>
+          <button type="button" class="ftab" data-cat="commercials">Commercials (138)</button>
           <button type="button" class="ftab" data-cat="ai">AI (18)</button>
           <button type="button" class="ftab" data-cat="cafe">Cafe (17)</button>
           <button type="button" class="ftab" data-cat="finishing">Finishing (16)</button>
@@ -619,11 +619,11 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
           <button type="button" class="ftab" data-cat="beauty">Beauty (11)</button>
           <button type="button" class="ftab" data-cat="event">Event (9)</button>
           <button type="button" class="ftab" data-cat="cars">Cars (8)</button>
-          <button type="button" class="ftab" data-cat="realestate">Real Estate (6)</button>
+          <button type="button" class="ftab" data-cat="realestate">Real Estate (10)</button>
           <button type="button" class="ftab" data-cat="agency">Agency (5)</button>
           <button type="button" class="ftab" data-cat="dates">Dates (4)</button>
           <button type="button" class="ftab" data-cat="kitchens">Kitchens (3)</button>
-          <button type="button" class="ftab" data-cat="restaurant">Restaurant (3)</button>
+          <button type="button" class="ftab" data-cat="restaurant">Restaurant (4)</button>
           <button type="button" class="ftab" data-cat="motion">Motion (2)</button>
           <button type="button" class="ftab" data-cat="saudi">Saudi (2)</button>
         </div></div>
@@ -885,8 +885,11 @@ function extractDriveId(url) {
 function isDirectVideoUrl(url) {
   if (!url || typeof url !== 'string') return false;
   const u = url.trim().toLowerCase();
-  if (u.includes('drive.google.com') || u.includes('drive.usercontent.google.com') || u.includes('youtube.com') || u.includes('youtu.be')) {
+  if (u.includes('youtube.com') || u.includes('youtu.be') || u.includes('drive.google.com/file/d/')) {
     return false;
+  }
+  if (u.includes('drive.usercontent.google.com/download') || u.includes('drive.google.com/uc?')) {
+    return true;
   }
   if (u.includes('firebasestorage.googleapis.com')) {
     return true;
@@ -1521,31 +1524,33 @@ window.filterVideosByCategory = function(catalog, cat) {
   const base = (catalog && catalog.length) ? catalog : (window.ALL_PORTFOLIO_VIDEOS || INITIAL_GYM_VIDEOS);
   if (!cat || cat === 'all') return base;
   if (cat === 'featured') {
-    return base.filter(v => window.FEATURED_SET.has(v.id || v.fileId));
+    const feat = base.filter(v => window.FEATURED_SET.has(v.id || v.fileId));
+    return feat.length ? feat : base.slice(0, 25);
   }
   return base.filter(v => {
     const sub = (v.subfolder || '').toLowerCase();
     const title = (v.title || '').toLowerCase();
     const kind = (v.kind || v.genre || '').toLowerCase();
+    const catAr = (v.categoryAr || '').toLowerCase();
     switch(cat) {
-      case 'fitness': return sub.includes('جيم') || sub.includes('fitness') || kind === 'fitness';
-      case 'medical': return sub.includes('طبي') || sub.includes('medical') || kind === 'medical';
-      case 'commercials': return !sub.includes('جيم') && !sub.includes('fitness') && !sub.includes('طبي') && !sub.includes('medical');
-      case 'ai': return sub.includes('ai') || title.includes('ai');
-      case 'cafe': return sub.includes('كافيه') || sub.includes('cafe');
-      case 'finishing': return sub.includes('تشطيب') || sub.includes('finishing');
-      case 'lighting': return sub.includes('نجف') || sub.includes('lighting');
-      case 'fashion': return sub.includes('ملابس') || sub.includes('fashion');
-      case 'beauty': return sub.includes('تجميل') || sub.includes('beauty');
-      case 'event': return sub.includes('ايفنت') || sub.includes('event');
-      case 'cars': return sub.includes('عربيات') || sub.includes('cars');
-      case 'realestate': return sub.includes('عقارات') || sub.includes('real estate');
-      case 'agency': return sub.includes('ايجنسي') || sub.includes('agency');
-      case 'dates': return sub.includes('بلح') || sub.includes('dates');
-      case 'kitchens': return sub.includes('مطابخ') || sub.includes('kitchen');
-      case 'restaurant': return sub.includes('مطعم') || sub.includes('restaurant');
-      case 'motion': return sub.includes('موشن') || sub.includes('motion');
-      case 'saudi': return sub.includes('سعودي') || sub.includes('saudi');
+      case 'fitness': return sub.includes('جيم') || sub.includes('fitness') || kind.includes('fitness') || kind.includes('gym') || catAr.includes('جيم');
+      case 'medical': return sub.includes('طبي') || sub.includes('medical') || kind.includes('medical') || catAr.includes('طبي');
+      case 'commercials': return !kind.includes('fitness') && !kind.includes('gym') && !kind.includes('medical') && !catAr.includes('جيم') && !catAr.includes('طبي');
+      case 'ai': return sub.includes('ai') || title.includes('ai') || kind.includes('ai') || catAr.includes('ذكاء');
+      case 'cafe': return sub.includes('كافيه') || sub.includes('cafe') || kind.includes('cafe') || catAr.includes('كافيه');
+      case 'finishing': return sub.includes('تشطيب') || sub.includes('finishing') || kind.includes('finishing') || catAr.includes('تشطيب');
+      case 'lighting': return sub.includes('نجف') || sub.includes('lighting') || kind.includes('chandelier') || catAr.includes('نجف');
+      case 'fashion': return sub.includes('ملابس') || sub.includes('fashion') || kind.includes('fashion') || catAr.includes('ملابس');
+      case 'beauty': return sub.includes('تجميل') || sub.includes('beauty') || kind.includes('beauty') || catAr.includes('تجميل');
+      case 'event': return sub.includes('ايفنت') || sub.includes('event') || kind.includes('event') || catAr.includes('فعاليات');
+      case 'cars': return sub.includes('عربيات') || sub.includes('cars') || kind.includes('auto') || catAr.includes('سيارات');
+      case 'realestate': return sub.includes('عقارات') || sub.includes('real estate') || kind.includes('real estate') || catAr.includes('عقارات');
+      case 'agency': return sub.includes('ايجنسي') || sub.includes('agency') || kind.includes('agency') || catAr.includes('أعمال');
+      case 'dates': return sub.includes('بلح') || sub.includes('dates') || kind.includes('dates') || catAr.includes('تمور');
+      case 'kitchens': return sub.includes('مطابخ') || sub.includes('kitchen') || kind.includes('kitchen') || catAr.includes('أثاث');
+      case 'restaurant': return sub.includes('مطعم') || sub.includes('restaurant') || kind.includes('restaurant') || catAr.includes('مطاعم');
+      case 'motion': return sub.includes('موشن') || sub.includes('motion') || kind.includes('motion') || catAr.includes('موشن');
+      case 'saudi': return sub.includes('سعودي') || sub.includes('saudi') || kind.includes('saudi') || catAr.includes('سعودية');
       default: return true;
     }
   });
