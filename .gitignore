@@ -1,1 +1,10 @@
 .vercel
+.env*
+*.key
+*.pem
+serviceAccountKey.json
+temp_downloads/
+temp_videos/
+migration_progress.json
+__pycache__/
+*.pyc

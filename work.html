@@ -573,7 +573,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
     <a class="brand" href="#top">Portfolio</a>
     <nav aria-label="Sections">
       <a href="#shorts">Short-form</a>
-      <!-- <a href="#films">Long-form</a> -->
+      <a href="#films">Long-form</a>
       <a href="#services">Services</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -590,7 +590,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
       <div class="hero-grid-text">
         <div class="mono">Video editor &nbsp;·&nbsp; <span class="tc" id="tc">00:00:00:00</span></div>
         <h1 id="name"><span class="nl" id="nl1">Omar</span> <span class="nl" id="nl2">Mostafa</span></h1>
-        <p class="lead" style="display:none;"></p>
+        <p class="lead" id="bio-text"></p>
         <div class="langs" aria-label="Languages: English and Arabic"><span class="mono">Content in</span><span class="lang" title="English">ENG</span><span class="lang" title="Arabic">AR</span></div>
         <div class="ruler" aria-hidden="true"><i></i></div>
       </div>
@@ -648,7 +648,7 @@ footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8p
       <div class="ticks" id="ticks"></div>
     </section>
 
-    <section id="films" aria-labelledby="films-h" style="display:none !important;">
+    <section id="films" aria-labelledby="films-h">
       <div class="sec-head">
         <h2 id="films-h">Long-form</h2>
         <span class="mono">16:9</span>
@@ -925,7 +925,7 @@ const thumbImg = (x, isLazy = false) => {
   const safeTitle = escapeHTML(x.title || '');
   const fb1 = fid ? ('https://drive.google.com/thumbnail?id=' + fid + '&sz=w600') : 'profile.jpg';
   const fb2 = fid ? ('https://drive.usercontent.google.com/download?id=' + fid + '&export=view') : 'profile.jpg';
-  return '<img class="thumb" src="' + p + '" alt="' + safeTitle + '" decoding="async" referrerpolicy="no-referrer" onload="if(this.naturalWidth && this.naturalHeight){const c=this.closest(\'.card\');if(c){c.style.setProperty(\'--aspect\', (this.naturalWidth/this.naturalHeight).toFixed(4));c.style.setProperty(\'--v-ratio\', (this.naturalHeight/this.naturalWidth).toFixed(4));}}" onerror="if(!this.dataset.t1){this.dataset.t1=1;this.src=\'' + fb1 + '\';}else if(!this.dataset.t2){this.dataset.t2=1;this.src=\'' + fb2 + '\';}">';
+  return '<img class="thumb" src="' + p + '" alt="' + safeTitle + '" decoding="async" referrerpolicy="no-referrer"' + (isLazy ? ' loading="lazy"' : '') onload="if(this.naturalWidth && this.naturalHeight){const c=this.closest(\'.card\');if(c){c.style.setProperty(\'--aspect\', (this.naturalWidth/this.naturalHeight).toFixed(4));c.style.setProperty(\'--v-ratio\', (this.naturalHeight/this.naturalWidth).toFixed(4));}}" onerror="if(!this.dataset.t1){this.dataset.t1=1;this.src=\'' + fb1 + '\';}else if(!this.dataset.t2){this.dataset.t2=1;this.src=\'' + fb2 + '\';}">';
 };
 
 // =========================================================================
@@ -1533,7 +1533,7 @@ window.filterVideosByCategory = function(catalog, cat) {
       case 'fitness': return sub.includes('جيم') || sub.includes('fitness') || kind.includes('fitness') || kind.includes('gym') || catAr.includes('جيم');
       case 'medical': return sub.includes('طبي') || sub.includes('medical') || kind.includes('medical') || catAr.includes('طبي');
       case 'commercials': return !kind.includes('fitness') && !kind.includes('gym') && !kind.includes('medical') && !catAr.includes('جيم') && !catAr.includes('طبي');
-      case 'ai': return sub.includes('ai') || title.includes('ai') || kind.includes('ai') || catAr.includes('ذكاء');
+      case 'ai': return sub.includes('ai') || (title.startsWith('ai') || title.includes(' ai ') || title.endsWith(' ai')) || (kind.toLowerCase() === 'ai') || catAr.includes('ذكاء');
       case 'cafe': return sub.includes('كافيه') || sub.includes('cafe') || kind.includes('cafe') || catAr.includes('كافيه');
       case 'finishing': return sub.includes('تشطيب') || sub.includes('finishing') || kind.includes('finishing') || catAr.includes('تشطيب');
       case 'lighting': return sub.includes('نجف') || sub.includes('lighting') || kind.includes('chandelier') || catAr.includes('نجف');
@@ -1695,7 +1695,8 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && playerOp
 const copyPhoneBtn = document.getElementById('copy-phone');
 if (copyPhoneBtn) {
   copyPhoneBtn.addEventListener('click', async () => {
-    const phoneVal = '+201144826641';
+    const phEl = document.getElementById('phone');
+    const phoneVal = phEl ? phEl.textContent.trim() : '+201144826641';
     try {
       await navigator.clipboard.writeText(phoneVal);
       copyPhoneBtn.textContent = 'Copied!';
@@ -1821,6 +1822,12 @@ function applySettingsData(s) {
   }
   if (s.phone) {
     const ph = $('#phone'); if (ph) ph.textContent = s.phone;
+    const telLinks = document.querySelectorAll('a[href^="tel:"]');
+    telLinks.forEach(l => l.href = 'tel:' + s.phone.replace(/\s+/g, ''));
+  }
+  if (s.whatsapp) {
+    const waLinks = document.querySelectorAll('a[href*="wa.me"], a[href*="whatsapp.com"]');
+    waLinks.forEach(l => l.href = 'https://wa.me/' + s.whatsapp.replace(/[^0-9]/g, ''));
   }
   if (s.profileImage) {
     const p = $('#portrait');
@@ -1841,34 +1848,15 @@ function startFirestoreSync() {
   let fsLongs = [];
 
   function updateCatalogFromFirestore() {
-    const map = new Map();
-    // 1. Seed with initial gym videos
-    const seedList = (window.ALL_PORTFOLIO_VIDEOS && window.ALL_PORTFOLIO_VIDEOS.length) ? window.ALL_PORTFOLIO_VIDEOS : INITIAL_GYM_VIDEOS;
-    seedList.forEach(v => map.set(v.id, { ...v }));
-
-    // 2. Overlay or add shortVideos from Firestore
-    fsShorts.forEach(v => {
-      const fid = v.fileId || v.id;
-      const existing = map.get(fid) || map.get(v.id);
-      if (existing) {
-        map.set(existing.id || fid, { ...existing, ...v });
-      } else {
-        map.set(v.id || fid, v);
-      }
-    });
-
-    // 3. Overlay longVideos from Firestore
-    fsLongs.forEach(v => {
-      const fid = v.fileId || v.id;
-      const existing = map.get(fid) || map.get(v.id);
-      if (existing) {
-        map.set(existing.id || fid, { ...existing, ...v });
-      } else if (v.title && (v.title.includes('Gym') || v.kind === 'Gym & Fitness')) {
-        map.set(v.id || fid, v);
-      }
-    });
-
-    const fullList = Array.from(map.values());
+    // Authoritative Firestore sync: When Firestore contains videos, it serves as the single source of truth.
+    // This ensures true deletion from admin panel immediately reflects on the live site!
+    let fullList = [];
+    if (fsShorts.length > 0) {
+      fullList = fsShorts;
+    } else {
+      const seedList = (window.ALL_PORTFOLIO_VIDEOS && window.ALL_PORTFOLIO_VIDEOS.length) ? window.ALL_PORTFOLIO_VIDEOS : INITIAL_GYM_VIDEOS;
+      fullList = seedList;
+    }
     window.ALL_PORTFOLIO_VIDEOS = fullList;
 
     const activeCat = window.currentActiveCategory || 'featured';
@@ -1882,7 +1870,7 @@ function startFirestoreSync() {
       if (typeof renderDrum === 'function') renderDrum(activeList);
     }
 
-    const filmList = fsLongs.length ? fsLongs : fullList.slice(24);
+    const filmList = fsLongs.length ? fsLongs : fullList.filter(x => x.type === 'long' || x.dur === '3:00' || (x.kind && x.kind.toLowerCase().includes('film')));
     window.FILMS = filmList;
     FILMS = filmList;
     if (typeof renderFilms === 'function') renderFilms(filmList);
@@ -1898,8 +1886,8 @@ function startFirestoreSync() {
         fsShorts.push({
           id: d.id,
           fileId: fid,
-          title: v.title || 'Gym Workout',
-          kind: v.genre || 'Gym & Fitness',
+          title: v.title || 'Portfolio Video',
+          kind: v.genre || v.category || 'Portfolio',
           dur: v.duration || '0:30',
           role: v.role || 'Edit · sound design · color',
           poster: v.thumbnail || (fid ? `https://lh3.googleusercontent.com/d/${fid}=w400` : ''),
@@ -1924,8 +1912,8 @@ function startFirestoreSync() {
         fsLongs.push({
           id: d.id,
           fileId: fid,
-          title: v.title || 'Gym Workout',
-          kind: v.genre || 'Gym & Fitness',
+          title: v.title || 'Portfolio Video',
+          kind: v.genre || v.category || 'Portfolio',
           dur: v.duration || '3:00',
           poster: v.thumbnail || (fid ? `https://lh3.googleusercontent.com/d/${fid}=w400` : ''),
           thumbnail: v.thumbnail || (fid ? `https://lh3.googleusercontent.com/d/${fid}=w400` : ''),

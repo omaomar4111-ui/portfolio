@@ -16,7 +16,6 @@ DRIVE_FILES_PATH = os.path.join(CURRENT_DIR, "drive_files.json")
 PROGRESS_FILE = os.path.join(CURRENT_DIR, "migration_progress.json")
 TEMP_DIR = os.path.join(CURRENT_DIR, "temp_downloads")
 
-# Bucket name matching firebase-config.js
 BUCKET_NAME = "portfolio-35032.firebasestorage.app"
 FALLBACK_BUCKET = "portfolio-35032.appspot.com"
 
@@ -29,14 +28,14 @@ CATEGORY_MAP = {
     "06 - كافيه": ("Cafe", "كافيهات"),
     "07 - تجميل": ("Beauty", "تجميل وعناية"),
     "08 - عربيات": ("Automotive", "سيارات"),
-    "09 - جيم": ("Fitness", "جيم ولياقة"),
-    "10 - موشن": ("Motion", "موشن جرافيك"),
+    "09 - جيم": ("Gym & Fitness", "جيم ولياقة"),
+    "10 - موشن": ("Motion Graphics", "موشن جرافيك"),
     "11 - ملابس": ("Fashion", "أزياء وملابس"),
     "12 - ايجنسي": ("Agency", "أعمال الأيچنسي"),
     "AI": ("AI", "ذكاء اصطناعي"),
-    "ايفنت": ("Event", "فعاليات وتغطيات"),
+    "ايفنت": ("Events", "فعاليات وتغطيات"),
     "بلح": ("Dates", "تمور وأغذية"),
-    "سعودي": ("Saudi", "مشاريع سعودية"),
+    "سعودي": ("Saudi Projects", "مشاريع سعودية"),
     "مطعم": ("Restaurant", "مطاعم وأغذية")
 }
 
@@ -51,21 +50,19 @@ def clean_title(path_str):
 
 def main():
     print("=====================================================")
-    print("      Omar Mostafa Portfolio - Video Migrator")
+    print("  Omar Mostafa Portfolio - Idempotent Video Migrator")
     print("=====================================================")
 
     if not os.path.exists(KEY_PATH):
-        print("\n[!] ملف مفتاح الخدمة غير موجود!")
-        print(f"يرجى التأكد من وضع الملف باسم: serviceAccountKey.json داخل المجلد:")
-        print(f"-> {CURRENT_DIR}")
-        input("\nاضغط Enter للخروج...")
+        print(f"\n[!] serviceAccountKey.json not found in: {CURRENT_DIR}")
+        print("Please place your Firebase serviceAccountKey.json in the project root.")
         sys.exit(1)
 
     if not os.path.exists(DRIVE_FILES_PATH):
-        print(f"\n[!] ملف فهرس الفيديوهات drive_files.json غير موجود في: {CURRENT_DIR}")
+        print(f"\n[!] drive_files.json not found in: {CURRENT_DIR}")
         sys.exit(1)
 
-    print("\n[1/4] جاري الاتصال بـ Firebase Admin SDK...")
+    print("\n[1/4] Connecting to Firebase Admin SDK...")
     cred = credentials.Certificate(KEY_PATH)
     try:
         firebase_admin.initialize_app(cred, {'storageBucket': BUCKET_NAME})
@@ -75,25 +72,25 @@ def main():
         bucket = storage.bucket()
 
     db = firestore.client()
-    print("      تم الاتصال بـ Firestore و Storage بنجاح!")
+    print("      Connected successfully to Firestore and Storage!")
 
     os.makedirs(TEMP_DIR, exist_ok=True)
 
     with open(DRIVE_FILES_PATH, 'r', encoding='utf-8') as f:
         files = json.load(f)
 
-    # Resume capability
+    # 1. Load progress
     processed_ids = set()
     if os.path.exists(PROGRESS_FILE):
         try:
             with open(PROGRESS_FILE, 'r', encoding='utf-8') as pf:
                 processed_ids = set(json.load(pf))
-            print(f"[2/4] استئناف الترحيل: {len(processed_ids)} فيديو تم رفعهم مسبقاً.")
+            print(f"[2/4] Resuming: {len(processed_ids)} videos already uploaded.")
         except Exception:
             processed_ids = set()
 
     total = len(files)
-    print(f"[3/4] إجمالي الفيديوهات المطلوب ترحيلها: {total}")
+    print(f"[3/4] Total videos in catalog: {total}")
 
     success_count = len(processed_ids)
 
@@ -108,7 +105,7 @@ def main():
         cat_en, cat_ar = CATEGORY_MAP.get(raw_folder, (raw_folder, raw_folder))
         title = clean_title(rel_path)
 
-        print(f"\n--- [{idx}/{total}] جاري معالجة: {title} ({raw_folder}) ---")
+        print(f"\n--- [{idx}/{total}] Processing: {title} ({raw_folder}) ---")
 
         safe_name = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', os.path.basename(rel_path))
         temp_video_path = os.path.join(TEMP_DIR, f"{file_id}_{safe_name}")
@@ -116,57 +113,60 @@ def main():
             temp_video_path += '.mp4'
 
         try:
-            # 1. Download via gdown
-            print("  -> جاري التنزيل من Google Drive...")
+            # Step A: Download
+            print("  -> Downloading from Google Drive...")
             gdown.download(id=file_id, output=temp_video_path, quiet=True)
 
             if not os.path.exists(temp_video_path) or os.path.getsize(temp_video_path) == 0:
-                print("  [!] فشل التحميل أو الملف فارغ. تخطي.")
+                print("  [!] Download failed or empty file. Skipping.")
                 continue
 
             size_mb = os.path.getsize(temp_video_path) / (1024 * 1024)
-            print(f"  -> تم التنزيل بنجاح ({size_mb:.2f} MB)")
+            print(f"  -> Downloaded: {size_mb:.2f} MB")
 
-            # 2. Upload to Firebase Storage
+            # Step B: Upload to Firebase Storage
             storage_dest = f"videos/{file_id}_{safe_name}"
             blob = bucket.blob(storage_dest)
             blob.content_type = 'video/mp4'
 
-            print("  -> جاري الرفع إلى Firebase Storage...")
+            print("  -> Uploading to Firebase Storage...")
             blob.upload_from_filename(temp_video_path)
 
             try:
                 blob.make_public()
                 direct_url = blob.public_url
             except Exception:
-                # Standard Firebase media token URL format
                 direct_url = f"https://firebasestorage.googleapis.com/v0/b/{bucket.name}/o/{storage_dest.replace('/', '%2F')}?alt=media"
 
-            print(f"  -> تم الرفع والرابط المباشر: {direct_url}")
+            print(f"  -> Direct public URL: {direct_url}")
 
-            # 3. Add to Firestore shortVideos
+            # Step C: Deterministic Idempotent Document Write
+            # Use fixed doc ID = file_id so re-runs never duplicate documents!
+            # Provide both 'genre' and 'category' so all frontend consumers resolve correctly
             doc_data = {
+                'id': file_id,
+                'fileId': file_id,
                 'title': title,
+                'genre': cat_en,
                 'category': cat_en,
                 'categoryAr': cat_ar,
                 'videoUrl': direct_url,
                 'thumbnail': f"https://lh3.googleusercontent.com/d/{file_id}=w600",
                 'order': idx,
-                'fileId': file_id,
-                'createdAt': firestore.SERVER_TIMESTAMP
+                'source': 'Firebase Storage',
+                'updatedAt': firestore.SERVER_TIMESTAMP
             }
 
-            db.collection('shortVideos').add(doc_data)
-            print("  -> تم الحفظ في قاعدة بيانات Firestore بنجاح!")
+            db.collection('shortVideos').document(file_id).set(doc_data, merge=True)
+            print(f"  -> Firestore doc shortVideos/{file_id} saved/updated successfully!")
 
-            # 4. Save progress
             processed_ids.add(file_id)
             success_count += 1
             with open(PROGRESS_FILE, 'w', encoding='utf-8') as pf:
                 json.dump(list(processed_ids), pf, ensure_ascii=False)
 
         except Exception as err:
-            print(f"  [X] حدث خطأ أثناء المعالجة: {err}")
+            print(f"  [X] Error on {file_id}: {err}")
         finally:
             if os.path.exists(temp_video_path):
                 try:
@@ -175,7 +175,7 @@ def main():
                     pass
 
     print("\n=====================================================")
-    print(f" اكتملت العملية بنجاح! تم رفع {success_count} من أصل {total} فيديو.")
+    print(f" Migration finished! {success_count}/{total} files in Firebase Storage & Firestore.")
     print("=====================================================")
 
 if __name__ == '__main__':

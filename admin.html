@@ -247,7 +247,7 @@
         </div>
         <button class="btn secondary" id="resetShortsBtn" style="font-size:12px;">🔄 استعادة فيديوهات Drive (24 فيديو)</button>
         </div>
-        <div id="shortsList"><div id="loading">جاري التحميل…</div></div>
+        <div id="shortsList"><div class="loading-state">جاري التحميل…</div></div>
       </div>
     </div>
 
@@ -262,7 +262,7 @@
         </div>
         <button class="btn secondary" id="resetLongsBtn" style="font-size:12px;">🔄 استعادة فيديوهات Drive (22 فيديو)</button>
         </div>
-        <div id="longsList"><div id="loading">جاري التحميل…</div></div>
+        <div id="longsList"><div class="loading-state">جاري التحميل…</div></div>
       </div>
     </div>
 
@@ -527,7 +527,7 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
     const AUTHORIZED_ADMINS = ['omaomar4111@gmail.com'];
     if (auth) {
       auth.onAuthStateChanged(user => {
-        if (user && AUTHORIZED_ADMINS.includes(user.email)) {
+        if (user && AUTHORIZED_ADMINS.includes(user.email) && user.emailVerified) {
           document.getElementById('loginView').style.display = 'none';
           document.getElementById('dashView').style.display = 'block';
           loadAll();
@@ -536,6 +536,10 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
             auth.signOut();
             const errEl = document.getElementById('loginErr');
             if (errEl) errEl.textContent = 'عذراً، هذا الحساب غير مصرح له بالدخول كمسؤول.';
+          } else if (user && !user.emailVerified) {
+            auth.signOut();
+            const errEl = document.getElementById('loginErr');
+            if (errEl) errEl.textContent = 'يرجى تأكيد البريد الإلكتروني (Email Verification) أولاً لتفعيل الصلاحية.';
           }
           document.getElementById('loginView').style.display = 'block';
           document.getElementById('dashView').style.display = 'none';
@@ -752,7 +756,7 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
       list.innerHTML = docs.map(v => {
         const safeTitle = escapeHTML(v.title || '(بدون عنوان)');
         const safeDuration = escapeHTML(v.duration || 'غير محدد');
-        const safeGenre = escapeHTML(v.genre || 'Gym & Fitness');
+        const safeGenre = escapeHTML(v.genre || v.category || 'Portfolio');
         let thumbUrl = v.thumbnail || v.poster || '';
         if (v.fileId && !thumbUrl) thumbUrl = 'https://lh3.googleusercontent.com/d/' + v.fileId + '=w400';
         const safeThumb = sanitizeUrl(thumbUrl) || 'profile.jpg';
