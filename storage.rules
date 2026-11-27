@@ -2,35 +2,42 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     
-    // Helper function to check if requester is authenticated admin
+    // Strict Admin check: authenticated, verified email or admin custom claim
     function isAdmin() {
       return request.auth != null && 
-             request.auth.token.email in ['omaomar4111@gmail.com'];
+             (request.auth.token.admin == true || 
+              (request.auth.token.email in ['omaomar4111@gmail.com'] && 
+               request.auth.token.email_verified == true));
     }
 
-    // Public read for portfolio visitors, write restricted strictly to admin in approved paths
+    // Portfolio videos: Public read, admin create/update with validation, admin delete without request.resource validation
     match /videos/{videoId} {
       allow read: if true;
-      allow write: if isAdmin() && 
-                   request.resource.size < 250 * 1024 * 1024 && // 250MB limit per video
-                   request.resource.contentType.matches('video/.*');
+      allow create, update: if isAdmin() && 
+                            request.resource.size < 250 * 1024 * 1024 &&
+                            request.resource.contentType.matches('video/.*');
+      allow delete: if isAdmin();
     }
 
+    // Thumbnails: Public read, admin create/update with image validation, admin delete
     match /thumbnails/{thumbId} {
       allow read: if true;
-      allow write: if isAdmin() && 
-                   request.resource.size < 10 * 1024 * 1024 && // 10MB limit per image
-                   request.resource.contentType.matches('image/.*');
+      allow create, update: if isAdmin() && 
+                            request.resource.size < 10 * 1024 * 1024 &&
+                            request.resource.contentType.matches('image/.*');
+      allow delete: if isAdmin();
     }
 
+    // Profile photos: Public read, admin create/update, admin delete
     match /profile/{imageName} {
       allow read: if true;
-      allow write: if isAdmin() && 
-                   request.resource.size < 10 * 1024 * 1024 &&
-                   request.resource.contentType.matches('image/.*');
+      allow create, update: if isAdmin() && 
+                            request.resource.size < 10 * 1024 * 1024 &&
+                            request.resource.contentType.matches('image/.*');
+      allow delete: if isAdmin();
     }
 
-    // Default deny for all other paths
+    // Explicit default deny for all other paths
     match /{allPaths=**} {
       allow read: if true;
       allow write: if false;
