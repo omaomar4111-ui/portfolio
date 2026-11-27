@@ -2,12 +2,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Strict Admin check: authenticated, email matches, and email verified or custom claims
+    // Strict Admin check: Verified email AND exact admin email match
     function isAdmin() {
       return request.auth != null && 
-             (request.auth.token.admin == true || 
-              (request.auth.token.email in ['omaomar4111@gmail.com'] && 
-               request.auth.token.email_verified == true));
+             request.auth.token.email in ['omaomar4111@gmail.com'] && 
+             request.auth.token.email_verified == true;
     }
 
     // Public videos collections: Read is public, write is strictly admin
@@ -29,13 +28,7 @@ service cloud.firestore {
 
     // Internal sensitive settings: Strictly admin read & write
     match /settings/{docId} {
-      allow read: if isAdmin();
-      allow write: if isAdmin();
-    }
-
-    // Explicit default deny for any other document or collection
-    match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if isAdmin() && docId != 'main';
     }
   }
 }
