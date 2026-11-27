@@ -524,13 +524,19 @@ https://www.youtube.com/watch?v=kY31..."></textarea>
     }
 
     // إدارة تسجيل الدخول
+    const AUTHORIZED_ADMINS = ['omaomar4111@gmail.com'];
     if (auth) {
       auth.onAuthStateChanged(user => {
-        if (user) {
+        if (user && AUTHORIZED_ADMINS.includes(user.email)) {
           document.getElementById('loginView').style.display = 'none';
           document.getElementById('dashView').style.display = 'block';
           loadAll();
         } else {
+          if (user && !AUTHORIZED_ADMINS.includes(user.email)) {
+            auth.signOut();
+            const errEl = document.getElementById('loginErr');
+            if (errEl) errEl.textContent = 'عذراً، هذا الحساب غير مصرح له بالدخول كمسؤول.';
+          }
           document.getElementById('loginView').style.display = 'block';
           document.getElementById('dashView').style.display = 'none';
         }

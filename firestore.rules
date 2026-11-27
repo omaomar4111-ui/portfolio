@@ -1,8 +1,32 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // Helper function to check if requester is authenticated admin
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.email in ['omaomar4111@gmail.com'];
+    }
+
+    // Public read for portfolio visitors, write restricted strictly to authenticated admin
+    match /shortVideos/{videoId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /longVideos/{videoId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Default deny for all other collections
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

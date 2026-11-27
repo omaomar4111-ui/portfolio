@@ -1,9 +1,39 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    
+    // Helper function to check if requester is authenticated admin
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.email in ['omaomar4111@gmail.com'];
+    }
+
+    // Public read for portfolio visitors, write restricted strictly to admin in approved paths
+    match /videos/{videoId} {
+      allow read: if true;
+      allow write: if isAdmin() && 
+                   request.resource.size < 250 * 1024 * 1024 && // 250MB limit per video
+                   request.resource.contentType.matches('video/.*');
+    }
+
+    match /thumbnails/{thumbId} {
+      allow read: if true;
+      allow write: if isAdmin() && 
+                   request.resource.size < 10 * 1024 * 1024 && // 10MB limit per image
+                   request.resource.contentType.matches('image/.*');
+    }
+
+    match /profile/{imageName} {
+      allow read: if true;
+      allow write: if isAdmin() && 
+                   request.resource.size < 10 * 1024 * 1024 &&
+                   request.resource.contentType.matches('image/.*');
+    }
+
+    // Default deny for all other paths
     match /{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if false;
     }
   }
 }
