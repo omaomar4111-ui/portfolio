@@ -1,6 +1,6 @@
 /**
  * Omar Mostafa Portfolio - Full Video Catalog
- * Direct MP4 Stream Engine (217 Videos across 17 Categories)
+ * Clean Production Release (217 Videos)
  */
 
 window.ALL_PORTFOLIO_VIDEOS = [
@@ -1102,7 +1102,7 @@ window.ALL_PORTFOLIO_VIDEOS = [
   {
     "id": "1-GoxsgVhQTnZtM-cn8_jiWKtMe5e5Vi4",
     "fileId": "1-GoxsgVhQTnZtM-cn8_jiWKtMe5e5Vi4",
-    "title": "Chandeliers - رجب عيسي ",
+    "title": "Chandeliers - رجب عيسي",
     "type": "short",
     "kind": "Chandeliers",
     "categoryAr": "نجف وإضاءة",
@@ -1162,7 +1162,7 @@ window.ALL_PORTFOLIO_VIDEOS = [
   {
     "id": "1tXS6vGOFu97bzvw5Dprk0Lm71zbmfFBY",
     "fileId": "1tXS6vGOFu97bzvw5Dprk0Lm71zbmfFBY",
-    "title": "Cafe - .........mp4",
+    "title": "Cafe -",
     "type": "short",
     "kind": "Cafe",
     "categoryAr": "كافيهات",
@@ -3067,7 +3067,7 @@ window.ALL_PORTFOLIO_VIDEOS = [
   {
     "id": "1clUUz3pU-3r3_3VzLeELMF9A28i39tHD",
     "fileId": "1clUUz3pU-3r3_3VzLeELMF9A28i39tHD",
-    "title": "Events - UG---",
+    "title": "Events - UG-",
     "type": "short",
     "kind": "Events",
     "categoryAr": "فعاليات وتغطيات",
@@ -3157,7 +3157,7 @@ window.ALL_PORTFOLIO_VIDEOS = [
   {
     "id": "1rlJ4AIRQvsgawKQuG0vmlH4gj9x1GsU6",
     "fileId": "1rlJ4AIRQvsgawKQuG0vmlH4gj9x1GsU6",
-    "title": "Dates & Food - ايفنت ",
+    "title": "Dates & Food - ايفنت",
     "type": "short",
     "kind": "Dates & Food",
     "categoryAr": "تمور وأغذية",
@@ -3202,7 +3202,7 @@ window.ALL_PORTFOLIO_VIDEOS = [
   {
     "id": "1mnb9GBVclbLfnHOdTXJ4dncAWfNx3LMB",
     "fileId": "1mnb9GBVclbLfnHOdTXJ4dncAWfNx3LMB",
-    "title": "Restaurant - .........mp4",
+    "title": "Restaurant -",
     "type": "short",
     "kind": "Restaurant",
     "categoryAr": "مطاعم وأغذية",
@@ -3217,7 +3217,7 @@ window.ALL_PORTFOLIO_VIDEOS = [
   {
     "id": "1NJQxiLGnX8WxcomTaNk4UxZwZiEImkxD",
     "fileId": "1NJQxiLGnX8WxcomTaNk4UxZwZiEImkxD",
-    "title": "Restaurant - ....mp4",
+    "title": "Restaurant -",
     "type": "short",
     "kind": "Restaurant",
     "categoryAr": "مطاعم وأغذية",
